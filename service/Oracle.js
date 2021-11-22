@@ -3,8 +3,8 @@ const config = require('../config/Config');
 
 if (process.platform === 'win32') { // Windows
   oracledb.initOracleClient({ libDir: 'D:\\app\\mathe\\product\\11.2.0\\client_1\\instantclient' });
-} else if (process.platform === 'darwin') { // macOS
-  oracledb.initOracleClient({ libDir: process.env.HOME + '/Downloads/instantclient_19_8' });
+} else if (process.platform === 'linux') { // macOS
+  oracledb.initOracleClient({ libDir: '/opt/oracle/instantclient_21_4' });
 }
 
 let connection;
