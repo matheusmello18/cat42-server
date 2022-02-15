@@ -5,6 +5,7 @@ const path = require("path")
 const cors = require("cors")
 
 const cliente = require("./route/v1/cliente")
+const users = require("./route/user/users")
 
 var corsOptions = {
   origin: ['http://localhost:3000','http://192.168.1.188:3000'], // colocar aqui o ip externo e o nome do site
@@ -20,6 +21,7 @@ serve.use(bodyParser.json())
 serve.use(express.static(path.join(__dirname, "public")))
 
 serve.use('/api/v1/cliente', cliente)
+serve.use('/api/user', users)
 
 serve.get('*', (req, res) => {
   res.json({msg: "rota não existe"})
