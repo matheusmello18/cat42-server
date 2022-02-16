@@ -1,3 +1,5 @@
+// exempos de como uilizar os oracledb
+// https://github.com/oracle/node-oracledb/blob/main/examples
 const oracledb = require('oracledb');
 const config = require('../config/Config');
 
