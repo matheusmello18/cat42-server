@@ -1,3 +1,4 @@
+// Precisa ativar no gmail para permitir o loginho do e-mail configurado fazer os envios dos e-mail segue a pagina que explica: https://nodemailer.com/usage/using-gmail/
 const nodemailer = require("nodemailer");
 const config = require('../config/Config');
 
@@ -256,4 +257,113 @@ module.exports.administrador = async (rows) => {
       }
     },
   });
+}
+
+/**
+ * 
+ * @param usuario: { 
+    DM_ATIVO: "S"
+    E_MAIL: "MATHEUS.MELLO@PAINELFISCAL.COM.BR"
+    HASH_RECOVERY: "f84997f7804666f0118af5578d2ee4e2"
+    ID_USUARIO: 176
+    NM_COMPLETO: "MATHEUS DE MELLO"
+    NM_USUARIO: "MATHEUS"
+  }
+ */
+
+module.exports.recuperarSenha = async (usuario, hash) => {
+
+  let transporter = nodemailer.createTransport(config.email);
+
+  let info = await transporter.sendMail({
+    from: `"Recuperar Senha 👻" <${config.email.auth.user}>`, // sender address
+    to: `${usuario.E_MAIL}` , // list of receivers
+    bcc: "ffcore.contato@gmail.com, matheus.gnu@gmail.com",
+    subject: `${usuario.NM_COMPLETO} - Segue as instruções para recuperar sua senha ✔`, // Subject line
+    text: `Instruções para recuperar a senha.`, // plain text body
+    html: 
+    `
+    <!doctype html>
+    <html lang="en">
+      <head>
+        <title>Simulador Cat42</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+      </head>
+      <body>
+          
+        <div class="card text-center">
+          <div class="card-header bg-white">
+            <div class="container">
+              <div class="row justify-content-center">
+                <div class="col-5 align-self-center" style="max-width: 600px !important;">
+                  <img src="http://painelfiscal.com.br/Assets/images/painel-fiscal-horizontal-dark.png" class="img-thumbnail" alt="..." style="width: 30% !important;">
+                  <img src="http://painelfiscal.com.br/Assets/images/bolsa-nacional-icms-horizontal.png" class="img-thumbnail" alt="..." style="width: 30% !important;">
+                  <img src="http://painelfiscal.com.br/Assets/images/Painel-Contabil.png" class="img-thumbnail" alt="..." style="width: 30% !important;">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <h2 class="card-title">${usuario.NM_COMPLETO}. Iremos recuperar sua senha.</h2>
+            <p class="card-text">Click no link para ser direcionado a recuperação de senha. <a href="${config.appFrontEnd.baseURL}/recovery/${hash}"> Recuperar Senha</a></p>
+          </div>
+        </div>
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+      </body>
+    </html>  
+    `, // html body
+    amp: 
+    `
+    <!doctype html>
+    <html lang="en">
+      <head>
+        <title>Simulador Cat42</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+      </head>
+      <body>
+          
+        <div class="card text-center">
+          <div class="card-header bg-white">
+            <div class="container">
+              <div class="row justify-content-center">
+                <div class="col-5 align-self-center" style="max-width: 600px !important;">
+                  <img src="http://painelfiscal.com.br/Assets/images/painel-fiscal-horizontal-dark.png" class="img-thumbnail" alt="..." style="width: 30% !important;">
+                  <img src="http://painelfiscal.com.br/Assets/images/bolsa-nacional-icms-horizontal.png" class="img-thumbnail" alt="..." style="width: 30% !important;">
+                  <img src="http://painelfiscal.com.br/Assets/images/Painel-Contabil.png" class="img-thumbnail" alt="..." style="width: 30% !important;">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+          <h2 class="card-title">${usuario.NM_COMPLETO}. Iremos recuperar sua senha.</h2>
+          <p class="card-text">Click no link para ser direcionado a recuperação de senha. <a href="${config.appFrontEnd.baseURL}/recovery/${usuario.HASH_RECOVERY}"> Recuperar Senha</a></p>
+          </div>
+        </div>
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+      </body>
+    </html>  
+    `,
+  });
+
+  /*console.log("Message sent: %s", info.messageId);
+
+  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));*/
 }

@@ -33,11 +33,48 @@ const sqlUpdate = `UPDATE CTRL_USUARIO SET HASH_RECOVERY = :HASH_RECOVERY WHERE 
 module.exports.updateHash = async (id, hash) => {
   try {
     let params = {
-      HASH_RECOVERY: hash,
-      ID_USUARIO: id
+      ID_USUARIO: id,
+      HASH_RECOVERY: hash
     };
 
-    return await Oracle.execute(qry, params, {autoCommit: true});
+    return await Oracle.update(sqlUpdate, params);
+  
+  } catch (err) {
+    console.log(err.message);
+  }
+}
+
+const sqlHash = `SELECT ID_USUARIO, NM_COMPLETO, E_MAIL, NM_USUARIO, DM_ATIVO, HASH_RECOVERY FROM CTRL_USUARIO WHERE HASH_RECOVERY = :HASH_RECOVERY`;
+
+module.exports.selectByHash = async (hash) => {
+  try {
+    params = {
+      HASH_RECOVERY: hash,
+    };
+
+    return await Oracle.select(sqlHash, params);
+  
+  } catch (err) {
+    console.log(err.message);
+  }
+}
+
+const sqlUpdateHash = `UPDATE CTRL_USUARIO 
+                          SET HASH_RECOVERY = :HASH_RECOVERY,
+                          SENHA_USUARIO_WEB = :SENHA_USUARIO_WEB,
+                          SENHA_USUARIO     = :SENHA_USUARIO
+                        WHERE ID_USUARIO = :ID_USUARIO`;
+
+module.exports.updateSenha = async (id, senhaWeb, senha) => {
+  try {
+    let params = {
+      ID_USUARIO: id,
+      HASH_RECOVERY: null,
+      SENHA_USUARIO_WEB: senhaWeb,
+      SENHA_USUARIO: senha,
+    };
+
+    return await Oracle.update(sqlUpdateHash, params);
   
   } catch (err) {
     console.log(err.message);

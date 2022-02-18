@@ -1,3 +1,7 @@
+module.exports.appFrontEnd = {
+  baseURL: "http://localhost:3000"
+}
+
 module.exports.db = {
   user: "MF_PRODUCAO",
   password: "mf",
