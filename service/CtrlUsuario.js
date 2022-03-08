@@ -1,8 +1,29 @@
 const oracledb = require('oracledb');
 const Oracle = require('./Oracle');
 
-const sql = `SELECT ID_USUARIO, NM_COMPLETO, E_MAIL, NM_USUARIO, DM_ATIVO, HASH_RECOVERY FROM CTRL_USUARIO WHERE E_MAIL = :E_MAIL`;
-const sqlWhereSenha = ` AND SENHA_USUARIO_WEB = :SENHA_USUARIO_WEB`
+const sql = `SELECT S.ID_SIMUL_CADASTRO,
+                    TO_CHAR(S.DT_CADASTRO, 'DD/MM/YYYY') DT_CADASTRO,
+                    S.NM_EMPRESA,
+                    S.NR_CNPJ,
+                    S.NM_CONTATO,
+                    S.NR_TELEFONE,
+                    S.DS_EMAIL,
+                    O.ID_ORGAO, 
+                    O.DS_ORGAO,
+                    S.DM_ATIVO DM_ATIVO_SIMULADOR,
+                    TO_CHAR(S.DT_PERIODO, 'DD/MM/YYYY') DT_PERIODO,
+                    C.ID_USUARIO, 
+                    C.NM_COMPLETO, 
+                    C.E_MAIL, 
+                    C.NM_USUARIO, 
+                    C.DM_ATIVO DM_ATIVO_USUARIO, 
+                    C.HASH_RECOVERY,
+                    S.ID_EMPRESA
+               FROM SIMUL_CADASTRO S
+              INNER JOIN CTRL_USUARIO C ON (C.ID_USUARIO = S.ID_USUARIO)
+              INNER JOIN IN_ORGAO O ON (O.ID_ORGAO = S.ID_ORGAO)
+              WHERE C.E_MAIL = :E_MAIL`;
+const sqlWhereSenha = ` AND C.SENHA_USUARIO_WEB = :SENHA_USUARIO_WEB`;
 
 module.exports.select = async (email, senha = '') => {
   try {
@@ -28,7 +49,9 @@ module.exports.select = async (email, senha = '') => {
   }
 }
 
-const sqlUpdate = `UPDATE CTRL_USUARIO SET HASH_RECOVERY = :HASH_RECOVERY WHERE ID_USUARIO = :ID_USUARIO`;
+const sqlUpdate = `UPDATE CTRL_USUARIO 
+                      SET HASH_RECOVERY = :HASH_RECOVERY 
+                    WHERE ID_USUARIO    = :ID_USUARIO`;
 
 module.exports.updateHash = async (id, hash) => {
   try {
@@ -44,7 +67,28 @@ module.exports.updateHash = async (id, hash) => {
   }
 }
 
-const sqlHash = `SELECT ID_USUARIO, NM_COMPLETO, E_MAIL, NM_USUARIO, DM_ATIVO, HASH_RECOVERY FROM CTRL_USUARIO WHERE HASH_RECOVERY = :HASH_RECOVERY`;
+const sqlHash = `SELECT S.ID_SIMUL_CADASTRO,
+                        TO_CHAR(S.DT_CADASTRO, 'DD/MM/YYYY') DT_CADASTRO,
+                        S.NM_EMPRESA,
+                        S.NR_CNPJ,
+                        S.NM_CONTATO,
+                        S.NR_TELEFONE,
+                        S.DS_EMAIL,
+                        O.ID_ORGAO, 
+                        O.DS_ORGAO,
+                        S.DM_ATIVO DM_ATIVO_SIMULADOR,
+                        TO_CHAR(S.DT_PERIODO, 'DD/MM/YYYY') DT_PERIODO,
+                        C.ID_USUARIO, 
+                        C.NM_COMPLETO, 
+                        C.E_MAIL, 
+                        C.NM_USUARIO, 
+                        C.DM_ATIVO DM_ATIVO_USUARIO, 
+                        C.HASH_RECOVERY,
+                        S.ID_EMPRESA
+                   FROM SIMUL_CADASTRO S
+                  INNER JOIN CTRL_USUARIO C ON (C.ID_USUARIO = S.ID_USUARIO)
+                  INNER JOIN IN_ORGAO     O ON (O.ID_ORGAO   = S.ID_ORGAO)
+                  WHERE C.HASH_RECOVERY = :HASH_RECOVERY`;
 
 module.exports.selectByHash = async (hash) => {
   try {
@@ -60,10 +104,10 @@ module.exports.selectByHash = async (hash) => {
 }
 
 const sqlUpdateHash = `UPDATE CTRL_USUARIO 
-                          SET HASH_RECOVERY = :HASH_RECOVERY,
-                          SENHA_USUARIO_WEB = :SENHA_USUARIO_WEB,
-                          SENHA_USUARIO     = :SENHA_USUARIO
-                        WHERE ID_USUARIO = :ID_USUARIO`;
+                          SET HASH_RECOVERY     = :HASH_RECOVERY,
+                              SENHA_USUARIO_WEB = :SENHA_USUARIO_WEB,
+                              SENHA_USUARIO     = :SENHA_USUARIO
+                        WHERE ID_USUARIO        = :ID_USUARIO`;
 
 module.exports.updateSenha = async (id, senhaWeb, senha) => {
   try {
