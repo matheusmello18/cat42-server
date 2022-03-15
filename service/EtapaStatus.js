@@ -34,3 +34,25 @@ module.exports.select = async (id_empresa, id_usuario, id_simul_etapa) => {
     console.log(err.message);
   }
 }
+
+const sqlInser = `insert into simul_etapa_status (id_simul_status,dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status)
+values (:id_simul_status,:dt_periodo,:id_simul_tp_status,:id_simul_etapa,:id_empresa,:id_usuario,:ds_status)`;
+
+module.exports.insert = async ({id_simul_status,dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status}) => {
+  try {
+    let params = {
+      id_simul_status: id_simul_status,
+      dt_periodo: dt_periodo,
+      id_simul_tp_status: id_simul_tp_status,
+      id_simul_etapa: id_simul_etapa,
+      id_empresa: id_empresa,
+      id_usuario: id_usuario,
+      ds_status: ds_status
+    };
+
+    return await Oracle.insert(sqlInsert, params);
+  
+  } catch (err) {
+    console.log(err.message);
+  }
+}
