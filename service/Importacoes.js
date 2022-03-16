@@ -1,18 +1,22 @@
 const etapaStatus = require('./EtapaStatus');
 const ProxCod = require('./ProxCod');
+const ExcelJS = require('exceljs');
 
-module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo) => {
+module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nr_cnpj) => {
   try {
     console.log(filename, path);
-    const workbook = new Excel.Workbook();
-    await workbook.xlsx.readFile(`../uploads/${filename}`);
-    workbook.eachSheet(function(worksheet, sheetId) {
-      console.log(sheetId);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(path);
+    const worksheet = workbook.worksheets[0];
 
-      worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+    worksheet.eachRow({ includeEmpty: false }, function(row, rowNumber) {
+      if (![1,2].includes(rowNumber)){
         console.log('Row ' + rowNumber + ' = ' + JSON.stringify(row.values));
-      });
-
+        console.log(row.getCell(6).value, row.getCell(7).value, row.getCell(8).value);
+        /*row.eachCell((cell, colNumber) => {
+          console.log(cell.value, colNumber);
+        })*/
+      }
     });
 
     /* const nProx_Codigo = await ProxCod("SIMUL_CADASTRO");

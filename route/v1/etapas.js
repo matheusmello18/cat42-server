@@ -1,11 +1,13 @@
-const express = require("express")
-const path = require("path")
-const multer = require("multer")
+const express = require("express");
+const path = require("path");
+const multer = require("multer");
+var fs = require('fs');
 const router = express.Router();
 
 const etapas = require("../../service/Etapas")
 const etapaStatus = require('../../service/EtapaStatus');
 const Importacoes = require('../../service/Importacoes');
+const { Console } = require("console");
 
 router.post("/show", async (req, res) => {
   var retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
@@ -26,7 +28,9 @@ router.post("/show", async (req, res) => {
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
       // Uploads is the Upload_folder_name
-      cb(null, "uploads")
+      if (!fs.existsSync(`uploads/${req.body.nr_cnpj}`))
+        fs.mkdirSync(`uploads/${req.body.nr_cnpj}`, { recursive: true })
+      cb(null, `uploads/${req.body.nr_cnpj}`)
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + "-" + file.originalname)
@@ -41,7 +45,10 @@ var upload = multer({
     limits: { fileSize: maxSize },
     fileFilter: function (req, file, cb){
         // Set the filetypes, it is optional
-        var filetypes = /x-xls|xlsx|xls|vnd.openxmlformats-officedocument.spreadsheetml.sheet|excel/;
+        var filetypes;
+        if (req.body.nm_method === 'ImportarArqExcel'){
+          filetypes = /x-xls|xlsx|xls|vnd.openxmlformats-officedocument.spreadsheetml.sheet|excel/;
+        }
         var mimetype = filetypes.test(file.mimetype);
   
         var extname = filetypes.test(path.extname(
@@ -58,7 +65,7 @@ var upload = multer({
 // mypic is the name of file attribute
 }).single("arquivo"); 
 
-router.post("/upload", (req, res) => {  
+router.post("/upload", (req, res) => {
     upload(req,res, async function(err) {
     if(err) {
         // ERROR occured (here it can be occured due
@@ -68,11 +75,8 @@ router.post("/upload", (req, res) => {
     }
     else {
         // SUCCESS, image successfully uploaded
-        var retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
-
-        if (retorno.rows[0].NM_METHOD === 'ImportarArqExcel'){
-          console.log('entrou');
-          Importacoes.Excel(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
+        if (req.body.nm_method === 'ImportarArqExcel'){
+          Importacoes.Excel(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nr_cnpj);
         }
 
         retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
@@ -82,5 +86,14 @@ router.post("/upload", (req, res) => {
     }
   })
 })
+
+router.get("/download", async (req, res) => {
+
+  if (req.query.arquivo === 'ImportarArqExcel'){
+    const file = `${process.env.INIT_CWD}\\download\\planilha\\modelo\\produto.xlsx`;
+    res.download(file); 
+  }
+  
+});
 
 module.exports = router;
