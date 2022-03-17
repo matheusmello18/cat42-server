@@ -7,7 +7,6 @@ const router = express.Router();
 const etapas = require("../../service/Etapas")
 const etapaStatus = require('../../service/EtapaStatus');
 const Importacoes = require('../../service/Importacoes');
-const { Console } = require("console");
 
 router.post("/show", async (req, res) => {
   var retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
@@ -44,45 +43,59 @@ var upload = multer({
     storage: storage,
     limits: { fileSize: maxSize },
     fileFilter: function (req, file, cb){
-        // Set the filetypes, it is optional
-        var filetypes;
-        if (req.body.nm_method === 'ImportarArqExcel'){
-          filetypes = /x-xls|xlsx|xls|vnd.openxmlformats-officedocument.spreadsheetml.sheet|excel/;
-        }
-        var mimetype = filetypes.test(file.mimetype);
-  
-        var extname = filetypes.test(path.extname(
-                    file.originalname).toLowerCase());
-        
-        if (mimetype && extname) {
-            return cb(null, true);
-        }
+      // Set the filetypes, it is optional
+
+      if (req.body.nm_method === 'ImportarArqExcel'){
+        var filetypes = /x-xls|xlsx|xls|vnd.openxmlformats-officedocument.spreadsheetml.sheet|excel/;
+      } else if (req.body.nm_method === 'ImportarArqTexto') {
+        var filetypes = /text|txt|tex\/plain|plain/;
+      } else if (req.body.nm_method === 'ImportarArqXML') {
+        var filetypes = /xml|xhtml+xml/;
+      } else {
+        var filetypes = /||/;
+      }
+
+      var mimetype = filetypes.test(file.mimetype);
+
+      var extname  = filetypes.test(path.extname(file.originalname).toLowerCase());
       
-        cb("Error: File upload only supports the "
-                + "following filetypes - " + filetypes);
-      } 
+      if (mimetype && extname) {
+          return cb(null, true);
+      }
+    
+      if (req.body.nm_method === 'ImportarArqExcel'){
+        cb("O upload do arquivo não é compativel com o esperado. Permitdo arquivo Excel");
+      } else if (req.body.nm_method === 'ImportarArqTexto') {
+        cb("O upload do arquivo não é compativel com o esperado. Permitdo arquivo Texto");
+      } else if (req.body.nm_method === 'ImportarArqXML') {
+        cb("O upload do arquivo não é compativel com o esperado. Permitdo arquivo XML");
+      }
+    } 
   
 // mypic is the name of file attribute
 }).single("arquivo"); 
 
-router.post("/upload", (req, res) => {
-    upload(req,res, async function(err) {
+router.post("/upload", async (req, res) => {
+    await upload(req,res, async function(err) {
     if(err) {
-        // ERROR occured (here it can be occured due
-        // to uploading image of size greater than
-        // 1MB or uploading different file type)
-        return res.status(200).json({success:"false", message: err})
-    }
-    else {
-        // SUCCESS, image successfully uploaded
-        if (req.body.nm_method === 'ImportarArqExcel'){
-          Importacoes.Excel(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nr_cnpj);
-        }
+      // ERROR occured (here it can be occured due
+      // to uploading image of size greater than
+      // 5MB or uploading different file type)
+      return res.status(200).json({success:"false", message: err, row: []})
+    } else {
+      // SUCCESS, image successfully uploaded
+      if (req.body.nm_method === 'ImportarArqExcel') {
+        Importacoes.Excel(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nr_cnpj);
+      } else if (req.body.nm_method === 'ImportarArqTexto') {
+        Importacoes.Text(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nr_cnpj);
+      } else if (req.body.nm_method === 'ImportarArqXML') {
+        Importacoes.Xml(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nr_cnpj);
+      }
 
-        retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
-        var retStatus = await etapaStatus.select(req.body.id_empresa, req.body.id_usuario, req.body.id_simul_etapa);
-        retorno.rows[0].STATUS = retStatus.rows;
-        return res.status(200).json({success:"true", row: retorno.rows[0]})
+      retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
+      var retStatus = await etapaStatus.select(req.body.id_empresa, req.body.id_usuario, req.body.id_simul_etapa);
+      retorno.rows[0].STATUS = retStatus.rows;
+      return res.status(200).json({success:"true", message: 'Importação finalizada.', row: retorno.rows[0]});
     }
   })
 })
@@ -90,7 +103,7 @@ router.post("/upload", (req, res) => {
 router.get("/download", async (req, res) => {
 
   if (req.query.arquivo === 'ImportarArqExcel'){
-    const file = `${process.env.INIT_CWD}\\download\\planilha\\modelo\\produto.xlsx`;
+    const file = `${process.env.INIT_CWD}\\download\\planilha\\modelo\\Cat42_Simulador_CadProdutos.xlsx`;
     res.download(file); 
   }
   

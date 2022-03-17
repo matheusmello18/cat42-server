@@ -38,10 +38,11 @@ module.exports.select = async (id_empresa, id_usuario, id_simul_etapa) => {
 const sqlInser = `insert into simul_etapa_status (id_simul_status,dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status)
 values (:id_simul_status,:dt_periodo,:id_simul_tp_status,:id_simul_etapa,:id_empresa,:id_usuario,:ds_status)`;
 
-module.exports.insert = async ({id_simul_status,dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status}) => {
+module.exports.insert = async (dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status) => {
+  const nProx_Codigo = await ProxCod("SIMUL_CADASTRO");
   try {
     let params = {
-      id_simul_status: id_simul_status,
+      id_simul_status: nProx_Codigo,
       dt_periodo: dt_periodo,
       id_simul_tp_status: id_simul_tp_status,
       id_simul_etapa: id_simul_etapa,
