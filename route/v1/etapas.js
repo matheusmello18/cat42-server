@@ -85,11 +85,11 @@ router.post("/upload", async (req, res) => {
     } else {
       // SUCCESS, image successfully uploaded
       if (req.body.nm_method === 'ImportarArqExcel') {
-        Importacoes.Excel(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nr_cnpj);
+        Importacoes.Excel(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nm_procedure1, req.body.nm_procedure2);
       } else if (req.body.nm_method === 'ImportarArqTexto') {
-        Importacoes.Text(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nr_cnpj);
+        Importacoes.Text(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
       } else if (req.body.nm_method === 'ImportarArqXML') {
-        Importacoes.Xml(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nr_cnpj);
+        Importacoes.Xml(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
       }
 
       retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);

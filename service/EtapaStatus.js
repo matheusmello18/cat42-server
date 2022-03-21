@@ -1,5 +1,5 @@
-const oracledb = require('oracledb');
 const Oracle = require('./Oracle');
+const ProxCod = require('./ProxCod');
 
 const sql = `
 SELECT S.ID_SIMUL_STATUS,
@@ -35,7 +35,7 @@ module.exports.select = async (id_empresa, id_usuario, id_simul_etapa) => {
   }
 }
 
-const sqlInser = `insert into simul_etapa_status (id_simul_status,dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status)
+const sqlInsert = `insert into simul_etapa_status (id_simul_status,dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status)
 values (:id_simul_status,:dt_periodo,:id_simul_tp_status,:id_simul_etapa,:id_empresa,:id_usuario,:ds_status)`;
 
 module.exports.insert = async (dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status) => {

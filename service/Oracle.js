@@ -73,3 +73,24 @@ module.exports.update = async (sql,params) => {
     }
   }
 }
+
+module.exports.delete = async (sql,params) => {
+  try {
+    connection = await oracledb.getConnection(config.db);
+
+    const result = await connection.execute(
+      sql, params, {autoCommit: true}
+    );
+
+  } catch (err) {
+    throw new Error(err.message);
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();   // Always close connections
+      } catch (err) {
+        throw new Error(err.message);
+      }
+    }
+  }
+}
