@@ -9,19 +9,23 @@ const etapaStatus = require('../../service/EtapaStatus');
 const Importacoes = require('../../service/Importacoes');
 
 router.post("/show", async (req, res) => {
-  var retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
-
-  for (let index = 0; index < retorno.rows.length; index++) {
-    const etapa = retorno.rows[index];
-    if (etapa.ID_SIMUL_STATUS !== null){
-      var retStatus = await etapaStatus.select(req.body.id_empresa, req.body.id_usuario, etapa.ID_SIMUL_ETAPA);
-      retorno.rows[index].STATUS = retStatus.rows;
-    } else {
-      retorno.rows[index].STATUS = [];
+  try {
+    var retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
+  
+    for (let index = 0; index < retorno.rows.length; index++) {
+      const etapa = retorno.rows[index];
+      if (etapa.ID_SIMUL_STATUS !== null){
+        var retStatus = await etapaStatus.select(req.body.id_empresa, req.body.id_usuario, etapa.ID_SIMUL_ETAPA);
+        retorno.rows[index].STATUS = retStatus.rows;
+      } else {
+        retorno.rows[index].STATUS = [];
+      }
     }
+  
+    return res.status(200).json({success:"true", rows: retorno.rows})
+  } catch (err) {
+    return res.status(200).json({success:"false", message: err.message, rows: null})
   }
-
-  return res.status(200).json({success:"true", rows: retorno.rows})
 })
 
 var storage = multer.diskStorage({
@@ -81,21 +85,26 @@ router.post("/upload", async (req, res) => {
       // ERROR occured (here it can be occured due
       // to uploading image of size greater than
       // 5MB or uploading different file type)
-      return res.status(200).json({success:"false", message: err, row: []})
+      return res.status(200).json({success:"false", message: err, row: null})
     } else {
       // SUCCESS, image successfully uploaded
-      if (req.body.nm_method === 'ImportarArqExcel') {
-        Importacoes.Excel(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nm_procedure1, req.body.nm_procedure2);
-      } else if (req.body.nm_method === 'ImportarArqTexto') {
-        Importacoes.Text(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
-      } else if (req.body.nm_method === 'ImportarArqXML') {
-        Importacoes.Xml(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
-      }
+      try {
+        if (req.body.nm_method === 'ImportarArqExcel') {
+          await Importacoes.Excel(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nm_procedure1, req.body.nm_procedure2);
+        } else if (req.body.nm_method === 'ImportarArqTexto') {
+          Importacoes.Text(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
+        } else if (req.body.nm_method === 'ImportarArqXML') {
+          Importacoes.Xml(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
+        }
 
-      retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
-      var retStatus = await etapaStatus.select(req.body.id_empresa, req.body.id_usuario, req.body.id_simul_etapa);
-      retorno.rows[0].STATUS = retStatus.rows;
-      return res.status(200).json({success:"true", message: 'Importação finalizada.', row: retorno.rows[0]});
+        retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
+        var retStatus = await etapaStatus.select(req.body.id_empresa, req.body.id_usuario, req.body.id_simul_etapa);
+        retorno.rows[0].STATUS = retStatus.rows;
+        return res.status(200).json({success:"true", message: 'Importação finalizada.', row: retorno.rows[0]});
+
+      } catch (error) {
+        return res.status(200).json({success:"false", message: 'Importação não finalizada. ' + error.message, row: null});  
+      }
     }
   })
 })

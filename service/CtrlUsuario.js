@@ -45,7 +45,7 @@ module.exports.select = async (email, senha = '') => {
     return await Oracle.select(qry, params);
   
   } catch (err) {
-    console.log(err.message);
+    throw new Error(err);
   }
 }
 
@@ -63,7 +63,7 @@ module.exports.updateHash = async (id, hash) => {
     return await Oracle.update(sqlUpdate, params);
   
   } catch (err) {
-    console.log(err.message);
+    throw new Error(err);
   }
 }
 
@@ -99,7 +99,7 @@ module.exports.selectByHash = async (hash) => {
     return await Oracle.select(sqlHash, params);
   
   } catch (err) {
-    console.log(err.message);
+    throw new Error(err);
   }
 }
 
@@ -121,6 +121,6 @@ module.exports.updateSenha = async (id, senhaWeb, senha) => {
     return await Oracle.update(sqlUpdateHash, params);
   
   } catch (err) {
-    console.log(err.message);
+    throw new Error(err);
   }
 }

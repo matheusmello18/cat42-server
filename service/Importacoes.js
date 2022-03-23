@@ -1,24 +1,23 @@
+const Oracle = require('./Oracle');
 const etapaStatus = require('./EtapaStatus');
 const produtos = require('./Produtos');
 const ExcelJS = require('exceljs'); // documentação: https://www.npmjs.com/package/exceljs
 
 module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2) => {
   try {
-
+    let existeErrorCampoNulo = false;
     // realizar os deletes da tabela produto
-    console.log(filename, path);
+    
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(path);
     const worksheet = workbook.worksheets[0];
 
-    worksheet.eachRow({ includeEmpty: false }, async function(row, rowNumber) {
+    await worksheet.eachRow({ includeEmpty: false }, async function(row, rowNumber) {
       if (![1,2].includes(rowNumber)){
-        console.log('Row ' + rowNumber + ' = ' + JSON.stringify(row.values));
-        //console.log(row.getCell(6).value, row.getCell(7).value, row.getCell(8).value);
         
         let params;
         let camposNulo = 'Campo(s) vazio(s):';
-        let existeErrorCampoNulo = false;
+        
 
         if (row.getCell(1).value.lenght === 0 ) // cd_produto
           camposNulo.concat(' Cd. Produto,');
@@ -39,22 +38,16 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
 
         if (camposNulo.endsWith(',')){
           existeErrorCampoNulo = true;
-          camposNulo = camposNulo.substring(0, camposNulo.length-1)
+          camposNulo = camposNulo.substring(0, camposNulo.length-1);
+          camposNulo.concat(`. Número da linha: ${rowNumber.toString()}`)
           
           /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-          params = {
-            dt_periodo: dt_periodo,
-            id_simul_tp_status: 2,
-            id_simul_etapa: parseInt(id_simul_etapa),
-            id_empresa: parseInt(id_empresa),
-            id_usuario: parseInt(id_usuario),
-            ds_status: camposNulo
-          };
-  
-          await etapaStatus.insert(params);
+          await etapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), camposNulo);
+
         } else {
-        
+          const nProx_Codigo = await Oracle.proxCod("SIMUL_PRODUTO");
           await produtos.Insert(
+            nProx_Codigo,
             row.getCell(1).value, //cd_produto
             row.getCell(2).value, //ds_produto
             row.getCell(3).value, //ds_unidade_venda
@@ -67,29 +60,19 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
             id_usuario
           );
         }
-
-        if (!existeErrorCampoNulo){
-          //executar a procedure configurada
-          console.log(nm_procedure1, nm_procedure2);
-          //aqui que irá determinar a estapa status
-          /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-          params = {
-            dt_periodo: dt_periodo,
-            id_simul_tp_status: 1,
-            id_simul_etapa: parseInt(id_simul_etapa),
-            id_empresa: parseInt(id_empresa),
-            id_usuario: parseInt(id_usuario),
-            ds_status: 'Dados importado com sucesso.'
-          };
-  
-          await etapaStatus.insert(params);
-        }
-
       }
     });
-  
+
+    if (!existeErrorCampoNulo){
+      //executar a procedure configurada
+      console.log("matheus");
+      console.log(nm_procedure1, nm_procedure2);
+      //aqui que irá determinar a estapa status
+      /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
+      await etapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
+    }
   } catch (err) {
-    console.log(err.message);
+    throw new Error(err);
   }
 }
 

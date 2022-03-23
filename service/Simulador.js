@@ -1,6 +1,5 @@
 const oracledb = require('oracledb');
 const Oracle = require('./Oracle');
-const ProxCod = require('./ProxCod');
 
 
 const insert = `INSERT INTO SIMUL_CADASTRO (ID_SIMUL_CADASTRO, DT_CADASTRO, NM_EMPRESA, NR_CNPJ, NM_CONTATO, NR_TELEFONE, DS_EMAIL) 
@@ -8,7 +7,7 @@ const insert = `INSERT INTO SIMUL_CADASTRO (ID_SIMUL_CADASTRO, DT_CADASTRO, NM_E
 
 module.exports.inserir = async (obj) => {
   try {
-    const nProx_Codigo = await ProxCod("SIMUL_CADASTRO");
+    const nProx_Codigo = await Oracle.proxCod("SIMUL_CADASTRO");
 
     const params = {
       ID_SIMUL_CADASTRO: nProx_Codigo,
@@ -24,7 +23,7 @@ module.exports.inserir = async (obj) => {
 
     return nProx_Codigo;
   } catch (err) {
-    console.log(err.message);
+    throw new Error(err);
   }
 }
 
@@ -45,6 +44,6 @@ module.exports.select = async (id = '') => {
     }
     
   } catch (err) {
-    console.log(err.message);
+    throw new Error(err);
   }
 }

@@ -1,7 +1,7 @@
 const oracledb = require('oracledb');
 const Oracle = require('./Oracle');
 
-let sql = `
+const sql = `
 select es.id_simul_status,
        to_char(es.dt_periodo, 'dd/mm/yyyy') dt_periodo,
        es.id_simul_tp_status,
@@ -58,26 +58,27 @@ module.exports.select = async (id_empresa, id_usuario, dt_periodo, id_simul_etap
   try {
     let params;
 
-    params = {
-      id_empresa: parseInt(id_empresa),
-      dt_periodo: dt_periodo,
-      id_usuario: parseInt(id_usuario),
-    };
-
     if (id_simul_etapa !== ''){
-      sql = sql + ' and es.id_simul_etapa = :id_simul_etapa'
+      let sqlNova = sql + ' and es.id_simul_etapa = :id_simul_etapa'
       params = {
         id_empresa: parseInt(id_empresa),
-        dt_periodo: dt_periodo,
         id_usuario: parseInt(id_usuario),
+        dt_periodo: dt_periodo,
         id_simul_etapa: parseInt(id_simul_etapa),
       };
+      return await Oracle.select(sqlNova, params);
+  
+    } else {
+      params = {
+        id_empresa: parseInt(id_empresa),
+        id_usuario: parseInt(id_usuario),
+        dt_periodo: dt_periodo,
+      };
+
+      return await Oracle.select(sql, params);
     }
-
-
-    return await Oracle.select(sql, params);
   
   } catch (err) {
-    console.log(err.message);
+    throw new Error(err);
   }
 }

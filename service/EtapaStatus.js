@@ -1,5 +1,5 @@
+const oracledb = require('oracledb');
 const Oracle = require('./Oracle');
-const ProxCod = require('./ProxCod');
 
 const sql = `
 SELECT S.ID_SIMUL_STATUS,
@@ -31,7 +31,7 @@ module.exports.select = async (id_empresa, id_usuario, id_simul_etapa) => {
     return await Oracle.select(sql, params);
   
   } catch (err) {
-    console.log(err.message);
+    throw new Error(err);
   }
 }
 
@@ -39,11 +39,11 @@ const sqlInsert = `insert into simul_etapa_status (id_simul_status,dt_periodo,id
 values (:id_simul_status,:dt_periodo,:id_simul_tp_status,:id_simul_etapa,:id_empresa,:id_usuario,:ds_status)`;
 
 module.exports.insert = async (dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status) => {
-  const nProx_Codigo = await ProxCod("SIMUL_CADASTRO");
+  const nProx_Codigo = await Oracle.proxCod("SIMUL_CADASTRO");
   try {
     let params = {
       id_simul_status: nProx_Codigo,
-      dt_periodo: dt_periodo,
+      dt_periodo:  { type: oracledb.DATE, val: new Date(dt_periodo)},
       id_simul_tp_status: id_simul_tp_status,
       id_simul_etapa: id_simul_etapa,
       id_empresa: id_empresa,
@@ -51,9 +51,9 @@ module.exports.insert = async (dt_periodo,id_simul_tp_status,id_simul_etapa,id_e
       ds_status: ds_status
     };
 
-    return await Oracle.insert(sqlInsert, params);
+    await Oracle.insert(sqlInsert, params);
   
   } catch (err) {
-    console.log(err.message);
+    throw new Error(err);
   }
 }
