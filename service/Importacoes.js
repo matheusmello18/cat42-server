@@ -14,32 +14,32 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
 
     await worksheet.eachRow({ includeEmpty: false }, async function(row, rowNumber) {
       if (![1,2].includes(rowNumber)){
+        console.log(row.getCell(1).value, row.getCell(2).value, row.getCell(3).value, row.getCell(4).value, row.getCell(5).value,
+        row.getCell(6).value, row.getCell(7).value);
         
-        let params;
         let camposNulo = 'Campo(s) vazio(s):';
-        
 
-        if (row.getCell(1).value.lenght === 0 ) // cd_produto
-          camposNulo.concat(' Cd. Produto,');
-        if (row.getCell(2).value.lenght === 0 ) // ds_produto
-          camposNulo.concat(' Ds. Produto,');
-        if (row.getCell(3).value.lenght === 0 ) // ds_unidade_venda
-          camposNulo.concat(' UM Venda,');
-        if (row.getCell(4).value.lenght === 0 ) // cd_produto_forn
-          camposNulo.concat(' Cd. Produto Fornecedor,');
-        if (row.getCell(5).value.lenght === 0 ) // ds_unidade_forn
-          camposNulo.concat(' UM Fornecedor,');
-        if (row.getCell(6).value.lenght === 0 ) // vl_fator_conversao
-          camposNulo.concat(' Fator Conversao,');
-        if (row.getCell(7).value.lenght === 0 ) // aliq_icms
-          camposNulo.concat(' Aliq ICMS,');
-        if (row.getCell(8).value.lenght === 0 ) // vl_saldo_estoque_inicial
-          camposNulo.concat(' Saldo Inicial Estoque,');
+        if (row.getCell(1).value === null ) // cd_produto
+          camposNulo = camposNulo.concat(' Cd. Produto,');
+        if (row.getCell(2).value === null ) // ds_produto
+          camposNulo = camposNulo.concat(' Ds. Produto,');
+        if (row.getCell(3).value === null ) // ds_unidade_venda
+          camposNulo = camposNulo.concat(' UM Venda,');
+        if (row.getCell(4).value === null ) // cd_produto_forn
+          camposNulo = camposNulo.concat(' Cd. Produto Fornecedor,');
+        if (row.getCell(5).value === null ) // ds_unidade_forn
+          camposNulo = camposNulo.concat(' UM Fornecedor,');
+        if (row.getCell(6).value === null ) // vl_fator_conversao
+          camposNulo = camposNulo.concat(' Fator Conversao,');
+        if (row.getCell(7).value === null ) // aliq_icms
+          camposNulo = camposNulo.concat(' Aliq ICMS,');
+        if (row.getCell(8).value === null ) // vl_saldo_estoque_inicial
+          camposNulo = camposNulo.concat(' Saldo Inicial Estoque,');
 
         if (camposNulo.endsWith(',')){
           existeErrorCampoNulo = true;
           camposNulo = camposNulo.substring(0, camposNulo.length-1);
-          camposNulo.concat(`. Número da linha: ${rowNumber.toString()}`)
+          camposNulo = camposNulo.concat(`. Número da linha: ${rowNumber.toString()}`)
           
           /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
           await etapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), camposNulo);

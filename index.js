@@ -4,12 +4,13 @@ const bodyParser = require("body-parser")
 const path = require("path")
 const cors = require("cors")
 
+const config = require('./config/Config');
 const cliente = require("./route/v1/cliente")
 const users = require("./route/v1/users")
 const etapas = require("./route/v1/etapas")
 
 var corsOptions = {
-  origin: ['http://localhost:3000','http://192.168.1.111:3000'], // colocar aqui o ip externo e o nome do site
+  origin: config.appFrontEnd.origin, // colocar aqui o ip externo e o nome do site
   methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH'],
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }

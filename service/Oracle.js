@@ -4,7 +4,7 @@ const oracledb = require('oracledb');
 const config = require('../config/Config');
 
 if (process.platform === 'win32') { // Windows
-  oracledb.initOracleClient({ libDir: 'D:\\app\\mathe\\product\\11.2.0\\client_1\\instantclient' });
+  oracledb.initOracleClient({ libDir: config.oracle.libDir });
 } else if (process.platform === 'linux') { // macOS
   oracledb.initOracleClient({ libDir: '/opt/oracle/instantclient_21_4' });
 }
@@ -39,7 +39,6 @@ module.exports.insert = async (sql,params) => {
 }
 
 module.exports.select = async (sql,params) => {
-  console.log(sql,params);
   let connection;
 
   try {
@@ -48,7 +47,6 @@ module.exports.select = async (sql,params) => {
     return await connection.execute(
       sql, params, { outFormat: oracledb.OUT_FORMAT_OBJECT }
     ).catch(err => {
-      console.log(err.message);
       throw new Error(err);
     });
   
