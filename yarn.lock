@@ -1143,6 +1143,11 @@ multer@^1.4.4:
     type-is "^1.6.4"
     xtend "^4.0.0"
 
+n-readlines@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/n-readlines/-/n-readlines-1.0.1.tgz#bbb7364d38bc31a170a199f986fcacfa76b95f6e"
+  integrity sha512-z4SyAIVgMy7CkgsoNw7YVz40v0g4+WWvvqy8+ZdHrCtgevcEO758WQyrYcw3XPxcLxF+//RszTz/rO48nzD0wQ==
+
 negotiator@0.6.2:
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.2.tgz#feacf7ccf525a77ae9634436a64883ffeca346fb"

@@ -145,3 +145,42 @@ module.exports.proxCod = async (NomeEntidade) => {
     }
   }
 }
+
+module.exports.execProcedure = async (nm_procedure, id_empresa, id_usuarios, nameByName = {}) => {
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(config.db);
+
+    var params = '';
+    Object.keys(nameByName).forEach(element => {
+      params = params + `:${element}, `;
+    });
+
+    await connection.execute(
+      `BEGIN
+        ${nm_procedure}(${params} :id_empresa, :id_usuarios);
+       END;`,
+      {
+        ...nameByName,
+        ...{
+          id_empresa:  id_empresa,
+          id_usuarios: id_usuarios
+        }
+      }
+    ).catch(err => {
+      throw new Error(err);
+    });
+    
+  } catch (err) {
+    throw new Error(err.message);
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();   // Always close connections
+      } catch (err) {
+        throw new Error(err.message);
+      }
+    }
+  }
+}

@@ -16,6 +16,7 @@
     "exceljs": "^4.3.0",
     "express": "^4.17.1",
     "multer": "^1.4.4",
+    "n-readlines": "^1.0.1",
     "nodemailer": "^6.6.3",
     "nodemon": "^2.0.12",
     "oracledb": "^5.2.0"

@@ -19,7 +19,8 @@ select es.id_simul_status,
        es.dm_acao_arquivo,
        es.ds_acao,
        es.id_empresa,
-       es.nm_method
+       es.nm_method,
+       to_char(es.dt_status, 'dd/mm/yyyy hh24:mi:ss') dt_status
   from (select es.id_simul_status,
                es.dt_periodo,
                es.id_simul_tp_status,
@@ -37,7 +38,8 @@ select es.id_simul_status,
                e.dm_acao_arquivo,
                e.ds_acao,
                es.id_empresa,
-               e.nm_method
+               e.nm_method,
+               es.dt_status
           from simul_etapa e
           left join simul_etapa_status es
             on es.id_simul_etapa = e.id_simul_etapa

@@ -2,20 +2,20 @@ const Oracle = require('./Oracle');
 const etapaStatus = require('./EtapaStatus');
 const produtos = require('./Produtos');
 const ExcelJS = require('exceljs'); // documentação: https://www.npmjs.com/package/exceljs
+const nReadlines = require('n-readlines');
 
 module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2) => {
   try {
     let existeErrorCampoNulo = false;
     // realizar os deletes da tabela produto
-    
+    produtos.Delete(id_empresa, id_usuario);
+
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(path);
     const worksheet = workbook.worksheets[0];
 
     await worksheet.eachRow({ includeEmpty: false }, async function(row, rowNumber) {
       if (![1,2].includes(rowNumber)){
-        console.log(row.getCell(1).value, row.getCell(2).value, row.getCell(3).value, row.getCell(4).value, row.getCell(5).value,
-        row.getCell(6).value, row.getCell(7).value);
         
         let camposNulo = 'Campo(s) vazio(s):';
 
@@ -67,8 +67,7 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
       //executar a procedure configurada
       console.log("matheus");
       console.log(nm_procedure1, nm_procedure2);
-      //aqui que irá determinar a estapa status
-      /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
+      Oracle.execProcedure(nm_procedure1, id_empresa, id_usuario, {abc: `teste`, xyz: `xxxx`});
       await etapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
     }
   } catch (err) {
@@ -78,8 +77,25 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
 
 module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2) => {
 
+  const broadbandLines = new nReadlines(path);
+  let nextline, linha, arrLinha
+  while (nextline = broadbandLines.next()) {
+    linha = nextline.toString('ascii');
+
+    console.log(` ${linha}`);
+    arrLinha = linha.split("|")
+    console.log(arrLinha[1])
+  }
+
+
+  //Oracle.execProcedure(nm_procedure1, id_empresa, id_usuario);
+  //Oracle.execProcedure(nm_procedure2, id_empresa, id_usuario);
+
 }
 
 module.exports.Xml = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2) => {
 
+  Oracle.execProcedure(nm_procedure1, id_empresa, id_usuario);
+  Oracle.execProcedure(nm_procedure2, id_empresa, id_usuario);
+  
 }
