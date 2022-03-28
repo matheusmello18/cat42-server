@@ -146,7 +146,7 @@ module.exports.proxCod = async (NomeEntidade) => {
   }
 }
 
-module.exports.execProcedure = async (nm_procedure, id_empresa, id_usuarios, nameByName = {}) => {
+module.exports.execProcedure = async (nm_procedure, nameByName = {}) => {
   let connection;
 
   try {
@@ -154,20 +154,15 @@ module.exports.execProcedure = async (nm_procedure, id_empresa, id_usuarios, nam
 
     var params = '';
     Object.keys(nameByName).forEach(element => {
-      params = params + `:${element}, `;
+      params = params + `:${element},`;
     });
+    params = params.substring(0, params.length-1);
 
     await connection.execute(
       `BEGIN
-        ${nm_procedure}(${params} :id_empresa, :id_usuarios);
+        ${nm_procedure}(${params});
        END;`,
-      {
-        ...nameByName,
-        ...{
-          id_empresa:  id_empresa,
-          id_usuarios: id_usuarios
-        }
-      }
+      nameByName,
     ).catch(err => {
       throw new Error(err);
     });

@@ -1,6 +1,6 @@
 module.exports.appFrontEnd = {
   baseURL: "http://localhost:3000",
-  origin: ['http://localhost:3000','http://192.168.0.131:3000']
+  origin: ['http://localhost:3000','http://192.168.0.131:3000', 'http://localhost:3001','http://192.168.0.131:3001']
 }
 
 module.exports.oracle = {

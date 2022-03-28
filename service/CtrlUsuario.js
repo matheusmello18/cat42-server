@@ -18,7 +18,9 @@ const sql = `SELECT S.ID_SIMUL_CADASTRO,
                     C.NM_USUARIO, 
                     C.DM_ATIVO DM_ATIVO_USUARIO, 
                     C.HASH_RECOVERY,
-                    S.ID_EMPRESA
+                    S.ID_EMPRESA,
+                    O.ID_PROJETO,
+                    O.ID_MODULO
                FROM SIMUL_CADASTRO S
               INNER JOIN CTRL_USUARIO C ON (C.ID_USUARIO = S.ID_USUARIO)
               INNER JOIN IN_ORGAO O ON (O.ID_ORGAO = S.ID_ORGAO)
