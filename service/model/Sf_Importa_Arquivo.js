@@ -1,5 +1,5 @@
 const oracledb = require('oracledb');
-const Oracle = require('./Oracle');
+const Oracle = require('../Oracle');
 
 const sqlInsert = `insert into sf_importa_texto (id_importa_texto, nr_referencia, ds_conteudo, id_empresa, id_usuario, dt_inicial, dt_final, nr_linha, id_projeto, id_modulo, ds_arquivo ) 
 values (SQ_SF_IMPORTA_TEXTO.NEXTVAL, :nr_referencia, :ds_conteudo, :id_empresa, :id_usuario, :dt_inicial, :dt_final, :nr_linha, :id_projeto, :id_modulo, :ds_arquivo)`;

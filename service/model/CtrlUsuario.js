@@ -1,5 +1,5 @@
 const oracledb = require('oracledb');
-const Oracle = require('./Oracle');
+const Oracle = require('../Oracle');
 
 const sql = `SELECT S.ID_SIMUL_CADASTRO,
                     TO_CHAR(S.DT_CADASTRO, 'DD/MM/YYYY') DT_CADASTRO,

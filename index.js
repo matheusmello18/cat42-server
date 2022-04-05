@@ -9,6 +9,9 @@ const cliente = require("./route/v1/cliente")
 const users = require("./route/v1/users")
 const etapas = require("./route/v1/etapas")
 
+//const layoutX = require('./utils/LayoutX')
+
+
 var corsOptions = {
   origin: config.appFrontEnd.origin, // colocar aqui o ip externo e o nome do site
   methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH'],
@@ -32,6 +35,9 @@ serve.get('*', (req, res) => {
 serve.post('*', (req, res) => {
   res.json({msg: "rota não existe"})
 })
+
+//layoutX.GeraFunctionInsert();
+//layoutX.GeraInsertLayoutX();
 
 serve.listen(8081, function(){
   console.log("Servidor Rodando. Url: http://localhost:8081");

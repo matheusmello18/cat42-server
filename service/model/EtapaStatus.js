@@ -1,5 +1,5 @@
 const oracledb = require('oracledb');
-const Oracle = require('./Oracle');
+const Oracle = require('../Oracle');
 
 const sql = `
 SELECT S.ID_SIMUL_STATUS,

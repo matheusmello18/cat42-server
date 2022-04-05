@@ -4,8 +4,8 @@ const multer = require("multer");
 var fs = require('fs');
 const router = express.Router();
 
-const etapas = require("../../service/Etapas")
-const etapaStatus = require('../../service/EtapaStatus');
+const etapas = require("../../service/model/Etapas")
+const etapaStatus = require('../../service/model/EtapaStatus');
 const Importacoes = require('../../service/Importacoes');
 
 router.post("/show", async (req, res) => {
@@ -92,18 +92,27 @@ router.post("/upload", async (req, res) => {
         if (req.body.nm_method === 'ImportarArqExcel') {
           await Importacoes.Excel(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nm_procedure1, req.body.nm_procedure2);
         } else if (req.body.nm_method === 'ImportarArqTexto') {
-          Importacoes.Text(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nm_procedure1, req.body.nm_procedure2, req.body.id_modulo, req.body.id_projeto);
+       
+            await Importacoes.Text(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nm_procedure1, req.body.nm_procedure2, req.body.id_modulo, req.body.id_projeto);  
+
+          
         } else if (req.body.nm_method === 'ImportarArqXML') {
-          Importacoes.Xml(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
+          await Importacoes.XmlSaida(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
         }
 
         retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
         var retStatus = await etapaStatus.select(req.body.id_empresa, req.body.id_usuario, req.body.id_simul_etapa);
         retorno.rows[0].STATUS = retStatus.rows;
+        
         return res.status(200).json({success:"true", message: 'Importação finalizada.', row: retorno.rows[0]});
 
       } catch (error) {
-        return res.status(200).json({success:"false", message: 'Importação não finalizada. ' + error.message, row: null});  
+        
+        retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
+        var retStatus = await etapaStatus.select(req.body.id_empresa, req.body.id_usuario, req.body.id_simul_etapa);
+        retorno.rows[0].STATUS = retStatus.rows;
+
+        return res.status(200).json({success:"false", message: 'Importação não finalizada.', row: retorno.rows[0]});  
       }
     }
   })

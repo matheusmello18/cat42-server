@@ -3,7 +3,7 @@ const router = express.Router();
 var CryptoJS = require("crypto-js");
 
 const sendEmail = require("../../service/SendEmail")
-const Usuario = require("../../service/CtrlUsuario")
+const Usuario = require("../../service/model/CtrlUsuario")
 
 router.post("/login", async (req, res) => {
   try {
