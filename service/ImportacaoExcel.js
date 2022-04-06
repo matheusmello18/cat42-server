@@ -1,13 +1,12 @@
 const Oracle = require('./Oracle');
-const etapaStatus = require('./model/EtapaStatus');
-const produtos = require('./model/Produtos');
+const model = require('./model');
 const ExcelJS = require('exceljs'); // documentação: https://www.npmjs.com/package/exceljs
 
 module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2) => {
   try {
     let existeErrorCampoNulo = false;
     // realizar os deletes da tabela produto
-    produtos.Delete(id_empresa, id_usuario);
+    model.ProdutoSimulador.Delete(id_empresa, id_usuario);
 
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(path);
@@ -41,11 +40,11 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
           camposNulo = camposNulo.concat(`. Número da linha: ${rowNumber.toString()}`)
           
           /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-          await etapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), camposNulo);
+          await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), camposNulo);
 
         } else {
           const nProx_Codigo = await Oracle.proxCod("SIMUL_PRODUTO");
-          await produtos.Insert(
+          await model.ProdutoSimulador.Insert(
             nProx_Codigo,
             row.getCell(1).value, //cd_produto
             row.getCell(2).value, //ds_produto
@@ -66,7 +65,7 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
       //executar a procedure configurada
       
       await Oracle.execProcedure(nm_procedure1, {id_empresa: id_empresa, id_usuario: id_usuario, abc: `teste`, xyz: `xxxx`});
-      await etapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
+      await model.EtapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
     }
   } catch (err) {
     throw new Error(err);

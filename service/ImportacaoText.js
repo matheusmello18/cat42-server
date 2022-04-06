@@ -1,6 +1,5 @@
 const Oracle = require('./Oracle');
-const etapaStatus = require('./model/EtapaStatus');
-const sfimportatexto = require('./model/Sf_Importa_Arquivo');
+const model = require('./model');
 const nReadlines = require('n-readlines');
 
 module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2, id_modulo, id_projeto) => {
@@ -9,7 +8,7 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
   var dt_inicial = new Date(dateParts[2], dateParts[1]-1, 1);
   var dt_final = new Date(dateParts[2], dateParts[1], 0);
   
-  await sfimportatexto.Delete(
+  await model.Sf_Importa_Arquivo.Delete(
     id_projeto, 
     id_modulo, 
     dt_inicial, 
@@ -29,7 +28,7 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
     arrLinha = linha.split("|");
 
     try {
-      await sfimportatexto.Insert(
+      await model.Sf_Importa_Arquivo.Insert(
         arrLinha[1],
         linha,
         id_empresa,
@@ -63,11 +62,11 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
     );    
   } catch (err) {
     /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-    await etapaStatus.insert(dt_periodo, 3, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message.split(/\sORA-[0-9]*:/)[1].trim());
+    await model.EtapaStatus.insert(dt_periodo, 3, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message.split(/\sORA-[0-9]*:/)[1].trim());
     throw new Error(err.message);
   }
 
-  await etapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
+  await model.EtapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
   //Oracle.execProcedure(nm_procedure2, id_empresa, id_usuario);
 
 }

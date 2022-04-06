@@ -1,4 +1,3 @@
-const oracledb = require('oracledb');
 const Oracle = require('../Oracle');
 
 const sql = `
@@ -46,13 +45,13 @@ module.exports.insert = async (dt_periodo,id_simul_tp_status,id_simul_etapa,id_e
   try {
     let params = {
       id_simul_status: nProx_Codigo,
-      dt_periodo:  { type: oracledb.DATE, val: new Date(dt_periodo)},
+      dt_periodo:  { type: Oracle.oracledb.DATE, val: new Date(dt_periodo)},
       id_simul_tp_status: id_simul_tp_status,
       id_simul_etapa: id_simul_etapa,
       id_empresa: id_empresa,
       id_usuario: id_usuario,
       ds_status: ds_status,
-      dt_status: { type: oracledb.DATE, val: new Date() }
+      dt_status: { type: Oracle.oracledb.DATE, val: new Date() }
     };
 
     await Oracle.insert(sqlInsert, params);

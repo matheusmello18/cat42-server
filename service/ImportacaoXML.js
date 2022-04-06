@@ -1,375 +1,11 @@
 const Oracle = require('./Oracle');
-const CtrlEmpresa = require('./model/CtrlEmpresa');
-const etapaStatus = require('./model/EtapaStatus');
+const model = require('./model');
 const parseString = require('xml2js').parseString;
 const fs = require("fs");
 
-const InsertInPessoa = async (InPessoa = {}) => {
-	let sql = `insert into in_pessoa 
-						( dt_inicial, cd_pessoa, nm_razao_social, ds_endereco, ds_bairro, id_ref_331_municipio, uf, id_ref_331_pais, nr_cep, nr_cnpj_cpf, nr_inscricao_estadual, dt_movimento, nr_numero, ds_complemento, nr_fone, dm_contribuinte, nr_id_estrangeiro, id_empresa, id_usuario) 
-						values 
-						( :dt_inicial, :cd_pessoa, :nm_razao_social, :ds_endereco, :ds_bairro, :id_ref_331_municipio, :uf, :id_ref_331_pais, :nr_cep, :nr_cnpj_cpf, :nr_inscricao_estadual, :dt_movimento, :nr_numero, :ds_complemento, :nr_fone, :dm_contribuinte, :nr_id_estrangeiro, :id_empresa, :id_usuario)
-						`;
-	try {
-		await Oracle.insert(sql, InPessoa)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
 
-/** InsertInPessoa
-	InsertInPessoa({
-		dt_inicial:'',
-		cd_pessoa:'',
-		nm_razao_social:'',
-		ds_endereco:'',
-		ds_bairro:'',
-		id_ref_331_municipio:'',
-		uf:'',
-		id_ref_331_pais:'',
-		nr_cep:'',
-		nr_cnpj_cpf:'',
-		nr_inscricao_estadual:'',
-		dt_movimento:'',
-		nr_numero:'',
-		ds_complemento:'',
-		nr_fone:'',
-		dm_contribuinte:'',
-		nr_id_estrangeiro:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/
 
-const InsertSf0190 = async (Sf0190 = {}) => {
-	let sql = `insert into sf_0190 
-						( ds_unidade, ds_descricao, dt_inicial, dt_movimento, id_empresa, id_usuario) 
-						values 
-						( :ds_unidade, :ds_descricao, :dt_inicial, :dt_movimento, :id_empresa, :id_usuario)
-						`;
-	try {
-		await Oracle.insert(sql, Sf0190)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
 
-/** InsertSf0190
-	InsertSf0190({
-		ds_unidade:'',
-		ds_descricao:'',
-		dt_inicial:'',
-		dt_movimento:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/
-
-const InsertInProdutoServico = async (InProdutoServico = {}) => {
-	let sql = `insert into in_produto_servico 
-						( cd_produto_servico, cd_barra, ds_produto_servico, id_ref_331_ncm, id_ref_331_ex_ipi, dm_tipo_item, unidade, id_0190, dt_inicial, dt_movimento, id_cest, id_empresa, id_usuario) 
-						values 
-						( :cd_produto_servico, :cd_barra, :ds_produto_servico, :id_ref_331_ncm, :id_ref_331_ex_ipi, :dm_tipo_item, :unidade, :id_0190, :dt_inicial, :dt_movimento, :id_cest, :id_empresa, :id_usuario)
-						`;
-	try {
-		await Oracle.insert(sql, InProdutoServico)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertInProdutoServico
-	InsertInProdutoServico({
-		cd_produto_servico:'',
-		cd_barra:'',
-		ds_produto_servico:'',
-		id_ref_331_ncm:'',
-		id_ref_331_ex_ipi:'',
-		dm_tipo_item:'',
-		unidade:'',
-		id_0190:'',
-		dt_inicial:'',
-		dt_movimento:'',
-		id_cest:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/
-
-const InsertInNotaFiscalEntrada = async (InNotaFiscalEntrada = {}) => {
-	let sql = `insert into in_nota_fiscal_entrada 
-						( id_pessoa_remetente, id_modelo_documento, serie_subserie_documento, nr_documento, dm_tipo_fatura, dt_emissao_documento, dt_entrada, vl_total_nota_fiscal, vl_desconto, vl_icms_substituicao, vl_outras_despesas, vl_total_mercadoria, vl_frete, vl_seguro, vl_ipi, dm_modalidade_frete, id_ref_413, vl_icms_desonerado, nr_chave_nf_eletronica, vl_icms_fcp, vl_icms_uf_dest, vl_icms_uf_remet, nr_chave_nf_eletron_ref_cat83, vl_fcp_st, id_ref_331_munic_orig, id_ref_331_munic_dest, dm_tipo_cte, dm_finalidade, id_empresa, id_usuario) 
-						values 
-						( :id_pessoa_remetente, :id_modelo_documento, :serie_subserie_documento, :nr_documento, :dm_tipo_fatura, :dt_emissao_documento, :dt_entrada, :vl_total_nota_fiscal, :vl_desconto, :vl_icms_substituicao, :vl_outras_despesas, :vl_total_mercadoria, :vl_frete, :vl_seguro, :vl_ipi, :dm_modalidade_frete, :id_ref_413, :vl_icms_desonerado, :nr_chave_nf_eletronica, :vl_icms_fcp, :vl_icms_uf_dest, :vl_icms_uf_remet, :nr_chave_nf_eletron_ref_cat83, :vl_fcp_st, :id_ref_331_munic_orig, :id_ref_331_munic_dest, :dm_tipo_cte, :dm_finalidade, :id_empresa, :id_usuario)
-						`;
-	try {
-		await Oracle.insert(sql, InNotaFiscalEntrada)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertInNotaFiscalEntrada
-	InsertInNotaFiscalEntrada({
-		id_pessoa_remetente:'',
-		id_modelo_documento:'',
-		serie_subserie_documento:'',
-		nr_documento:'',
-		dm_tipo_fatura:'',
-		dt_emissao_documento:'',
-		dt_entrada:'',
-		vl_total_nota_fiscal:'',
-		vl_desconto:'',
-		vl_icms_substituicao:'',
-		vl_outras_despesas:'',
-		vl_total_mercadoria:'',
-		vl_frete:'',
-		vl_seguro:'',
-		vl_ipi:'',
-		dm_modalidade_frete:'',
-		id_ref_413:'',
-		vl_icms_desonerado:'',
-		nr_chave_nf_eletronica:'',
-		vl_icms_fcp:'',
-		vl_icms_uf_dest:'',
-		vl_icms_uf_remet:'',
-		nr_chave_nf_eletron_ref_cat83:'',
-		vl_fcp_st:'',
-		id_ref_331_munic_orig:'',
-		id_ref_331_munic_dest:'',
-		dm_tipo_cte:'',
-		dm_finalidade:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/
-
-const InsertInNotaFiscalSaida = async (InNotaFiscalSaida = {}) => {
-	let sql = `insert into in_nota_fiscal_saida 
-						( dm_entrada_saida, id_pessoa_destinatario, id_modelo_documento, serie_subserie_documento, nr_documento, dm_tipo_fatura, dt_emissao_documento, dt_entrada_saida, vl_total_nota_fiscal, vl_desconto, vl_icms_substituicao, vl_outras_despesas, vl_total_mercadoria, vl_frete, vl_ipi, vl_seguro, dm_modalidade_frete, id_ref_413, vl_icms_desonerado, dm_cancelamento, dm_gare, dm_gnre, nr_chave_nf_eletronica, id_pessoa_remetente_cte, vl_icms_fcp, vl_icms_uf_dest, vl_icms_uf_remet, nr_chave_nf_eletron_ref_cat83, vl_fcp_st, id_ref_331_munic_orig, id_ref_331_munic_dest, dm_tipo_cte, dm_finalidade, id_empresa, id_usuario) 
-						values 
-						( :dm_entrada_saida, :id_pessoa_destinatario, :id_modelo_documento, :serie_subserie_documento, :nr_documento, :dm_tipo_fatura, :dt_emissao_documento, :dt_entrada_saida, :vl_total_nota_fiscal, :vl_desconto, :vl_icms_substituicao, :vl_outras_despesas, :vl_total_mercadoria, :vl_frete, :vl_ipi, :vl_seguro, :dm_modalidade_frete, :id_ref_413, :vl_icms_desonerado, :dm_cancelamento, :dm_gare, :dm_gnre, :nr_chave_nf_eletronica, :id_pessoa_remetente_cte, :vl_icms_fcp, :vl_icms_uf_dest, :vl_icms_uf_remet, :nr_chave_nf_eletron_ref_cat83, :vl_fcp_st, :id_ref_331_munic_orig, :id_ref_331_munic_dest, :dm_tipo_cte, :dm_finalidade, :id_empresa, :id_usuario)
-						`;
-	try {
-		await Oracle.insert(sql, InNotaFiscalSaida)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertInNotaFiscalSaida
-	InsertInNotaFiscalSaida({
-		dm_entrada_saida:'',
-		id_pessoa_destinatario:'',
-		id_modelo_documento:'',
-		serie_subserie_documento:'',
-		nr_documento:'',
-		dm_tipo_fatura:'',
-		dt_emissao_documento:'',
-		dt_entrada_saida:'',
-		vl_total_nota_fiscal:'',
-		vl_desconto:'',
-		vl_icms_substituicao:'',
-		vl_outras_despesas:'',
-		vl_total_mercadoria:'',
-		vl_frete:'',
-		vl_ipi:'',
-		vl_seguro:'',
-		dm_modalidade_frete:'',
-		id_ref_413:'',
-		vl_icms_desonerado:'',
-		dm_cancelamento:'',
-		dm_gare:'',
-		dm_gnre:'',
-		nr_chave_nf_eletronica:'',
-		id_pessoa_remetente_cte:'',
-		vl_icms_fcp:'',
-		vl_icms_uf_dest:'',
-		vl_icms_uf_remet:'',
-		nr_chave_nf_eletron_ref_cat83:'',
-		vl_fcp_st:'',
-		id_ref_331_munic_orig:'',
-		id_ref_331_munic_dest:'',
-		dm_tipo_cte:'',
-		dm_finalidade:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/
-
-const InsertSfC110Saida = async (SfC110Saida = {}) => {
-	let sql = `insert into sf_c110_saida 
-						( id_modelo_documento, dm_entrada_saida, serie_subserie_documento, nr_documento, dt_emissao_documento, nr_item_imp, id_ref_0450, ds_complementar, id_empresa, id_usuario) 
-						values 
-						( :id_modelo_documento, :dm_entrada_saida, :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :nr_item_imp, :id_ref_0450, :ds_complementar, :id_empresa, :id_usuario)
-						`;
-	try {
-		await Oracle.insert(sql, SfC110Saida)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertSfC110Saida
-	InsertSfC110Saida({
-		id_modelo_documento:'',
-		dm_entrada_saida:'',
-		serie_subserie_documento:'',
-		nr_documento:'',
-		dt_emissao_documento:'',
-		nr_item_imp:'',
-		id_ref_0450:'',
-		ds_complementar:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/
-
-const InsertSfC110Entrada = async (SfC110Entrada = {}) => {
-	let sql = `insert into sf_c110_entrada 
-						( serie_subserie_documento, nr_documento, dt_emissao_documento, id_pessoa_remetente, nr_item_imp, id_ref_0450, ds_complementar, id_empresa, id_usuario, id_modelo_documento) 
-						values 
-						( :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :id_pessoa_remetente, :nr_item_imp, :id_ref_0450, :ds_complementar, :id_empresa, :id_usuario, :id_modelo_documento)
-						`;
-	try {
-		await Oracle.insert(sql, SfC110Entrada)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertSfC110Entrada
-	InsertSfC110Entrada({
-		serie_subserie_documento:'',
-		nr_documento:'',
-		dt_emissao_documento:'',
-		id_pessoa_remetente:'',
-		nr_item_imp:'',
-		id_ref_0450:'',
-		ds_complementar:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario,
-		id_modelo_documento:''
-	})
-*/
-
-const InsertAcC060Entrada = async (AcC060Entrada = {}) => {
-	let sql = `insert into ac_c060_entrada 
-						( dm_importacao, nr_di, dt_registro, dt_desembaraco, vl_pis, vl_cofins, id_nota_fiscal_entrada, id_pessoa_remetente, dt_emissao_documento, nr_documento, nr_item, nr_sequencia, serie_subserie_documento, id_empresa, id_usuario, id_modelo_documento) 
-						values 
-						( :dm_importacao, :nr_di, :dt_registro, :dt_desembaraco, :vl_pis, :vl_cofins, :id_nota_fiscal_entrada, :id_pessoa_remetente, :dt_emissao_documento, :nr_documento, :nr_item, :nr_sequencia, :serie_subserie_documento, :id_empresa, :id_usuario, :id_modelo_documento)
-						`;
-	try {
-		await Oracle.insert(sql, AcC060Entrada)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertAcC060Entrada
-	InsertAcC060Entrada({
-		dm_importacao:'',
-		nr_di:'',
-		dt_registro:'',
-		dt_desembaraco:'',
-		vl_pis:'',
-		vl_cofins:'',
-		id_nota_fiscal_entrada:'',
-		id_pessoa_remetente:'',
-		dt_emissao_documento:'',
-		nr_documento:'',
-		nr_item:'',
-		nr_sequencia:'',
-		serie_subserie_documento:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario,
-		id_modelo_documento:''
-	})
-*/
-
-const InsertAcC050Entrada = async (AcC050Entrada = {}) => {
-	let sql = `insert into ac_c050_entrada 
-						( id_ref_433, aliq_pis, vl_bc_pis, vl_pis, vl_aliq_pis, vl_pis_st, qtde_bc_pis, id_ref_434, aliq_cofins, vl_bc_cofins, vl_cofins, vl_aliq_cofins, vl_cofins_st, qtde_bc_cofins, id_nota_fiscal_entrada, dt_emissao_documento, id_pessoa_remetente, nr_documento, nr_item, nr_sequencia, serie_suserie_documento, id_empresa, id_usuario, id_modelo_documento) 
-						values 
-						( :id_ref_433, :aliq_pis, :vl_bc_pis, :vl_pis, :vl_aliq_pis, :vl_pis_st, :qtde_bc_pis, :id_ref_434, :aliq_cofins, :vl_bc_cofins, :vl_cofins, :vl_aliq_cofins, :vl_cofins_st, :qtde_bc_cofins, :id_nota_fiscal_entrada, :dt_emissao_documento, :id_pessoa_remetente, :nr_documento, :nr_item, :nr_sequencia, :serie_suserie_documento, :id_empresa, :id_usuario, :id_modelo_documento)
-						`;
-	try {
-		await Oracle.insert(sql, AcC050Entrada)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertAcC050Entrada
-	InsertAcC050Entrada({
-		id_ref_433:'',
-		aliq_pis:'',
-		vl_bc_pis:'',
-		vl_pis:'',
-		vl_aliq_pis:'',
-		vl_pis_st:'',
-		qtde_bc_pis:'',
-		id_ref_434:'',
-		aliq_cofins:'',
-		vl_bc_cofins:'',
-		vl_cofins:'',
-		vl_aliq_cofins:'',
-		vl_cofins_st:'',
-		qtde_bc_cofins:'',
-		id_nota_fiscal_entrada:'',
-		dt_emissao_documento:'',
-		id_pessoa_remetente:'',
-		nr_documento:'',
-		nr_item:'',
-		nr_sequencia:'',
-		serie_suserie_documento:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario,
-		id_modelo_documento:''
-	})
-*/
-
-const InsertAcC050Saida = async (AcC050Saida = {}) => {
-	let sql = `insert into ac_c050_saida 
-						( dm_entrada_saida, id_modelo_documento, id_ref_433, aliq_pis, vl_bc_pis, vl_pis, vl_aliq_pis, vl_pis_st, qtde_bc_pis, id_ref_434, aliq_cofins, vl_bc_cofins, vl_cofins, vl_aliq_cofins, vl_cofins_st, qtde_bc_cofins, id_nota_fiscal_saida, dt_emissao_documento, nr_documento, nr_item, nr_sequencia, serie_subserie_documento, id_empresa, id_usuario) 
-						values 
-						( :dm_entrada_saida, :id_modelo_documento, :id_ref_433, :aliq_pis, :vl_bc_pis, :vl_pis, :vl_aliq_pis, :vl_pis_st, :qtde_bc_pis, :id_ref_434, :aliq_cofins, :vl_bc_cofins, :vl_cofins, :vl_aliq_cofins, :vl_cofins_st, :qtde_bc_cofins, :id_nota_fiscal_saida, :dt_emissao_documento, :nr_documento, :nr_item, :nr_sequencia, :serie_subserie_documento, :id_empresa, :id_usuario)
-						`;
-	try {
-		await Oracle.insert(sql, AcC050Saida)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertAcC050Saida
-	InsertAcC050Saida({
-		dm_entrada_saida:'',
-		id_modelo_documento:'',
-		id_ref_433:'',
-		aliq_pis:'',
-		vl_bc_pis:'',
-		vl_pis:'',
-		vl_aliq_pis:'',
-		vl_pis_st:'',
-		qtde_bc_pis:'',
-		id_ref_434:'',
-		aliq_cofins:'',
-		vl_bc_cofins:'',
-		vl_cofins:'',
-		vl_aliq_cofins:'',
-		vl_cofins_st:'',
-		qtde_bc_cofins:'',
-		id_nota_fiscal_saida:'',
-		dt_emissao_documento:'',
-		nr_documento:'',
-		nr_item:'',
-		nr_sequencia:'',
-		serie_subserie_documento:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/
 
 const InsertInNotaFiscalSaidaItem = async (InNotaFiscalSaidaItem = {}) => {
 	let sql = `insert into in_nota_fiscal_saida_item 
@@ -751,20 +387,20 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
   fs.readFile(path, "utf8", async (err, xml) => {
     if (err){
       /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-      await etapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
+      await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
       throw new Error(err.message);
     }
     parseString(xml, async function (err, result) {
       if (err){
         /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-        await etapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
+        await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
         throw new Error(err.message);
       }
 
-			var Empresa = await CtrlEmpresa.select(id_empresa);
+			var Empresa = await model.CtrlEmpresa.select(id_empresa);
 
 			if(Empresa.rows[0].CNPJ_EMPRESA !== result.nfeProc.NFe[0].infNFe[0].emit[0].CNPJ[0]) { //então saida
-				await etapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Nota fiscal informada não é uma nota fiscal de saída.');
+				await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Nota fiscal informada não é uma nota fiscal de saída.');
         throw new Error(err.message);
 			}
 
@@ -796,7 +432,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
 			result.nfeProc.NFe[0].infNFe[0].emit[0].CNPJ
 			//if (inParametro.rows[0].DM_IMPORTAXML_DEPARA == '')
-      InsertInPessoa({
+      model.Pessoa.insert({
         dt_inicial:'',
         cd_pessoa:'',
         nm_razao_social:'',
@@ -818,16 +454,16 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       });
 
-      InsertSf0190({
-        ds_unidade:'',
-        ds_descricao:'',
-        dt_inicial:'',
-        dt_movimento:'',
-        id_empresa: id_empresa,
-        id_usuario: id_usuario
-      });
+			model.Unidade.insert({
+				ds_unidade:'',
+				ds_descricao:'',
+				dt_inicial:'',
+				dt_movimento:'',
+				id_empresa: id_empresa,
+				id_usuario: id_usuario
+			})
 
-      InsertInProdutoServico({
+      model.Produto.insert({
         cd_produto_servico:'',
         cd_barra:'',
         ds_produto_servico:'',
@@ -844,7 +480,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
       })
 
       // saída
-      InsertInNotaFiscalSaida({
+      model.NotaFiscal.Saida.Produto.insert({
         dm_entrada_saida:'',
         id_pessoa_destinatario:'',
         id_modelo_documento:'',
@@ -882,7 +518,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       })
 
-      InsertSfC110Saida({
+      model.SfC110.Saida.insert({
         id_modelo_documento:'',
         dm_entrada_saida:'',
         serie_subserie_documento:'',
@@ -895,7 +531,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       })
 
-      InsertAcC050Saida({
+      model.AcC050.Saida.insert({
         dm_entrada_saida:'',
         id_modelo_documento:'',
         id_ref_433:'',
@@ -1011,7 +647,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
   //Oracle.execProcedure(nm_procedure1, id_empresa, id_usuario);
   //Oracle.execProcedure(nm_procedure2, id_empresa, id_usuario);
   
-  await etapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
+  await model.EtapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
 }
 
 
@@ -1020,20 +656,20 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
   fs.readFile(path, "utf8", async (err, xml) => {
     if (err){
       /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-      await etapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
+      await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
       throw new Error(err.message);
     }
     parseString(xml, async function (err, result) {
       if (err){
         /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-        await etapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
+        await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
         throw new Error(err.message);
       }
 
-			var Empresa = await CtrlEmpresa.select(id_empresa);
+			var Empresa = await model.CtrlEmpresa.select(id_empresa);
 
 			if(Empresa.rows[0].CNPJ_EMPRESA !== result.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ[0]){ //então entrada
-				await etapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Nota fiscal informada não é uma nota fiscal de entrada.');
+				await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Nota fiscal informada não é uma nota fiscal de entrada.');
         throw new Error(err.message);
 			}
 
@@ -1049,7 +685,9 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
       if (result.nfeProc.NFe[0].infNFe[0].ide[0].ver)
         console.log(result.nfeProc.NFe[0].infNFe[0].ide[0].ver)
 
-      InsertInPessoa({
+
+
+      model.Pessoa.insert({
         dt_inicial:'',
         cd_pessoa:'',
         nm_razao_social:'',
@@ -1071,16 +709,16 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
         id_usuario: id_usuario
       });
 
-      InsertSf0190({
-        ds_unidade:'',
-        ds_descricao:'',
-        dt_inicial:'',
-        dt_movimento:'',
-        id_empresa: id_empresa,
-        id_usuario: id_usuario
-      });
+			model.Unidade.insert({
+				ds_unidade:'',
+				ds_descricao:'',
+				dt_inicial:'',
+				dt_movimento:'',
+				id_empresa: id_empresa,
+				id_usuario: id_usuario
+			})
 
-      InsertInProdutoServico({
+      model.Produto.insert({
         cd_produto_servico:'',
         cd_barra:'',
         ds_produto_servico:'',
@@ -1099,53 +737,40 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
 			// não será insert e sim update, pois a nota veio da importação texto
       // entrada
 
-      InsertInNotaFiscalEntrada({
-        id_pessoa_remetente:'',
-        id_modelo_documento:'',
-        serie_subserie_documento:'',
-        nr_documento:'',
-        dm_tipo_fatura:'',
-        dt_emissao_documento:'',
-        dt_entrada:'',
-        vl_total_nota_fiscal:'',
-        vl_desconto:'',
-        vl_icms_substituicao:'',
-        vl_outras_despesas:'',
-        vl_total_mercadoria:'',
-        vl_frete:'',
-        vl_seguro:'',
-        vl_ipi:'',
-        dm_modalidade_frete:'',
-        id_ref_413:'',
-        vl_icms_desonerado:'',
-        nr_chave_nf_eletronica:'',
-        vl_icms_fcp:'',
-        vl_icms_uf_dest:'',
-        vl_icms_uf_remet:'',
-        nr_chave_nf_eletron_ref_cat83:'',
-        vl_fcp_st:'',
-        id_ref_331_munic_orig:'',
-        id_ref_331_munic_dest:'',
-        dm_tipo_cte:'',
-        dm_finalidade:'',
-        id_empresa: id_empresa,
-        id_usuario: id_usuario
-      })
+      model.NotaFiscal.Entrada.Produto.insert({
+				id_pessoa_remetente:'',
+				id_modelo_documento:'',
+				serie_subserie_documento:'',
+				nr_documento:'',
+				dm_tipo_fatura:'',
+				dt_emissao_documento:'',
+				dt_entrada:'',
+				vl_total_nota_fiscal:'',
+				vl_desconto:'',
+				vl_icms_substituicao:'',
+				vl_outras_despesas:'',
+				vl_total_mercadoria:'',
+				vl_frete:'',
+				vl_seguro:'',
+				vl_ipi:'',
+				dm_modalidade_frete:'',
+				id_ref_413:'',
+				vl_icms_desonerado:'',
+				nr_chave_nf_eletronica:'',
+				vl_icms_fcp:'',
+				vl_icms_uf_dest:'',
+				vl_icms_uf_remet:'',
+				nr_chave_nf_eletron_ref_cat83:'',
+				vl_fcp_st:'',
+				id_ref_331_munic_orig:'',
+				id_ref_331_munic_dest:'',
+				dm_tipo_cte:'',
+				dm_finalidade:'',
+				id_empresa: id_empresa,
+				id_usuario: id_usuario
+			})
 
-      InsertSfC110Entrada({
-        serie_subserie_documento:'',
-        nr_documento:'',
-        dt_emissao_documento:'',
-        id_pessoa_remetente:'',
-        nr_item_imp:'',
-        id_ref_0450:'',
-        ds_complementar:'',
-        id_empresa: id_empresa,
-        id_usuario: id_usuario,
-        id_modelo_documento:''
-      })
-
-      InsertSfC110Entrada({
+      model.SfC110.Entrada.insert({
         serie_subserie_documento:'',
         nr_documento:'',
         dt_emissao_documento:'',
@@ -1158,7 +783,8 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
         id_modelo_documento:''
       })
 
-      InsertAcC060Entrada({
+
+      model.AcC060.Entrada.insert({
         dm_importacao:'',
         nr_di:'',
         dt_registro:'',
@@ -1177,7 +803,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
         id_modelo_documento:''
       })
 
-      InsertAcC050Entrada({
+      model.AcC050.Entrada.insert({
         id_ref_433:'',
         aliq_pis:'',
         vl_bc_pis:'',
@@ -1289,5 +915,5 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
   //Oracle.execProcedure(nm_procedure1, id_empresa, id_usuario);
   //Oracle.execProcedure(nm_procedure2, id_empresa, id_usuario);
   
-  await etapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
+  await model.EtapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
 }

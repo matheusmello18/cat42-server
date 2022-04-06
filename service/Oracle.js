@@ -9,6 +9,8 @@ if (process.platform === 'win32') { // Windows
   oracledb.initOracleClient({ libDir: '/opt/oracle/instantclient_21_4' });
 }
 
+module.exports.oracledb = oracledb;
+
 module.exports.insert = async (sql,params) => {
   let connection;
 

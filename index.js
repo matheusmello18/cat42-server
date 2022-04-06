@@ -9,6 +9,7 @@ const cliente = require("./route/v1/cliente")
 const users = require("./route/v1/users")
 const etapas = require("./route/v1/etapas")
 
+const model = require('./service/model')
 //const layoutX = require('./utils/LayoutX')
 
 
@@ -35,6 +36,17 @@ serve.get('*', (req, res) => {
 serve.post('*', (req, res) => {
   res.json({msg: "rota não existe"})
 })
+
+//console.log(model.NotaFiscal.Saida.Produto.item.data)
+/*
+async function getT(){
+  var retorno1 = await model.CtrlEmpresa.select(7);
+  console.log(retorno1.rows)
+  var retorno = await model.Ac331.municipio.select('3534302');
+  console.log(retorno.rows)
+}
+getT();
+*/
 
 //layoutX.GeraFunctionInsert();
 //layoutX.GeraInsertLayoutX();

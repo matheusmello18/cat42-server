@@ -1,4 +1,3 @@
-const oracledb = require('oracledb');
 const Oracle = require('../Oracle');
 
 const sql = `
