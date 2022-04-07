@@ -7,9 +7,10 @@ const Pessoa = require('./Pessoa');
 const Produto = require('./Produto');
 const Unidade = require('./Unidade');
 const NotaFiscal = require('./NotaFiscal');
-const SfC110 = require('./SfC110');
-const AcC060 = require('./AcC060');
-const AcC050 = require('./AcC050');
+
+const AcC700 = require('./AcC700');
+const SfC800 = require('./SfC800');
+const SfC850 = require('./SfC850');
 const ProdutoSimulador = require('./ProdutoSimulador');
 const Sf_Importa_Arquivo = require('./Sf_Importa_Arquivo');
 
@@ -17,6 +18,6 @@ module.exports = {
   Ac331, CtrlEmpresa, CtrlUsuario, 
   Etapas, EtapaStatus, Pessoa, 
   ProdutoSimulador, Sf_Importa_Arquivo, 
-  Produto, Unidade, NotaFiscal, SfC110,
-  AcC060
+  Produto, Unidade, NotaFiscal, AcC700, 
+  SfC800, SfC850
 }

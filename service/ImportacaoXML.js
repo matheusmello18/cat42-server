@@ -4,380 +4,6 @@ const parseString = require('xml2js').parseString;
 const fs = require("fs");
 
 
-
-
-
-const InsertInNotaFiscalSaidaItem = async (InNotaFiscalSaidaItem = {}) => {
-	let sql = `insert into in_nota_fiscal_saida_item 
-						( dm_entrada_saida, id_modelo_documento, serie_subserie_documento, nr_documento, dt_emissao_documento, nr_sequencia, id_produto_servico, id_0190, vl_unitario, vl_total_item, vl_desconto_item, dm_movimentacao_fisica, cd_fiscal_operacao, nr_fci, id_ref_431, vl_base_calculo_icms, vl_icms, vl_base_calculo_icms_subst, aliq_icms_subs, vl_icms_substituicao, aliq_icms, vl_reducao_bc_icms, vl_perc_red_icms, vl_perc_red_icms_st, dm_mod_bc_icms, dm_mod_bc_icms_st, dm_tributacao_icms, id_ref_432, vl_base_calculo_ipi, vl_ipi, aliq_ipi, qtde, unidade, dm_tributacao_ipi, vl_outras_despesas, vl_frete, vl_seguro, nr_item, ds_complementar, dm_mot_desc_icms, vl_icms_desonerado, vl_bc_ii, vl_desp_adu, vl_ii, vl_iof, vl_bc_icms_uf_dest, perc_icms_fcp, aliq_icms_uf_dest, aliq_icms_interestadual, perc_icms_partilha, vl_icms_fcp, vl_icms_uf_dest, vl_icms_uf_remet, id_ref_453, vl_bc_fcp_op, aliq_fcp_op, vl_fcp_op, vl_bc_fcp_st, aliq_fcp_st, vl_fcp_st, vl_bc_icms_st_obs, vl_icms_st_obs, qtde_tributada, id_empresa, id_usuario) 
-						values 
-						( :dm_entrada_saida, :id_modelo_documento, :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :nr_sequencia, :id_produto_servico, :id_0190, :vl_unitario, :vl_total_item, :vl_desconto_item, :dm_movimentacao_fisica, :cd_fiscal_operacao, :nr_fci, :id_ref_431, :vl_base_calculo_icms, :vl_icms, :vl_base_calculo_icms_subst, :aliq_icms_subs, :vl_icms_substituicao, :aliq_icms, :vl_reducao_bc_icms, :vl_perc_red_icms, :vl_perc_red_icms_st, :dm_mod_bc_icms, :dm_mod_bc_icms_st, :dm_tributacao_icms, :id_ref_432, :vl_base_calculo_ipi, :vl_ipi, :aliq_ipi, :qtde, :unidade, :dm_tributacao_ipi, :vl_outras_despesas, :vl_frete, :vl_seguro, :nr_item, :ds_complementar, :dm_mot_desc_icms, :vl_icms_desonerado, :vl_bc_ii, :vl_desp_adu, :vl_ii, :vl_iof, :vl_bc_icms_uf_dest, :perc_icms_fcp, :aliq_icms_uf_dest, :aliq_icms_interestadual, :perc_icms_partilha, :vl_icms_fcp, :vl_icms_uf_dest, :vl_icms_uf_remet, :id_ref_453, :vl_bc_fcp_op, :aliq_fcp_op, :vl_fcp_op, :vl_bc_fcp_st, :aliq_fcp_st, :vl_fcp_st, :vl_bc_icms_st_obs, :vl_icms_st_obs, :qtde_tributada, :id_empresa, :id_usuario)
-						`;
-	try {
-		await Oracle.insert(sql, InNotaFiscalSaidaItem)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertInNotaFiscalSaidaItem
-	InsertInNotaFiscalSaidaItem({
-		dm_entrada_saida:'',
-		id_modelo_documento:'',
-		serie_subserie_documento:'',
-		nr_documento:'',
-		dt_emissao_documento:'',
-		nr_sequencia:'',
-		id_produto_servico:'',
-		id_0190:'',
-		vl_unitario:'',
-		vl_total_item:'',
-		vl_desconto_item:'',
-		dm_movimentacao_fisica:'',
-		cd_fiscal_operacao:'',
-		nr_fci:'',
-		id_ref_431:'',
-		vl_base_calculo_icms:'',
-		vl_icms:'',
-		vl_base_calculo_icms_subst:'',
-		aliq_icms_subs:'',
-		vl_icms_substituicao:'',
-		aliq_icms:'',
-		vl_reducao_bc_icms:'',
-		vl_perc_red_icms:'',
-		vl_perc_red_icms_st:'',
-		dm_mod_bc_icms:'',
-		dm_mod_bc_icms_st:'',
-		dm_tributacao_icms:'',
-		id_ref_432:'',
-		vl_base_calculo_ipi:'',
-		vl_ipi:'',
-		aliq_ipi:'',
-		qtde:'',
-		unidade:'',
-		dm_tributacao_ipi:'',
-		vl_outras_despesas:'',
-		vl_frete:'',
-		vl_seguro:'',
-		nr_item:'',
-		ds_complementar:'',
-		dm_mot_desc_icms:'',
-		vl_icms_desonerado:'',
-		vl_bc_ii:'',
-		vl_desp_adu:'',
-		vl_ii:'',
-		vl_iof:'',
-		vl_bc_icms_uf_dest:'',
-		perc_icms_fcp:'',
-		aliq_icms_uf_dest:'',
-		aliq_icms_interestadual:'',
-		perc_icms_partilha:'',
-		vl_icms_fcp:'',
-		vl_icms_uf_dest:'',
-		vl_icms_uf_remet:'',
-		id_ref_453:'',
-		vl_bc_fcp_op:'',
-		aliq_fcp_op:'',
-		vl_fcp_op:'',
-		vl_bc_fcp_st:'',
-		aliq_fcp_st:'',
-		vl_fcp_st:'',
-		vl_bc_icms_st_obs:'',
-		vl_icms_st_obs:'',
-		qtde_tributada:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/
-
-const InsertInNotaFiscalEntradaItem = async (InNotaFiscalEntradaItem = {}) => {
-	let sql = `insert into in_nota_fiscal_entrada_item 
-						( id_modelo_documento, serie_subserie_documento, nr_documento, dt_emissao_documento, id_pessoa_remetente, nr_sequencia, id_produto_servico, id_0190, vl_unitario, vl_total_item, vl_desconto_item, dm_movimentacao_fisica, cd_fiscal_operacao, nr_fci, id_ref_431, vl_base_calculo_icms, vl_icms, vl_base_calculo_icms_subst, aliq_icms_subst, vl_icms_substituicao, aliq_icms, vl_reducao_bc_icms, dm_tributacao_icms, id_ref_432, vl_base_calculo_ipi, vl_ipi, aliq_ipi, qtde, unidade, dm_tributacao_ipi, vl_outras_despesas, vl_frete, vl_seguro, nr_item, ds_complementar, dm_mot_desc_icms, vl_icms_desonerado, vl_bc_ii, vl_desp_adu, vl_ii, vl_iof, vl_bc_icms_uf_dest, perc_icms_fcp, aliq_icms_uf_dest, aliq_icms_interestadual, perc_icms_partilha, vl_icms_fcp, vl_icms_uf_dest, vl_icms_uf_remet, id_ref_453, vl_bc_fcp_op, aliq_fcp_op, vl_fcp_op, vl_bc_fcp_st, aliq_fcp_st, vl_fcp_st, vl_bc_icms_st_obs, vl_icms_st_obs, cd_classificacao_fiscal_merc, id_empresa, id_usuario) 
-						values 
-						( :id_modelo_documento, :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :id_pessoa_remetente, :nr_sequencia, :id_produto_servico, :id_0190, :vl_unitario, :vl_total_item, :vl_desconto_item, :dm_movimentacao_fisica, :cd_fiscal_operacao, :nr_fci, :id_ref_431, :vl_base_calculo_icms, :vl_icms, :vl_base_calculo_icms_subst, :aliq_icms_subst, :vl_icms_substituicao, :aliq_icms, :vl_reducao_bc_icms, :dm_tributacao_icms, :id_ref_432, :vl_base_calculo_ipi, :vl_ipi, :aliq_ipi, :qtde, :unidade, :dm_tributacao_ipi, :vl_outras_despesas, :vl_frete, :vl_seguro, :nr_item, :ds_complementar, :dm_mot_desc_icms, :vl_icms_desonerado, :vl_bc_ii, :vl_desp_adu, :vl_ii, :vl_iof, :vl_bc_icms_uf_dest, :perc_icms_fcp, :aliq_icms_uf_dest, :aliq_icms_interestadual, :perc_icms_partilha, :vl_icms_fcp, :vl_icms_uf_dest, :vl_icms_uf_remet, :id_ref_453, :vl_bc_fcp_op, :aliq_fcp_op, :vl_fcp_op, :vl_bc_fcp_st, :aliq_fcp_st, :vl_fcp_st, :vl_bc_icms_st_obs, :vl_icms_st_obs, :cd_classificacao_fiscal_merc, :id_empresa, :id_usuario)
-						`;
-	try {
-		await Oracle.insert(sql, InNotaFiscalEntradaItem)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertInNotaFiscalEntradaItem
-	InsertInNotaFiscalEntradaItem({
-		id_modelo_documento:'',
-		serie_subserie_documento:'',
-		nr_documento:'',
-		dt_emissao_documento:'',
-		id_pessoa_remetente:'',
-		nr_sequencia:'',
-		id_produto_servico:'',
-		id_0190:'',
-		vl_unitario:'',
-		vl_total_item:'',
-		vl_desconto_item:'',
-		dm_movimentacao_fisica:'',
-		cd_fiscal_operacao:'',
-		nr_fci:'',
-		id_ref_431:'',
-		vl_base_calculo_icms:'',
-		vl_icms:'',
-		vl_base_calculo_icms_subst:'',
-		aliq_icms_subst:'',
-		vl_icms_substituicao:'',
-		aliq_icms:'',
-		vl_reducao_bc_icms:'',
-		dm_tributacao_icms:'',
-		id_ref_432:'',
-		vl_base_calculo_ipi:'',
-		vl_ipi:'',
-		aliq_ipi:'',
-		qtde:'',
-		unidade:'',
-		dm_tributacao_ipi:'',
-		vl_outras_despesas:'',
-		vl_frete:'',
-		vl_seguro:'',
-		nr_item:'',
-		ds_complementar:'',
-		dm_mot_desc_icms:'',
-		vl_icms_desonerado:'',
-		vl_bc_ii:'',
-		vl_desp_adu:'',
-		vl_ii:'',
-		vl_iof:'',
-		vl_bc_icms_uf_dest:'',
-		perc_icms_fcp:'',
-		aliq_icms_uf_dest:'',
-		aliq_icms_interestadual:'',
-		perc_icms_partilha:'',
-		vl_icms_fcp:'',
-		vl_icms_uf_dest:'',
-		vl_icms_uf_remet:'',
-		id_ref_453:'',
-		vl_bc_fcp_op:'',
-		aliq_fcp_op:'',
-		vl_fcp_op:'',
-		vl_bc_fcp_st:'',
-		aliq_fcp_st:'',
-		vl_fcp_st:'',
-		vl_bc_icms_st_obs:'',
-		vl_icms_st_obs:'',
-		cd_classificacao_fiscal_merc:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/
-
-const InsertSfC195Saida = async (SfC195Saida = {}) => {
-	let sql = `insert into sf_c195_saida 
-						( dm_entrada_saida, id_0460, ds_complementar, id_nota_fiscal_saida, nr_item, id_modelo_documento, serie_subserie_documento, nr_documento, dt_emissao_documento, nr_sequencia, id_empresa, id_usuario) 
-						values 
-						( :dm_entrada_saida, :id_0460, :ds_complementar, :id_nota_fiscal_saida, :nr_item, :id_modelo_documento, :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :nr_sequencia, :id_empresa, :id_usuario)
-						`;
-	try {
-		await Oracle.insert(sql, SfC195Saida)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertSfC195Saida
-	InsertSfC195Saida({
-		dm_entrada_saida:'',
-		id_0460:'',
-		ds_complementar:'',
-		id_nota_fiscal_saida:'',
-		nr_item:'',
-		id_modelo_documento:'',
-		serie_subserie_documento:'',
-		nr_documento:'',
-		dt_emissao_documento:'',
-		nr_sequencia:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/
-
-const InsertSfC195Entrada = async (SfC195Entrada = {}) => {
-	let sql = `insert into sf_c195_entrada 
-						( id_0460, ds_complementar, id_nota_fiscal_entrada, serie_subserie_documento, nr_documento, dt_emissao_documento, id_pessoa_remetente, nr_sequencia, nr_item, id_empresa, id_usuario, id_modelo_documento) 
-						values 
-						( :id_0460, :ds_complementar, :id_nota_fiscal_entrada, :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :id_pessoa_remetente, :nr_sequencia, :nr_item, :id_empresa, :id_usuario, :id_modelo_documento)
-						`;
-	try {
-		await Oracle.insert(sql, SfC195Entrada)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertSfC195Entrada
-	InsertSfC195Entrada({
-		id_0460:'',
-		ds_complementar:'',
-		id_nota_fiscal_entrada:'',
-		serie_subserie_documento:'',
-		nr_documento:'',
-		dt_emissao_documento:'',
-		id_pessoa_remetente:'',
-		nr_sequencia:'',
-		nr_item:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario,
-		id_modelo_documento:''
-	})
-*/
-
-const InsertAcC700Entrada = async (AcC700Entrada = {}) => {
-	let sql = `insert into ac_c700_entrada 
-						( dm_tipo_ligacao, dm_grupo_tensao, id_ref_331_municipio, nr_chave_nf_eletronica_ref, vl_fornecido, id_nota_fiscal_entrada, serie_subserie_documento, nr_documento, dt_emissao_documento, id_pessoa_remetente, id_empresa, id_usuario, id_modelo_documento) 
-						values 
-						( :dm_tipo_ligacao, :dm_grupo_tensao, :id_ref_331_municipio, :nr_chave_nf_eletronica_ref, :vl_fornecido, :id_nota_fiscal_entrada, :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :id_pessoa_remetente, :id_empresa, :id_usuario, :id_modelo_documento)
-						`;
-	try {
-		await Oracle.insert(sql, AcC700Entrada)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertAcC700Entrada
-	InsertAcC700Entrada({
-		dm_tipo_ligacao:'',
-		dm_grupo_tensao:'',
-		id_ref_331_municipio:'',
-		nr_chave_nf_eletronica_ref:'',
-		vl_fornecido:'',
-		id_nota_fiscal_entrada:'',
-		serie_subserie_documento:'',
-		nr_documento:'',
-		dt_emissao_documento:'',
-		id_pessoa_remetente:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario,
-		id_modelo_documento:''
-	})
-*/
-
-const InsertAcC700Saida = async (AcC700Saida = {}) => {
-	let sql = `insert into ac_c700_saida 
-						( dm_entrada_saida, dm_tipo_ligacao, dm_grupo_tensao, id_ref_331_municipio, nr_chave_nf_eletronica_ref, vl_fornecido, id_nota_fiscal_saida, serie_subserie_documento, nr_documento, dt_emissao_documento, id_modelo_documento, id_empresa, id_usuario) 
-						values 
-						( :dm_entrada_saida, :dm_tipo_ligacao, :dm_grupo_tensao, :id_ref_331_municipio, :nr_chave_nf_eletronica_ref, :vl_fornecido, :id_nota_fiscal_saida, :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :id_modelo_documento, :id_empresa, :id_usuario)
-						`;
-	try {
-		await Oracle.insert(sql, AcC700Saida)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertAcC700Saida
-	InsertAcC700Saida({
-		dm_entrada_saida:'',
-		dm_tipo_ligacao:'',
-		dm_grupo_tensao:'',
-		id_ref_331_municipio:'',
-		nr_chave_nf_eletronica_ref:'',
-		vl_fornecido:'',
-		id_nota_fiscal_saida:'',
-		serie_subserie_documento:'',
-		nr_documento:'',
-		dt_emissao_documento:'',
-		id_modelo_documento:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/
-
-const InsertSfC800 = async (SfC800 = {}) => {
-	let sql = `insert into sf_c800 
-						( nr_chave_cfe, id_modelo_documento, id_ref_413, dt_documento, nr_cnpj_cpf, nr_serie_sat, nr_cfe, nr_caixa, nm_destinatario, vl_desconto, vl_mercadoria, vl_outras_desp, vl_icms, vl_pis, vl_pis_st, vl_cofins, vl_cofins_st, vl_cfe, id_empresa, id_usuario) 
-						values 
-						( :nr_chave_cfe, :id_modelo_documento, :id_ref_413, :dt_documento, :nr_cnpj_cpf, :nr_serie_sat, :nr_cfe, :nr_caixa, :nm_destinatario, :vl_desconto, :vl_mercadoria, :vl_outras_desp, :vl_icms, :vl_pis, :vl_pis_st, :vl_cofins, :vl_cofins_st, :vl_cfe, :id_empresa, :id_usuario)
-						`;
-	try {
-		await Oracle.insert(sql, SfC800)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertSfC800
-	InsertSfC800({
-		nr_chave_cfe:'',
-		id_modelo_documento:'',
-		id_ref_413:'',
-		dt_documento:'',
-		nr_cnpj_cpf:'',
-		nr_serie_sat:'',
-		nr_cfe:'',
-		nr_caixa:'',
-		nm_destinatario:'',
-		vl_desconto:'',
-		vl_mercadoria:'',
-		vl_outras_desp:'',
-		vl_icms:'',
-		vl_pis:'',
-		vl_pis_st:'',
-		vl_cofins:'',
-		vl_cofins_st:'',
-		vl_cfe:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/
-
-const InsertSfC850 = async (SfC850 = {}) => {
-	let sql = `insert into sf_c850 
-						( nr_item, dt_documento, nr_cfe, id_ref_413, nr_serie_sat, cd_fiscal_operacao, id_produto_servico, vl_total_item, id_0460, id_ref_431, aliq_icms, vl_bc_icms, vl_icms, id_ref_433, aliq_pis, vl_bc_pis, vl_pis, vl_aliq_pis, vl_qtde_bc_pis, id_ref_434, vl_bc_cofins, aliq_cofins, vl_cofins, vl_aliq_cofins, vl_qtde_bc_cofins, vl_desconto, vl_outras_desp, qtde, vl_unitario, id_empresa, id_usuario) 
-						values 
-						( :nr_item, :dt_documento, :nr_cfe, :id_ref_413, :nr_serie_sat, :cd_fiscal_operacao, :id_produto_servico, :vl_total_item, :id_0460, :id_ref_431, :aliq_icms, :vl_bc_icms, :vl_icms, :id_ref_433, :aliq_pis, :vl_bc_pis, :vl_pis, :vl_aliq_pis, :vl_qtde_bc_pis, :id_ref_434, :vl_bc_cofins, :aliq_cofins, :vl_cofins, :vl_aliq_cofins, :vl_qtde_bc_cofins, :vl_desconto, :vl_outras_desp, :qtde, :vl_unitario, :id_empresa, :id_usuario)
-						`;
-	try {
-		await Oracle.insert(sql, SfC850)
-	} catch (err) {
-		throw new Error(err);
-	}
-}
-
-/** InsertSfC850
-	InsertSfC850({
-		nr_item:'',
-		dt_documento:'',
-		nr_cfe:'',
-		id_ref_413:'',
-		nr_serie_sat:'',
-		cd_fiscal_operacao:'',
-		id_produto_servico:'',
-		vl_total_item:'',
-		id_0460:'',
-		id_ref_431:'',
-		aliq_icms:'',
-		vl_bc_icms:'',
-		vl_icms:'',
-		id_ref_433:'',
-		aliq_pis:'',
-		vl_bc_pis:'',
-		vl_pis:'',
-		vl_aliq_pis:'',
-		vl_qtde_bc_pis:'',
-		id_ref_434:'',
-		vl_bc_cofins:'',
-		aliq_cofins:'',
-		vl_cofins:'',
-		vl_aliq_cofins:'',
-		vl_qtde_bc_cofins:'',
-		vl_desconto:'',
-		vl_outras_desp:'',
-		qtde:'',
-		vl_unitario:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/
-
 //deletar se existe o registro e importar novamnete;
 //tomar atenção para este procedimento em outras importação se isso será necessário
 //importar o cupom fiscal c800 e c850
@@ -404,10 +30,6 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         throw new Error(err.message);
 			}
 
-			//result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0]
-			//result.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ ou result.nfeProc.NFe[0].infNFe[0].dest[0].CPF
-			//result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0]? EX : 
-
       console.log(result.nfeProc.$.versao)
       console.dir(result.nfeProc.NFe[0].infNFe[0].ide[0].cUF[0]);
       
@@ -420,6 +42,8 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
       if (result.nfeProc.NFe[0].infNFe[0].ide[0].ver)
         console.log(result.nfeProc.NFe[0].infNFe[0].ide[0].ver)
 
+
+			
 			var inParametro = await Oracle.select(
 				`SELECT DM_IMPORTAXML_DEPARA, /*para nfe entrada*/
 								DM_APURACAO_DTEMISSAO, 
@@ -430,7 +54,13 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 				{ID_EMPRESA: id_empresa}
 			);
 
-			result.nfeProc.NFe[0].infNFe[0].emit[0].CNPJ
+      //result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0]
+			//result.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ ou result.nfeProc.NFe[0].infNFe[0].dest[0].CPF
+			//result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0]? EX : 
+      if (result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0] == 'EX'){
+        
+      }
+			//result.nfeProc.NFe[0].infNFe[0].emit[0].CNPJ
 			//if (inParametro.rows[0].DM_IMPORTAXML_DEPARA == '')
       model.Pessoa.insert({
         dt_inicial:'',
@@ -439,7 +69,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         ds_endereco:'',
         ds_bairro:'',
         id_ref_331_municipio:'',
-        uf:'',
+        uf:result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0],
         id_ref_331_pais:'',
         nr_cep:'',
         nr_cnpj_cpf:'',
@@ -449,37 +79,11 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         ds_complemento:'',
         nr_fone:'',
         dm_contribuinte:'',
-        nr_id_estrangeiro:'',
+        nr_id_estrangeiro:result.nfeProc.NFe[0].infNFe[0].dest[0].IdEstrangeiro !== undefined ? result.nfeProc.NFe[0].infNFe[0].dest[0].IdEstrangeiro[0] : "",
         id_empresa: id_empresa,
         id_usuario: id_usuario
       });
 
-			model.Unidade.insert({
-				ds_unidade:'',
-				ds_descricao:'',
-				dt_inicial:'',
-				dt_movimento:'',
-				id_empresa: id_empresa,
-				id_usuario: id_usuario
-			})
-
-      model.Produto.insert({
-        cd_produto_servico:'',
-        cd_barra:'',
-        ds_produto_servico:'',
-        id_ref_331_ncm:'',
-        id_ref_331_ex_ipi:'',
-        dm_tipo_item:'',
-        unidade:'',
-        id_0190:'',
-        dt_inicial:'',
-        dt_movimento:'',
-        id_cest:'',
-        id_empresa: id_empresa,
-        id_usuario: id_usuario
-      })
-
-      // saída
       model.NotaFiscal.Saida.Produto.insert({
         dm_entrada_saida:'',
         id_pessoa_destinatario:'',
@@ -518,7 +122,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       })
 
-      model.SfC110.Saida.insert({
+      model.NotaFiscal.Entrada.Produto.SfC110.insert({
         id_modelo_documento:'',
         dm_entrada_saida:'',
         serie_subserie_documento:'',
@@ -531,34 +135,32 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       })
 
-      model.AcC050.Saida.insert({
-        dm_entrada_saida:'',
-        id_modelo_documento:'',
-        id_ref_433:'',
-        aliq_pis:'',
-        vl_bc_pis:'',
-        vl_pis:'',
-        vl_aliq_pis:'',
-        vl_pis_st:'',
-        qtde_bc_pis:'',
-        id_ref_434:'',
-        aliq_cofins:'',
-        vl_bc_cofins:'',
-        vl_cofins:'',
-        vl_aliq_cofins:'',
-        vl_cofins_st:'',
-        qtde_bc_cofins:'',
-        id_nota_fiscal_saida:'',
-        dt_emissao_documento:'',
-        nr_documento:'',
-        nr_item:'',
-        nr_sequencia:'',
-        serie_subserie_documento:'',
+			model.Unidade.insert({
+				ds_unidade:'',
+				ds_descricao:'',
+				dt_inicial:'',
+				dt_movimento:'',
+				id_empresa: id_empresa,
+				id_usuario: id_usuario
+			})
+
+      model.Produto.insert({
+        cd_produto_servico:'',
+        cd_barra:'',
+        ds_produto_servico:'',
+        id_ref_331_ncm:'',
+        id_ref_331_ex_ipi:'',
+        dm_tipo_item:'',
+        unidade:'',
+        id_0190:'',
+        dt_inicial:'',
+        dt_movimento:'',
+        id_cest:'',
         id_empresa: id_empresa,
         id_usuario: id_usuario
       })
 
-      InsertInNotaFiscalSaidaItem({
+      model.NotaFiscal.Saida.Produto.Item.insert({
         dm_entrada_saida:'',
         id_modelo_documento:'',
         serie_subserie_documento:'',
@@ -626,7 +228,34 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       })
 
-      InsertSfC195Saida({
+      model.NotaFiscal.Saida.Produto.Item.AcC050.insert({
+        dm_entrada_saida:'',
+        id_modelo_documento:'',
+        id_ref_433:'',
+        aliq_pis:'',
+        vl_bc_pis:'',
+        vl_pis:'',
+        vl_aliq_pis:'',
+        vl_pis_st:'',
+        qtde_bc_pis:'',
+        id_ref_434:'',
+        aliq_cofins:'',
+        vl_bc_cofins:'',
+        vl_cofins:'',
+        vl_aliq_cofins:'',
+        vl_cofins_st:'',
+        qtde_bc_cofins:'',
+        id_nota_fiscal_saida:'',
+        dt_emissao_documento:'',
+        nr_documento:'',
+        nr_item:'',
+        nr_sequencia:'',
+        serie_subserie_documento:'',
+        id_empresa: id_empresa,
+        id_usuario: id_usuario
+      })
+
+      model.NotaFiscal.Saida.Produto.SfC195.insert({
         dm_entrada_saida:'',
         id_0460:'',
         ds_complementar:'',
@@ -770,7 +399,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
 				id_usuario: id_usuario
 			})
 
-      model.SfC110.Entrada.insert({
+      model.NotaFiscal.Entrada.Produto.SfC110.insert({
         serie_subserie_documento:'',
         nr_documento:'',
         dt_emissao_documento:'',
@@ -782,9 +411,8 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
         id_usuario: id_usuario,
         id_modelo_documento:''
       })
-
-
-      model.AcC060.Entrada.insert({
+      
+      model.NotaFiscal.Entrada.Produto.AcC060.insert({
         dm_importacao:'',
         nr_di:'',
         dt_registro:'',
@@ -803,34 +431,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
         id_modelo_documento:''
       })
 
-      model.AcC050.Entrada.insert({
-        id_ref_433:'',
-        aliq_pis:'',
-        vl_bc_pis:'',
-        vl_pis:'',
-        vl_aliq_pis:'',
-        vl_pis_st:'',
-        qtde_bc_pis:'',
-        id_ref_434:'',
-        aliq_cofins:'',
-        vl_bc_cofins:'',
-        vl_cofins:'',
-        vl_aliq_cofins:'',
-        vl_cofins_st:'',
-        qtde_bc_cofins:'',
-        id_nota_fiscal_entrada:'',
-        dt_emissao_documento:'',
-        id_pessoa_remetente:'',
-        nr_documento:'',
-        nr_item:'',
-        nr_sequencia:'',
-        serie_suserie_documento:'',
-        id_empresa: id_empresa,
-        id_usuario: id_usuario,
-        id_modelo_documento:''
-      })
-
-      InsertInNotaFiscalEntradaItem({
+      model.NotaFiscal.Entrada.Produto.Item.insert({
         id_modelo_documento:'',
         serie_subserie_documento:'',
         nr_documento:'',
@@ -894,7 +495,36 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
         id_usuario: id_usuario
       })
 
-      InsertSfC195Entrada({
+
+      model.NotaFiscal.Entrada.Produto.Item.AcC050.insert({
+        id_ref_433:'',
+        aliq_pis:'',
+        vl_bc_pis:'',
+        vl_pis:'',
+        vl_aliq_pis:'',
+        vl_pis_st:'',
+        qtde_bc_pis:'',
+        id_ref_434:'',
+        aliq_cofins:'',
+        vl_bc_cofins:'',
+        vl_cofins:'',
+        vl_aliq_cofins:'',
+        vl_cofins_st:'',
+        qtde_bc_cofins:'',
+        id_nota_fiscal_entrada:'',
+        dt_emissao_documento:'',
+        id_pessoa_remetente:'',
+        nr_documento:'',
+        nr_item:'',
+        nr_sequencia:'',
+        serie_suserie_documento:'',
+        id_empresa: id_empresa,
+        id_usuario: id_usuario,
+        id_modelo_documento:''
+      })
+
+
+      model.SfC195.Entrada.insert({
         id_0460:'',
         ds_complementar:'',
         id_nota_fiscal_entrada:'',

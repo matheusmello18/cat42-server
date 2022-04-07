@@ -21,7 +21,21 @@ module.exports.sp_gera_pessoa_mestre_item = async () => {
   }
 }
 
-module.exports.mestre = {}
+module.exports.mestre = {
+	selectByRazaoSocial: async (nm_razao_social, id_empresa) => {
+		let sql = `select in_pessoa_mestre.id_pessoa, 
+											in_pessoa_mestre.cd_pessoa 
+								from in_pessoa_item 
+								inner join in_pessoa_mestre on in_pessoa_mestre.id_pessoa = in_pessoa_item.id_pessoa 
+								where nm_razao_social = :nm_razao_social 
+									and in_pessoa_mestre.id_empresa = :id_empresa_referencia`;
+		try {
+			await Oracle.insert(sql, {nm_razao_social: nm_razao_social, id_empresa_referencia: id_empresa})
+		} catch (err) {
+			throw new Error(err);
+		}
+	}
+}
 module.exports.item = {}
 
 /** require('./model').Pessoa.insert
