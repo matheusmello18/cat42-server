@@ -15,7 +15,7 @@ module.exports.GeraInsertLayoutX = async () => {
   for (const codLayout of codLayouts) {
     codLayout;
 
-    console.log(codLayout);
+    
     sql = '';
     campos = '';
     fields = '';  

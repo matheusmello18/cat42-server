@@ -10,7 +10,8 @@ const users = require("./route/v1/users")
 const etapas = require("./route/v1/etapas")
 
 const model = require('./service/model')
-//const layoutX = require('./utils/LayoutX')
+const utils = require('./utils')
+const jsonNfe = require('./test/35201153309795000180550010005589881507126891.json')
 
 
 var corsOptions = {
@@ -37,19 +38,23 @@ serve.post('*', (req, res) => {
   res.json({msg: "rota não existe"})
 })
 
-//console.log(model.NotaFiscal.Saida.Produto.item.data)
-/*
+
+//console.log(utils.Validar.ifelse(jsonNfe.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ, jsonNfe.nfeProc.NFe[0].infNFe[0].dest[0].CPF));
+
+ //console.log(utils.FormatarData.DateOracleToPrimeiroDia("15/02/2020"));
+ //console.log(utils.FormatarData.DateOracleToUltimoDia("15/12/2020"));
+ //console.log(utils.FormatarData.RetornarMenorDataEmOracle("15/04/2020", "15/03/2020"));
+
+
 async function getT(){
-  var retorno1 = await model.CtrlEmpresa.select(7);
-  console.log(retorno1.rows)
+  var retorno1 = await model.CtrlEmpresa.select(77);
+  console.log(retorno1)
+  
   var retorno = await model.Ac331.municipio.select('3534302');
   console.log(retorno.rows)
 }
-getT();
-*/
+//getT();
 
-//layoutX.GeraFunctionInsert();
-//layoutX.GeraInsertLayoutX();
 
 serve.listen(8081, function(){
   console.log("Servidor Rodando. Url: http://localhost:8081");

@@ -1,5 +1,6 @@
 const Oracle = require('./Oracle');
 const model = require('./model');
+const utils = require('../utils');
 const parseString = require('xml2js').parseString;
 const fs = require("fs");
 
@@ -57,29 +58,67 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
       //result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0]
 			//result.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ ou result.nfeProc.NFe[0].infNFe[0].dest[0].CPF
 			//result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0]? EX : 
+      let dhEmi = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(result.nfeProc.NFe[0].infNFe[0].ide[0].dhEmi, result.nfeProc.NFe[0].infNFe[0].ide[0].dEmi)[0]);
+      let cpfOrCnpj = utils.Validar.ifelse(result.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ, result.nfeProc.NFe[0].infNFe[0].dest[0].CPF)[0];
+      let id_ref_331_pais = (await model.Ac331.pais.select(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].cPais[0])).rows[0].ID_REF_331_PAIS;
+      let id_ref_331_municipio = (await model.Ac331.municipio.select(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].cMun[0])).rows[0].ID_REF_331_MUNICIPIO;
+      let cd_pessoa = '';
+      let pm;
+
       if (result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0] == 'EX'){
-        
+        pm = await model.Pessoa.Mestre.selectByRazaoSocial(result.nfeProc.NFe[0].infNFe[0].dest[0].xNome[0], id_empresa);
+        if (pm.rows.length == 0){
+          let id_pessoa = await Oracle.proxCod("IN_PESSOA_MESTRE");
+          cd_pessoa = id_pessoa + '-EX';
+          await model.Pessoa.Mestre.insert({
+            id_pessoa: id_pessoa,
+            cd_pessoa: cd_pessoa,
+            id_empresa: id_empresa, 
+            id_usuario: id_usuario
+          })
+        } else {
+          cd_pessoa = pm.rows[0].CD_PESSOA;
+        }
+      } else {      
+        pm = await model.Pessoa.Mestre.selectByCpfOrCpnj(
+          cpfOrCnpj,
+          dhEmi,
+          id_empresa
+        );
+
+        if (pm.rows.length > 0){
+          cd_pessoa = pm.rows[0].CD_PESSOA;
+        }
       }
-			//result.nfeProc.NFe[0].infNFe[0].emit[0].CNPJ
-			//if (inParametro.rows[0].DM_IMPORTAXML_DEPARA == '')
-      model.Pessoa.insert({
-        dt_inicial:'',
-        cd_pessoa:'',
-        nm_razao_social:'',
-        ds_endereco:'',
-        ds_bairro:'',
-        id_ref_331_municipio:'',
-        uf:result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0],
-        id_ref_331_pais:'',
-        nr_cep:'',
-        nr_cnpj_cpf:'',
-        nr_inscricao_estadual:'',
-        dt_movimento:'',
-        nr_numero:'',
-        ds_complemento:'',
-        nr_fone:'',
-        dm_contribuinte:'',
-        nr_id_estrangeiro:result.nfeProc.NFe[0].infNFe[0].dest[0].IdEstrangeiro !== undefined ? result.nfeProc.NFe[0].infNFe[0].dest[0].IdEstrangeiro[0] : "",
+
+      if (result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0] == 'EX'){
+        if (cd_pessoa.endsWith('-EX')){
+          //importo
+        }
+      } else if (cd_pessoa.length == 0){
+        cd_pessoa = cpfOrCnpj;
+        //importo
+      }
+
+      //dt_inicial pegar data da nota se for menor que a data do cadastro simul
+      await model.Pessoa.insert({
+        dt_inicial: utils.FormatarData.RetornarMenorDataEmOracle(dhEmi, dt_periodo),
+        cd_pessoa: cd_pessoa,
+        nm_razao_social: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].xNome, 0),
+        ds_endereco: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].xLgr, 0),
+        ds_bairro: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].xBairro, 0),
+        id_ref_331_municipio: id_ref_331_municipio,
+        uf: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF, 0),
+        id_ref_331_pais: id_ref_331_pais,
+        nr_cep: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].CEP, 0),
+        nr_cnpj_cpf: cpfOrCnpj,
+        nr_inscricao_estadual: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].IE, 0),
+        dt_movimento: dhEmi,
+        nr_numero: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].nro, 0),
+        ds_complemento: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].xCpl, 0),
+        nr_fone: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].Fone, 0),
+        dm_contribuinte: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].indIEDest, 0),
+        nr_id_estrangeiro: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].IdEstrangeiro, 0),
         id_empresa: id_empresa,
         id_usuario: id_usuario
       });

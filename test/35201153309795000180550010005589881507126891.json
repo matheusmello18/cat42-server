@@ -1,0 +1,781 @@
+{
+  "nfeProc": {
+    "$": {
+      "xmlns": "http://www.portalfiscal.inf.br/nfe",
+      "versao": "4.00"
+    },
+    "NFe": [
+      {
+        "$": {
+          "xmlns": "http://www.portalfiscal.inf.br/nfe"
+        },
+        "infNFe": [
+          {
+            "$": {
+              "Id": "NFe35201153309795000180550010005589881507126891",
+              "versao": "4.00"
+            },
+            "ide": [
+              {
+                "cUF": [
+                  "35"
+                ],
+                "cNF": [
+                  "50712689"
+                ],
+                "natOp": [
+                  "REM.MERC. VENDA A ORDEM"
+                ],
+                "mod": [
+                  "55"
+                ],
+                "serie": [
+                  "1"
+                ],
+                "nNF": [
+                  "558988"
+                ],
+                "dhEmi": [
+                  "2020-11-13T18:23:29-03:00"
+                ],
+                "dhSaiEnt": [
+                  "2020-11-13T18:23:29-03:00"
+                ],
+                "tpNF": [
+                  "1"
+                ],
+                "idDest": [
+                  "2"
+                ],
+                "cMunFG": [
+                  "3534302"
+                ],
+                "tpImp": [
+                  "1"
+                ],
+                "tpEmis": [
+                  "1"
+                ],
+                "cDV": [
+                  "1"
+                ],
+                "tpAmb": [
+                  "1"
+                ],
+                "finNFe": [
+                  "1"
+                ],
+                "indFinal": [
+                  "0"
+                ],
+                "indPres": [
+                  "0"
+                ],
+                "procEmi": [
+                  "0"
+                ],
+                "verProc": [
+                  "FIT DFe CloudFiscal"
+                ]
+              }
+            ],
+            "emit": [
+              {
+                "CNPJ": [
+                  "53309795000180"
+                ],
+                "xNome": [
+                  "MORLAN S/A"
+                ],
+                "xFant": [
+                  "MORLAN S/A Matriz"
+                ],
+                "enderEmit": [
+                  {
+                    "xLgr": [
+                      "RUA QUATORZE"
+                    ],
+                    "nro": [
+                      "1126"
+                    ],
+                    "xCpl": [
+                      "TERREOFABRICA"
+                    ],
+                    "xBairro": [
+                      "ORLANDIA"
+                    ],
+                    "cMun": [
+                      "3534302"
+                    ],
+                    "xMun": [
+                      "ORLANDIA"
+                    ],
+                    "UF": [
+                      "SP"
+                    ],
+                    "CEP": [
+                      "14620000"
+                    ],
+                    "cPais": [
+                      "1058"
+                    ],
+                    "xPais": [
+                      "BRASIL"
+                    ],
+                    "fone": [
+                      "1638204000"
+                    ]
+                  }
+                ],
+                "IE": [
+                  "491000067114"
+                ],
+                "CRT": [
+                  "3"
+                ]
+              }
+            ],
+            "dest": [
+              {
+                "CNPJ": [
+                  "02515378000404"
+                ],
+                "xNome": [
+                  "FOSPLAN COM E IND DE PROD AGROP LTDA"
+                ],
+                "enderDest": [
+                  {
+                    "xLgr": [
+                      "AV.BERNARDO SAYAO"
+                    ],
+                    "nro": [
+                      "1954"
+                    ],
+                    "xCpl": [
+                      "QUADRA 02 - LOTE 06"
+                    ],
+                    "xBairro": [
+                      "SETOR MILENA"
+                    ],
+                    "cMun": [
+                      "1716109"
+                    ],
+                    "xMun": [
+                      "PARAISO DO TOCANTINS"
+                    ],
+                    "UF": [
+                      "TO"
+                    ],
+                    "CEP": [
+                      "77600000"
+                    ],
+                    "cPais": [
+                      "1058"
+                    ],
+                    "xPais": [
+                      "BRASIL"
+                    ]
+                  }
+                ],
+                "indIEDest": [
+                  "1"
+                ],
+                "IE": [
+                  "293818401"
+                ],
+                "email": [
+                  "edvando@terrafos.com.br"
+                ]
+              }
+            ],
+            "det": [
+              {
+                "$": {
+                  "nItem": "1",
+                  "idProduto": "1001"
+                },
+                "prod": [
+                  {
+                    "cProd": [
+                      "0000393"
+                    ],
+                    "cEAN": [
+                      "7897047203937"
+                    ],
+                    "xProd": [
+                      "TELA HEX.PIAU 3 BWG 18X0,80mX50m"
+                    ],
+                    "NCM": [
+                      "73144100"
+                    ],
+                    "CEST": [
+                      "1005300"
+                    ],
+                    "CFOP": [
+                      "6923"
+                    ],
+                    "uCom": [
+                      "RL"
+                    ],
+                    "qCom": [
+                      "20.0000"
+                    ],
+                    "vUnCom": [
+                      "0.00"
+                    ],
+                    "vProd": [
+                      "0.00"
+                    ],
+                    "cEANTrib": [
+                      "7897047203937"
+                    ],
+                    "uTrib": [
+                      "KG"
+                    ],
+                    "qTrib": [
+                      "258.8000"
+                    ],
+                    "vUnTrib": [
+                      "0.00"
+                    ],
+                    "indTot": [
+                      "1"
+                    ],
+                    "nFCI": [
+                      "8F867328-1C03-41EC-AA7B-4F019802CBCE"
+                    ]
+                  }
+                ],
+                "imposto": [
+                  {
+                    "ICMS": [
+                      {
+                        "ICMS90": [
+                          {
+                            "orig": [
+                              "5"
+                            ],
+                            "CST": [
+                              "90"
+                            ],
+                            "modBC": [
+                              "3"
+                            ],
+                            "vBC": [
+                              "0.00"
+                            ],
+                            "pICMS": [
+                              "0.00"
+                            ],
+                            "vICMS": [
+                              "0.00"
+                            ],
+                            "modBCST": [
+                              "4"
+                            ],
+                            "vBCST": [
+                              "0.00"
+                            ],
+                            "pICMSST": [
+                              "0.00"
+                            ],
+                            "vICMSST": [
+                              "0.00"
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    "IPI": [
+                      {
+                        "cEnq": [
+                          "999"
+                        ],
+                        "IPINT": [
+                          {
+                            "CST": [
+                              "53"
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    "PIS": [
+                      {
+                        "PISOutr": [
+                          {
+                            "CST": [
+                              "49"
+                            ],
+                            "vBC": [
+                              "0.00"
+                            ],
+                            "pPIS": [
+                              "0.00"
+                            ],
+                            "vPIS": [
+                              "0.00"
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    "COFINS": [
+                      {
+                        "COFINSOutr": [
+                          {
+                            "CST": [
+                              "49"
+                            ],
+                            "vBC": [
+                              "0.00"
+                            ],
+                            "pCOFINS": [
+                              "0.00"
+                            ],
+                            "vCOFINS": [
+                              "0.00"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "infAdProd": [
+                  "RESOLUCAO DO SENADO FEDERAL N.13/12, NUMERO FCI 8F867328-1C03-41EC-AA7B-4F019802CBCE"
+                ]
+              },
+              {
+                "$": {
+                  "nItem": "2",
+                  "idProduto": "1002"
+                },
+                "prod": [
+                  {
+                    "cProd": [
+                      "0000393"
+                    ],
+                    "cEAN": [
+                      "7897047203937"
+                    ],
+                    "xProd": [
+                      "TELA HEX.PIAU 3 BWG 18X0,80mX50m"
+                    ],
+                    "NCM": [
+                      "73144100"
+                    ],
+                    "CEST": [
+                      "1005300"
+                    ],
+                    "CFOP": [
+                      "6923"
+                    ],
+                    "uCom": [
+                      "RL"
+                    ],
+                    "qCom": [
+                      "20.0000"
+                    ],
+                    "vUnCom": [
+                      "0.00"
+                    ],
+                    "vProd": [
+                      "0.00"
+                    ],
+                    "cEANTrib": [
+                      "7897047203937"
+                    ],
+                    "uTrib": [
+                      "KG"
+                    ],
+                    "qTrib": [
+                      "258.8000"
+                    ],
+                    "vUnTrib": [
+                      "0.00"
+                    ],
+                    "indTot": [
+                      "1"
+                    ],
+                    "nFCI": [
+                      "8F867328-1C03-41EC-AA7B-4F019802CBCE"
+                    ]
+                  }
+                ],
+                "imposto": [
+                  {
+                    "ICMS": [
+                      {
+                        "ICMS90": [
+                          {
+                            "orig": [
+                              "5"
+                            ],
+                            "CST": [
+                              "90"
+                            ],
+                            "modBC": [
+                              "3"
+                            ],
+                            "vBC": [
+                              "0.00"
+                            ],
+                            "pICMS": [
+                              "0.00"
+                            ],
+                            "vICMS": [
+                              "0.00"
+                            ],
+                            "modBCST": [
+                              "4"
+                            ],
+                            "vBCST": [
+                              "0.00"
+                            ],
+                            "pICMSST": [
+                              "0.00"
+                            ],
+                            "vICMSST": [
+                              "0.00"
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    "IPI": [
+                      {
+                        "cEnq": [
+                          "999"
+                        ],
+                        "IPINT": [
+                          {
+                            "CST": [
+                              "53"
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    "PIS": [
+                      {
+                        "PISOutr": [
+                          {
+                            "CST": [
+                              "49"
+                            ],
+                            "vBC": [
+                              "0.00"
+                            ],
+                            "pPIS": [
+                              "0.00"
+                            ],
+                            "vPIS": [
+                              "0.00"
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    "COFINS": [
+                      {
+                        "COFINSOutr": [
+                          {
+                            "CST": [
+                              "49"
+                            ],
+                            "vBC": [
+                              "0.00"
+                            ],
+                            "pCOFINS": [
+                              "0.00"
+                            ],
+                            "vCOFINS": [
+                              "0.00"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "infAdProd": [
+                  "RESOLUCAO DO SENADO FEDERAL N.13/12, NUMERO FCI 8F867328-1C03-41EC-AA7B-4F019802CBCE"
+                ]
+              }
+            ],
+            "total": [
+              {
+                "ICMSTot": [
+                  {
+                    "vBC": [
+                      "0.00"
+                    ],
+                    "vICMS": [
+                      "0.00"
+                    ],
+                    "vICMSDeson": [
+                      "0.00"
+                    ],
+                    "vFCPUFDest": [
+                      "0.00"
+                    ],
+                    "vICMSUFDest": [
+                      "0.00"
+                    ],
+                    "vICMSUFRemet": [
+                      "0.00"
+                    ],
+                    "vFCP": [
+                      "0.00"
+                    ],
+                    "vBCST": [
+                      "0.00"
+                    ],
+                    "vST": [
+                      "0.00"
+                    ],
+                    "vFCPST": [
+                      "0.00"
+                    ],
+                    "vFCPSTRet": [
+                      "0.00"
+                    ],
+                    "vProd": [
+                      "0.00"
+                    ],
+                    "vFrete": [
+                      "0.00"
+                    ],
+                    "vSeg": [
+                      "0.00"
+                    ],
+                    "vDesc": [
+                      "0.00"
+                    ],
+                    "vII": [
+                      "0.00"
+                    ],
+                    "vIPI": [
+                      "0.00"
+                    ],
+                    "vIPIDevol": [
+                      "0.00"
+                    ],
+                    "vPIS": [
+                      "0.00"
+                    ],
+                    "vCOFINS": [
+                      "0.00"
+                    ],
+                    "vOutro": [
+                      "0.00"
+                    ],
+                    "vNF": [
+                      "0.00"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "transp": [
+              {
+                "modFrete": [
+                  "0"
+                ],
+                "transporta": [
+                  {
+                    "CNPJ": [
+                      "07341344000103"
+                    ],
+                    "xNome": [
+                      "RODOGHEL TRANSPORTES LTDA"
+                    ],
+                    "IE": [
+                      "491089129114"
+                    ],
+                    "xEnder": [
+                      "AVENIDA SETE, 2425"
+                    ],
+                    "xMun": [
+                      "ORLANDIA"
+                    ],
+                    "UF": [
+                      "SP"
+                    ]
+                  }
+                ],
+                "vol": [
+                  {
+                    "qVol": [
+                      "20"
+                    ],
+                    "esp": [
+                      "ROLOS TELAS"
+                    ],
+                    "marca": [
+                      "TERRAFOS"
+                    ],
+                    "nVol": [
+                      "007748904"
+                    ],
+                    "pesoL": [
+                      "258.800"
+                    ],
+                    "pesoB": [
+                      "258.800"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "pag": [
+              {
+                "detPag": [
+                  {
+                    "tPag": [
+                      "90"
+                    ],
+                    "vPag": [
+                      "0.00"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "infAdic": [
+              {
+                "infCpl": [
+                  "REMESSA POR CONTA DE TERCEIRO - ART.129 PARAGRAFO 2.RICMS/00 NFE CFOP 6118 VENDA ORDEM EMITIDA POR MORLAN S/A.NR.558869 SERIE 1 DE 13.11.20-O VALOR DA OPERACAO E O INDICADO NA NFE CFOP 5120 EMITIDA P/ADQUIR.ORIG.NR.26111 SERIE 1 DE 13 .11.20-RAZAO.SOC.TERRA MIX AT.P.AGROP.LTDA. AV.CONEGO JOAO LIMA,560 -CJ URBANISTICO - ARAGUAINA - TO.-CNPJ:24.255.673/0001-50 I.E. 294724788"
+                ]
+              }
+            ],
+            "infRespTec": [
+              {
+                "CNPJ": [
+                  "06158643000144"
+                ],
+                "xContato": [
+                  "JOSE FERREIRA GANDRA DE CARVALHO"
+                ],
+                "email": [
+                  "resp.tecnico@fitsistemas.com.br"
+                ],
+                "fone": [
+                  "1135867393"
+                ]
+              }
+            ]
+          }
+        ],
+        "Signature": [
+          {
+            "$": {
+              "xmlns": "http://www.w3.org/2000/09/xmldsig#"
+            },
+            "SignedInfo": [
+              {
+                "CanonicalizationMethod": [
+                  {
+                    "$": {
+                      "Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
+                    }
+                  }
+                ],
+                "SignatureMethod": [
+                  {
+                    "$": {
+                      "Algorithm": "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
+                    }
+                  }
+                ],
+                "Reference": [
+                  {
+                    "$": {
+                      "URI": "#NFe35201153309795000180550010005589881507126891"
+                    },
+                    "Transforms": [
+                      {
+                        "Transform": [
+                          {
+                            "$": {
+                              "Algorithm": "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
+                            }
+                          },
+                          {
+                            "$": {
+                              "Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "DigestMethod": [
+                      {
+                        "$": {
+                          "Algorithm": "http://www.w3.org/2000/09/xmldsig#sha1"
+                        }
+                      }
+                    ],
+                    "DigestValue": [
+                      "grYyVt1k2IWJ6mK/Gdi7y9fLcjw="
+                    ]
+                  }
+                ]
+              }
+            ],
+            "SignatureValue": [
+              "s6QDXTYzTunh1t9HwZMc1A6UB6mAy2LnaL5A7l/00FCzhUvYO0lg8s7t17fR2DQGMRknxrXhZzJQ0isk1sVlYeNdAcrOYz/apVWemmoeHq8BrSaK44qgK2LDUqHZoxDLzxcrA+qRqWR4DCHZ8P2blqAie/YuSPuw3SltwEfVTf+Lq8XDJVIC1CQqNxcG9m6nehif24mXRyT77xP72nI3cbthFcd1ogd7wsQyn7uF1LoI9Y0xWlE+a+F0WeKAEYt+TQSesqLIJ0J9xdUiZ3Qii2d+WUwWLhL5FLpYY++KCcXBpyw0U/uWyC3UdxMPub7StnMGS52scMqkx3Os7SviXw=="
+            ],
+            "KeyInfo": [
+              {
+                "X509Data": [
+                  {
+                    "X509Certificate": [
+                      "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"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "protNFe": [
+      {
+        "$": {
+          "versao": "4.00"
+        },
+        "infProt": [
+          {
+            "tpAmb": [
+              "1"
+            ],
+            "verAplic": [
+              "SP_NFE_PL009_V4"
+            ],
+            "chNFe": [
+              "35201153309795000180550010005589881507126891"
+            ],
+            "dhRecbto": [
+              "2020-11-13T18:23:43-03:00"
+            ],
+            "nProt": [
+              "135201043091288"
+            ],
+            "digVal": [
+              "grYyVt1k2IWJ6mK/Gdi7y9fLcjw="
+            ],
+            "cStat": [
+              "100"
+            ],
+            "xMotivo": [
+              "Autorizado o uso da NF-e"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
