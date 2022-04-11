@@ -47,9 +47,9 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 			
 			var inParametro = await Oracle.select(
 				`SELECT DM_IMPORTAXML_DEPARA, /*para nfe entrada*/
-								DM_APURACAO_DTEMISSAO, 
-								NVL(DM_IMPXML_CNPJ_PROD,'N') DM_IMPXML_CNPJ_PROD, 
-								NVL(DM_PESQ_AC_0450,'S') DM_PESQ_AC_0450
+								NVL(DM_APURACAO_DTEMISSAO, 'N') DM_APURACAO_DTEMISSAO, 
+								NVL(DM_IMPXML_CNPJ_PROD, 'N') DM_IMPXML_CNPJ_PROD, 
+								NVL(DM_PESQ_AC_0450, 'S') DM_PESQ_AC_0450
 					FROM IN_PARAMETRO_EMPRESA 
 					WHERE ID_EMPRESA = :ID_EMPRESA`, 
 				{ID_EMPRESA: id_empresa}
@@ -59,6 +59,13 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 			//result.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ ou result.nfeProc.NFe[0].infNFe[0].dest[0].CPF
 			//result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0]? EX : 
       let dhEmi = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(result.nfeProc.NFe[0].infNFe[0].ide[0].dhEmi, result.nfeProc.NFe[0].infNFe[0].ide[0].dEmi)[0]);
+      let dSaiEnt = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(result.nfeProc.NFe[0].infNFe[0].ide[0].dhSaiEnt, result.nfeProc.NFe[0].infNFe[0].ide[0].dSaiEnt)[0]);
+      dSaiEnt = utils.Validar.ifthen(
+        inParametro.rows[0].DM_APURACAO_DTEMISSAO === 'N',
+        dSaiEnt,
+        dhEmi
+      );
+      let cd_modelo_documento = utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].mod, 0);
       let cpfOrCnpj = utils.Validar.ifelse(result.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ, result.nfeProc.NFe[0].infNFe[0].dest[0].CPF)[0];
       let id_ref_331_pais = (await model.Ac331.pais.select(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].cPais[0])).rows[0].ID_REF_331_PAIS;
       let id_ref_331_municipio = (await model.Ac331.municipio.select(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].cMun[0])).rows[0].ID_REF_331_MUNICIPIO;
@@ -101,6 +108,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
       }
 
       //dt_inicial pegar data da nota se for menor que a data do cadastro simul
+      //0150
       await model.Pessoa.insert({
         dt_inicial: utils.FormatarData.RetornarMenorDataEmOracle(dhEmi, dt_periodo),
         cd_pessoa: cd_pessoa,
@@ -123,19 +131,54 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       });
 
-      model.NotaFiscal.Saida.Produto.insert({
-        dm_entrada_saida:'',
-        id_pessoa_destinatario:'',
-        id_modelo_documento:'',
-        serie_subserie_documento:'',
-        nr_documento:'',
-        dm_tipo_fatura:'',
-        dt_emissao_documento:'',
-        dt_entrada_saida:'',
-        vl_total_nota_fiscal:'',
-        vl_desconto:'',
-        vl_icms_substituicao:'',
-        vl_outras_despesas:'',
+      let dm_entrada_saida = utils.Validar.ifthen(
+        utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].tpNF, 0) == "1",
+        "S", "E"
+      );
+      let id_pessoa_destinatario = await model.Pessoa.Mestre.selectByCdPessoa(cd_pessoa, id_empresa).rows[0].ID_PESSOA;
+      let id_modelo_documento = await model.ModeloDocumento.selectByCdModeloDocumento(cd_modelo_documento).rows[0].ID_MODELO_DOCUMENTO;
+      let serie_subserie_documento = utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].serie, 0)
+      let nr_documento =  utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].nNF, 0)
+
+      if (['3', '7'].includes(result.nfeProc.NFe[0].infNFe[0].total[0].prod[0].CFOP[0][0])){
+        
+      }
+
+      let vl_outras_despesas = utils.Validar.ifthen(
+        utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].det[0].ICMSTot[0].vOutro, 0) !== "",
+        utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vOutro, 0),
+        0
+      )
+      //C100
+      await model.NotaFiscal.Saida.Produto.insert({
+        dm_entrada_saida: dm_entrada_saida,
+        id_pessoa_destinatario: id_pessoa_destinatario,
+        id_modelo_documento: id_modelo_documento,
+        serie_subserie_documento: serie_subserie_documento,
+        nr_documento: nr_documento,
+        dm_tipo_fatura: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].indPag, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].indPag, 0),
+          "0"
+        ),
+        dt_emissao_documento: dhEmi,
+        dt_entrada_saida: dSaiEnt,
+        vl_total_nota_fiscal: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vNF, 0).replace('.',','),
+        vl_desconto: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vDesc, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vDesc, 0).replace('.',','),
+          "0"
+        ),
+        vl_icms_substituicao: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vST, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vST, 0).replace('.',','),
+          "0"
+        ),
+        vl_outras_despesas: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vOutro, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vOutro, 0).replace('.',','),
+          "0"
+        ),
         vl_total_mercadoria:'',
         vl_frete:'',
         vl_ipi:'',
@@ -161,7 +204,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       })
 
-      model.NotaFiscal.Entrada.Produto.SfC110.insert({
+      await model.NotaFiscal.Entrada.Produto.SfC110.insert({
         id_modelo_documento:'',
         dm_entrada_saida:'',
         serie_subserie_documento:'',
@@ -174,7 +217,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       })
 
-			model.Unidade.insert({
+			await model.Unidade.insert({
 				ds_unidade:'',
 				ds_descricao:'',
 				dt_inicial:'',
@@ -183,7 +226,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 				id_usuario: id_usuario
 			})
 
-      model.Produto.insert({
+      await model.Produto.insert({
         cd_produto_servico:'',
         cd_barra:'',
         ds_produto_servico:'',
@@ -199,7 +242,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       })
 
-      model.NotaFiscal.Saida.Produto.Item.insert({
+      await model.NotaFiscal.Saida.Produto.Item.insert({
         dm_entrada_saida:'',
         id_modelo_documento:'',
         serie_subserie_documento:'',
@@ -267,7 +310,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       })
 
-      model.NotaFiscal.Saida.Produto.Item.AcC050.insert({
+      await model.NotaFiscal.Saida.Produto.Item.AcC050.insert({
         dm_entrada_saida:'',
         id_modelo_documento:'',
         id_ref_433:'',
@@ -294,7 +337,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       })
 
-      model.NotaFiscal.Saida.Produto.SfC195.insert({
+      await model.NotaFiscal.Saida.Produto.SfC195.insert({
         dm_entrada_saida:'',
         id_0460:'',
         ds_complementar:'',
@@ -355,7 +398,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
 
 
 
-      model.Pessoa.insert({
+      await model.Pessoa.insert({
         dt_inicial:'',
         cd_pessoa:'',
         nm_razao_social:'',
@@ -377,7 +420,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
         id_usuario: id_usuario
       });
 
-			model.Unidade.insert({
+			await model.Unidade.insert({
 				ds_unidade:'',
 				ds_descricao:'',
 				dt_inicial:'',
@@ -386,7 +429,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
 				id_usuario: id_usuario
 			})
 
-      model.Produto.insert({
+      await model.Produto.insert({
         cd_produto_servico:'',
         cd_barra:'',
         ds_produto_servico:'',
@@ -405,7 +448,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
 			// não será insert e sim update, pois a nota veio da importação texto
       // entrada
 
-      model.NotaFiscal.Entrada.Produto.insert({
+      await model.NotaFiscal.Entrada.Produto.insert({
 				id_pessoa_remetente:'',
 				id_modelo_documento:'',
 				serie_subserie_documento:'',
@@ -438,7 +481,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
 				id_usuario: id_usuario
 			})
 
-      model.NotaFiscal.Entrada.Produto.SfC110.insert({
+      await model.NotaFiscal.Entrada.Produto.SfC110.insert({
         serie_subserie_documento:'',
         nr_documento:'',
         dt_emissao_documento:'',
@@ -451,7 +494,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
         id_modelo_documento:''
       })
       
-      model.NotaFiscal.Entrada.Produto.AcC060.insert({
+      await model.NotaFiscal.Entrada.Produto.AcC060.insert({
         dm_importacao:'',
         nr_di:'',
         dt_registro:'',
@@ -470,7 +513,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
         id_modelo_documento:''
       })
 
-      model.NotaFiscal.Entrada.Produto.Item.insert({
+      await model.NotaFiscal.Entrada.Produto.Item.insert({
         id_modelo_documento:'',
         serie_subserie_documento:'',
         nr_documento:'',
@@ -535,7 +578,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
       })
 
 
-      model.NotaFiscal.Entrada.Produto.Item.AcC050.insert({
+      await model.NotaFiscal.Entrada.Produto.Item.AcC050.insert({
         id_ref_433:'',
         aliq_pis:'',
         vl_bc_pis:'',
@@ -563,7 +606,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
       })
 
 
-      model.SfC195.Entrada.insert({
+      await model.SfC195.Entrada.insert({
         id_0460:'',
         ds_complementar:'',
         id_nota_fiscal_entrada:'',

@@ -6,3 +6,7 @@ module.exports.ifelse = (param1, param2) => {
 module.exports.getValueArray = (array, pos) => {
   return (array ? array[pos] : "")
 }
+
+module.exports.ifthen = (bool, valTrue, valFalse) => {
+  return bool ? valTrue : valFalse;
+}

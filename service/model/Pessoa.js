@@ -34,6 +34,17 @@ module.exports.Mestre = {
 			throw new Error(err);
 		}
 	},
+	selectByCdPessoa: async (cd_pessoa, id_empresa) => {
+		let sql = `select id_pessoa, cd_pessoa, id_empresa, id_usuario 
+								 from in_pessoa_mestre
+							  where cd_pessoa  = :cd_pessoa
+								  and id_empresa = :id_empresa`;
+		try {
+			await Oracle.select(sql, {cd_pessoa: cd_pessoa, id_empresa: id_empresa})
+		} catch (err) {
+			throw new Error(err);
+		}
+	},
 	selectByRazaoSocial: async (nm_razao_social, id_empresa) => {
 		let sql = `select in_pessoa_mestre.id_pessoa, 
 											in_pessoa_mestre.cd_pessoa 

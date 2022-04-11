@@ -39,6 +39,7 @@ serve.post('*', (req, res) => {
 })
 
 
+
 //console.log(utils.Validar.ifelse(jsonNfe.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ, jsonNfe.nfeProc.NFe[0].infNFe[0].dest[0].CPF));
 
  //console.log(utils.FormatarData.DateOracleToPrimeiroDia("15/02/2020"));
