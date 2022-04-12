@@ -3,8 +3,8 @@ module.exports.selectByCdModeloDocumento = async (cd_modelo_documento) => {
                from in_modelo_documento
               where cd_modelo_documento = :cd_modelo_documento`;
   try {
-  await Oracle.insert(sql, InPessoa)
+    return await Oracle.select(sql, {cd_modelo_documento: cd_modelo_documento})
   } catch (err) {
-  throw new Error(err);
+    throw new Error(err);
   }
 }

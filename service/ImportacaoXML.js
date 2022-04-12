@@ -139,16 +139,32 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
       let id_modelo_documento = await model.ModeloDocumento.selectByCdModeloDocumento(cd_modelo_documento).rows[0].ID_MODELO_DOCUMENTO;
       let serie_subserie_documento = utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].serie, 0)
       let nr_documento =  utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].nNF, 0)
-
-      if (['3', '7'].includes(result.nfeProc.NFe[0].infNFe[0].total[0].prod[0].CFOP[0][0])){
-        
-      }
-
+      
       let vl_outras_despesas = utils.Validar.ifthen(
         utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].det[0].ICMSTot[0].vOutro, 0) !== "",
-        utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vOutro, 0),
+        parseFloat(utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vOutro, 0).replace('.',',')),
         0
       )
+
+      let cfop = await model.Cfop.selectByCdCfop(result.nfeProc.NFe[0].infNFe[0].total[0].prod[0].CFOP[0]).rows[0];
+      if (['3', '7'].includes(result.nfeProc.NFe[0].infNFe[0].total[0].prod[0].CFOP[0][0])){
+        if (cfop.DM_ICMS_VL_CONTABIL === 'S'){
+          vl_outras_despesas = vl_outras_despesas + 
+            parseFloat(utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vOutro, 0).replace('.',','));
+        }
+        if (cfop.DM_VLCONTABIL_PISCOFINS === 'S'){
+          vl_outras_despesas = vl_outras_despesas + 
+            parseFloat(utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vPIS, 0).replace('.',',')) +
+            parseFloat(utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vCOFINS, 0).vCOFINS('.',','));
+        }
+        if (cfop.DM_VLCONTABIL_II === 'S'){
+          vl_outras_despesas = vl_outras_despesas + 
+            parseFloat(utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vII, 0).vCOFINS('.',','));
+        }
+      }
+
+      let id_ref_413 = await model.Ac413.selectByCodigo('00').rows[0].ID_REF_413;
+
       //C100
       await model.NotaFiscal.Saida.Produto.insert({
         dm_entrada_saida: dm_entrada_saida,
@@ -174,42 +190,87 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vST, 0).replace('.',','),
           "0"
         ),
-        vl_outras_despesas: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vOutro, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vOutro, 0).replace('.',','),
+        vl_outras_despesas: vl_outras_despesas,
+        vl_total_mercadoria: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vProd, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vProd, 0).replace('.',','),
           "0"
         ),
-        vl_total_mercadoria:'',
-        vl_frete:'',
-        vl_ipi:'',
-        vl_seguro:'',
-        dm_modalidade_frete:'',
-        id_ref_413:'',
-        vl_icms_desonerado:'',
-        dm_cancelamento:'',
-        dm_gare:'',
-        dm_gnre:'',
-        nr_chave_nf_eletronica:'',
-        id_pessoa_remetente_cte:'',
-        vl_icms_fcp:'',
-        vl_icms_uf_dest:'',
-        vl_icms_uf_remet:'',
-        nr_chave_nf_eletron_ref_cat83:'',
-        vl_fcp_st:'',
-        id_ref_331_munic_orig:'',
-        id_ref_331_munic_dest:'',
-        dm_tipo_cte:'',
-        dm_finalidade:'',
+        vl_frete: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFrete, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFrete, 0).replace('.',','),
+          "0"
+        ),
+        vl_ipi: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vIPI, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vIPI, 0).replace('.',','),
+          "0"
+        ),
+        vl_seguro: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vSeg, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vSeg, 0).replace('.',','),
+          "0"
+        ),
+        dm_modalidade_frete: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].transp[0].modFrete, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].transp[0].modFrete, 0).replace('.',','),
+          "0"
+        ),
+        id_ref_413: id_ref_413,
+        vl_icms_desonerado: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSDeson, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSDeson, 0).replace('.',','),
+          "0"
+        ),
+        dm_cancelamento: 'N',
+        dm_gare: 'N',
+        dm_gnre: 'N',
+        nr_chave_nf_eletronica: result.nfeProc.NFe[0].infNFe[0].$.Id.toUpperCase().replace('NFE'),
+        id_pessoa_remetente_cte: '', //VAZIO
+        vl_icms_fcp: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFCPUFDest, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFCPUFDest, 0).replace('.',','),
+          "0"
+        ),
+        vl_icms_uf_dest: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSUFDest, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSUFDest, 0).replace('.',','),
+          "0"
+        ),
+        vl_icms_uf_remet: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSUFRemet, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSUFRemet, 0).replace('.',','),
+          "0"
+        ),
+        nr_chave_nf_eletron_ref_cat83: utils.Validar.ifthen(
+          result.nfeProc.NFe[0].infNFe[0].Ide[0].NFref === undefined,
+          "",
+          utils.Validar.ifthen(
+            utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].Ide[0].NFref[0].refNFe, 0) !== "",
+            utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].Ide[0].NFref[0].refNFe, 0).replace('.',','),
+            "0"
+          )
+        ),
+        vl_fcp_st: utils.Validar.ifthen(
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFCPST, 0) !== "",
+          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFCPST, 0).replace('.',','),
+          "0"
+        ),
+        id_ref_331_munic_orig: '',
+        id_ref_331_munic_dest: '',
+        dm_tipo_cte: '',
+        dm_finalidade: '',
         id_empresa: id_empresa,
         id_usuario: id_usuario
-      })
+      });
 
+      //C110
       await model.NotaFiscal.Entrada.Produto.SfC110.insert({
-        id_modelo_documento:'',
-        dm_entrada_saida:'',
-        serie_subserie_documento:'',
-        nr_documento:'',
-        dt_emissao_documento:'',
+        id_modelo_documento: id_modelo_documento,
+        dm_entrada_saida: dm_entrada_saida,
+        serie_subserie_documento: serie_subserie_documento,
+        nr_documento: nr_documento,
+        dt_emissao_documento: dhEmi,
         nr_item_imp:'',
         id_ref_0450:'',
         ds_complementar:'',
