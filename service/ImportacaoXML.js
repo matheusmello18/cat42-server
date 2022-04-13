@@ -243,11 +243,11 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           "0"
         ),
         nr_chave_nf_eletron_ref_cat83: utils.Validar.ifthen(
-          result.nfeProc.NFe[0].infNFe[0].Ide[0].NFref === undefined,
+          result.nfeProc.NFe[0].infNFe[0].ide[0].NFref === undefined,
           "",
           utils.Validar.ifthen(
-            utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].Ide[0].NFref[0].refNFe, 0) !== "",
-            utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].Ide[0].NFref[0].refNFe, 0).replace('.',','),
+            utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].NFref[0].refNFe, 0) !== "",
+            utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].NFref[0].refNFe, 0).replace('.',','),
             "0"
           )
         ),
@@ -264,155 +264,219 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       });
 
-      //C110
-      await model.NotaFiscal.Entrada.Produto.SfC110.insert({
-        id_modelo_documento: id_modelo_documento,
-        dm_entrada_saida: dm_entrada_saida,
-        serie_subserie_documento: serie_subserie_documento,
-        nr_documento: nr_documento,
-        dt_emissao_documento: dhEmi,
-        nr_item_imp:'',
-        id_ref_0450:'',
-        ds_complementar:'',
-        id_empresa: id_empresa,
-        id_usuario: id_usuario
-      })
+      if (result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic !== undefined){
 
-			await model.Unidade.insert({
-				ds_unidade:'',
-				ds_descricao:'',
-				dt_inicial:'',
-				dt_movimento:'',
-				id_empresa: id_empresa,
-				id_usuario: id_usuario
-			})
+        if (result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infCpl !== undefined){
+          var ac0450 = await model.Ac0450.select(
+            result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infCpl[0],
+            id_empresa,
+            dhEmi
+          );
 
-      await model.Produto.insert({
-        cd_produto_servico:'',
-        cd_barra:'',
-        ds_produto_servico:'',
-        id_ref_331_ncm:'',
-        id_ref_331_ex_ipi:'',
-        dm_tipo_item:'',
-        unidade:'',
-        id_0190:'',
-        dt_inicial:'',
-        dt_movimento:'',
-        id_cest:'',
-        id_empresa: id_empresa,
-        id_usuario: id_usuario
-      })
+          let id_ref_0450
+          if (ac0450.rows.length == 0){
+            id_ref_0450 = await model.Ac0450.insert(
+              result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infCpl[0],
+              id_empresa,
+              dhEmi
+            )
+          } else {
+            id_ref_0450 = ac0450.rows[0].ID_REF_0450
+          }
+          //C110
+          await model.NotaFiscal.Saida.Produto.SfC110.insert({
+            id_modelo_documento: id_modelo_documento,
+            dm_entrada_saida: dm_entrada_saida,
+            serie_subserie_documento: serie_subserie_documento,
+            nr_documento: nr_documento,
+            dt_emissao_documento: dhEmi,
+            nr_item_imp: "1",
+            id_ref_0450: id_ref_0450,
+            ds_complementar: result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infCpl[0].substring(1,3980),
+            id_empresa: id_empresa,
+            id_usuario: id_usuario
+          })
+        }
 
-      await model.NotaFiscal.Saida.Produto.Item.insert({
-        dm_entrada_saida:'',
-        id_modelo_documento:'',
-        serie_subserie_documento:'',
-        nr_documento:'',
-        dt_emissao_documento:'',
-        nr_sequencia:'',
-        id_produto_servico:'',
-        id_0190:'',
-        vl_unitario:'',
-        vl_total_item:'',
-        vl_desconto_item:'',
-        dm_movimentacao_fisica:'',
-        cd_fiscal_operacao:'',
-        nr_fci:'',
-        id_ref_431:'',
-        vl_base_calculo_icms:'',
-        vl_icms:'',
-        vl_base_calculo_icms_subst:'',
-        aliq_icms_subs:'',
-        vl_icms_substituicao:'',
-        aliq_icms:'',
-        vl_reducao_bc_icms:'',
-        vl_perc_red_icms:'',
-        vl_perc_red_icms_st:'',
-        dm_mod_bc_icms:'',
-        dm_mod_bc_icms_st:'',
-        dm_tributacao_icms:'',
-        id_ref_432:'',
-        vl_base_calculo_ipi:'',
-        vl_ipi:'',
-        aliq_ipi:'',
-        qtde:'',
-        unidade:'',
-        dm_tributacao_ipi:'',
-        vl_outras_despesas:'',
-        vl_frete:'',
-        vl_seguro:'',
-        nr_item:'',
-        ds_complementar:'',
-        dm_mot_desc_icms:'',
-        vl_icms_desonerado:'',
-        vl_bc_ii:'',
-        vl_desp_adu:'',
-        vl_ii:'',
-        vl_iof:'',
-        vl_bc_icms_uf_dest:'',
-        perc_icms_fcp:'',
-        aliq_icms_uf_dest:'',
-        aliq_icms_interestadual:'',
-        perc_icms_partilha:'',
-        vl_icms_fcp:'',
-        vl_icms_uf_dest:'',
-        vl_icms_uf_remet:'',
-        id_ref_453:'',
-        vl_bc_fcp_op:'',
-        aliq_fcp_op:'',
-        vl_fcp_op:'',
-        vl_bc_fcp_st:'',
-        aliq_fcp_st:'',
-        vl_fcp_st:'',
-        vl_bc_icms_st_obs:'',
-        vl_icms_st_obs:'',
-        qtde_tributada:'',
-        id_empresa: id_empresa,
-        id_usuario: id_usuario
-      })
+        if (result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infAdFisco !== undefined){
+          var ac0450 = await model.Ac0450.select(
+            result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infAdFisco[0],
+            id_empresa,
+            dhEmi
+          );
 
-      await model.NotaFiscal.Saida.Produto.Item.AcC050.insert({
-        dm_entrada_saida:'',
-        id_modelo_documento:'',
-        id_ref_433:'',
-        aliq_pis:'',
-        vl_bc_pis:'',
-        vl_pis:'',
-        vl_aliq_pis:'',
-        vl_pis_st:'',
-        qtde_bc_pis:'',
-        id_ref_434:'',
-        aliq_cofins:'',
-        vl_bc_cofins:'',
-        vl_cofins:'',
-        vl_aliq_cofins:'',
-        vl_cofins_st:'',
-        qtde_bc_cofins:'',
-        id_nota_fiscal_saida:'',
-        dt_emissao_documento:'',
-        nr_documento:'',
-        nr_item:'',
-        nr_sequencia:'',
-        serie_subserie_documento:'',
-        id_empresa: id_empresa,
-        id_usuario: id_usuario
-      })
+          let id_ref_0450
+          if (ac0450.rows.length == 0){
+            id_ref_0450 = await model.Ac0450.insert(
+              result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infAdFisco[0],
+              id_empresa,
+              dhEmi
+            )
+          } else {
+            id_ref_0450 = ac0450.rows[0].ID_REF_0450
+          }
+          //C110
+          await model.NotaFiscal.Saida.Produto.SfC110.insert({
+            dm_entrada_saida: dm_entrada_saida,
+            id_modelo_documento: id_modelo_documento,
+            serie_subserie_documento: serie_subserie_documento,
+            nr_documento: nr_documento,
+            dt_emissao_documento: dhEmi,
+            nr_item_imp: "1",
+            id_ref_0450: id_ref_0450,
+            ds_complementar: result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infAdFisco[0],
+            id_empresa: id_empresa,
+            id_usuario: id_usuario
+          })
+        }
+      }
 
-      await model.NotaFiscal.Saida.Produto.SfC195.insert({
-        dm_entrada_saida:'',
-        id_0460:'',
-        ds_complementar:'',
-        id_nota_fiscal_saida:'',
-        nr_item:'',
-        id_modelo_documento:'',
-        serie_subserie_documento:'',
-        nr_documento:'',
-        dt_emissao_documento:'',
-        nr_sequencia:'',
-        id_empresa: id_empresa,
-        id_usuario: id_usuario
-      })
+      for (let i = 0; i < result.nfeProc.NFe[0].infNFe[0].det.length; i++) {
+        const det = result.nfeProc.NFe[0].infNFe[0].det[i];
+        
+        const prod = await model.Produto.Mestre.selectByCodigo(det.prod[0].cProd[0], id_empresa);
+        let id_produto_servico;
 
+        if (prod.rows.length === 0){
+
+        }
+
+        await model.Unidade.insert({
+          ds_unidade:'',
+          ds_descricao:'',
+          dt_inicial:'',
+          dt_movimento:'',
+          id_empresa: id_empresa,
+          id_usuario: id_usuario
+        })
+
+        await model.Produto.insert({
+          cd_produto_servico:'',
+          cd_barra:'',
+          ds_produto_servico:'',
+          id_ref_331_ncm:'',
+          id_ref_331_ex_ipi:'',
+          dm_tipo_item:'',
+          unidade:'',
+          id_0190:'',
+          dt_inicial:'',
+          dt_movimento:'',
+          id_cest:'',
+          id_empresa: id_empresa,
+          id_usuario: id_usuario
+        })
+
+        //C170
+        await model.NotaFiscal.Saida.Produto.Item.insert({
+          dm_entrada_saida: dm_entrada_saida,
+          id_modelo_documento: id_modelo_documento,
+          serie_subserie_documento: serie_subserie_documento,
+          nr_documento: nr_documento,
+          dt_emissao_documento: dhEmi,
+          nr_sequencia: det.$.nItem,
+          id_produto_servico: id_produto_servico,
+          id_0190:'',
+          vl_unitario:'',
+          vl_total_item:'',
+          vl_desconto_item:'',
+          dm_movimentacao_fisica:'',
+          cd_fiscal_operacao:'',
+          nr_fci:'',
+          id_ref_431:'',
+          vl_base_calculo_icms:'',
+          vl_icms:'',
+          vl_base_calculo_icms_subst:'',
+          aliq_icms_subs:'',
+          vl_icms_substituicao:'',
+          aliq_icms:'',
+          vl_reducao_bc_icms:'',
+          vl_perc_red_icms:'',
+          vl_perc_red_icms_st:'',
+          dm_mod_bc_icms:'',
+          dm_mod_bc_icms_st:'',
+          dm_tributacao_icms:'',
+          id_ref_432:'',
+          vl_base_calculo_ipi:'',
+          vl_ipi:'',
+          aliq_ipi:'',
+          qtde:'',
+          unidade:'',
+          dm_tributacao_ipi:'',
+          vl_outras_despesas:'',
+          vl_frete:'',
+          vl_seguro:'',
+          nr_item:'',
+          ds_complementar:'',
+          dm_mot_desc_icms:'',
+          vl_icms_desonerado:'',
+          vl_bc_ii:'',
+          vl_desp_adu:'',
+          vl_ii:'',
+          vl_iof:'',
+          vl_bc_icms_uf_dest:'',
+          perc_icms_fcp:'',
+          aliq_icms_uf_dest:'',
+          aliq_icms_interestadual:'',
+          perc_icms_partilha:'',
+          vl_icms_fcp:'',
+          vl_icms_uf_dest:'',
+          vl_icms_uf_remet:'',
+          id_ref_453:'',
+          vl_bc_fcp_op:'',
+          aliq_fcp_op:'',
+          vl_fcp_op:'',
+          vl_bc_fcp_st:'',
+          aliq_fcp_st:'',
+          vl_fcp_st:'',
+          vl_bc_icms_st_obs:'',
+          vl_icms_st_obs:'',
+          qtde_tributada:'',
+          id_empresa: id_empresa,
+          id_usuario: id_usuario
+        })
+
+        await model.NotaFiscal.Saida.Produto.Item.AcC050.insert({
+          dm_entrada_saida:'',
+          id_modelo_documento:'',
+          id_ref_433:'',
+          aliq_pis:'',
+          vl_bc_pis:'',
+          vl_pis:'',
+          vl_aliq_pis:'',
+          vl_pis_st:'',
+          qtde_bc_pis:'',
+          id_ref_434:'',
+          aliq_cofins:'',
+          vl_bc_cofins:'',
+          vl_cofins:'',
+          vl_aliq_cofins:'',
+          vl_cofins_st:'',
+          qtde_bc_cofins:'',
+          id_nota_fiscal_saida:'',
+          dt_emissao_documento:'',
+          nr_documento:'',
+          nr_item:'',
+          nr_sequencia:'',
+          serie_subserie_documento:'',
+          id_empresa: id_empresa,
+          id_usuario: id_usuario
+        })
+
+        await model.NotaFiscal.Saida.Produto.SfC195.insert({
+          dm_entrada_saida:'',
+          id_0460:'',
+          ds_complementar:'',
+          id_nota_fiscal_saida:'',
+          nr_item:'',
+          id_modelo_documento:'',
+          serie_subserie_documento:'',
+          nr_documento:'',
+          dt_emissao_documento:'',
+          nr_sequencia:'',
+          id_empresa: id_empresa,
+          id_usuario: id_usuario
+        })
+      }
     })
   });
   

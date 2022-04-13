@@ -21,5 +21,17 @@ module.exports.sp_gera_produto_mestre_item = async () => {
   }
 }
 
-module.exports.mestre = {}
+module.exports.Mestre = {
+	selectByCodigo: async (cd_produto_servico, id_empresa) => {
+    let sql = `select max(id_produto_servico)
+								 from in_produto_servico_mestre
+							  where upper(cd_produto_servico) = upper(:cd_produto_servico)
+								  and id_empresa                = :id_empresa`;
+    try {
+      return await Oracle.select(sql, {cd_produto_servico: cd_produto_servico, id_empresa: id_empresa})
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+}
 module.exports.item = {}

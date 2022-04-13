@@ -15,12 +15,6 @@ module.exports.municipio = {
    */
   select: async (cd_municipio) => {
     try {
-      let params;
-  
-      params = {
-        param1: parseInt(cd_municipio),
-      };
-  
       return await Oracle.select(
         `SELECT ID_REF_331_MUNICIPIO,
                 DS_MUNICIPIO,
@@ -28,7 +22,8 @@ module.exports.municipio = {
                 CD_MUNICIPIO
           FROM AC_331_MUNICIPIO
           WHERE CD_MUNICIPIO = :param1`,
-        params);
+          {param1: parseInt(cd_municipio)}
+        );
     
     } catch (err) {
       throw new Error(err);
@@ -50,20 +45,13 @@ module.exports.pais = {
    */
   select: async (cd_pais) => {
     try {
-      let params;
-  
-      params = {
-        param1: cd_pais,
-      };
-  
       return await Oracle.select(
         `SELECT ID_REF_331_PAIS,
                 CD_PAIS,
                 DS_PAIS
           FROM AC_331_PAIS
          WHERE TO_NUMBER(CD_PAIS) = TO_NUMBER(:param1)`,
-        params);
-    
+        {param1: cd_pais});
     } catch (err) {
       throw new Error(err);
     }
