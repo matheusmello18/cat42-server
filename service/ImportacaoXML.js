@@ -341,14 +341,30 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
         }
 
-        await model.Unidade.insert({
-          ds_unidade:'',
-          ds_descricao:'',
-          dt_inicial:'',
-          dt_movimento:'',
-          id_empresa: id_empresa,
-          id_usuario: id_usuario
-        })
+        if (inParametro.rows[0].DM_APURACAO_DTEMISSAO === 'S'){
+
+        }
+
+        let ds_unidade = utils.Validar.ifthen(
+          utils.Validar.getValueArray(det.prod[0].uCom, 0) !== "",
+          utils.Validar.getValueArray(det.prod[0].uCom, 0),
+          'XX'
+        );
+        let unidade = await model.Sf0190.selectyDsUnidade(ds_unidade, id_empresa, dhEmi).rows[0]
+
+        if (unidade.length === 0){
+          //0190
+          await model.Unidade.insert({
+            ds_unidade: ds_unidade,
+            ds_descricao: ds_unidade,
+            dt_inicial: dhEmi,
+            dt_movimento: dhEmi,
+            id_empresa: id_empresa,
+            id_usuario: id_usuario
+          })
+        } else {
+          ds_unidade = unidade[0].DS_UNIDADE;
+        }
 
         await model.Produto.insert({
           cd_produto_servico:'',

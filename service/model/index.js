@@ -2,6 +2,7 @@ const Ac331 = require('./Ac331');
 const AcC700 = require('./AcC700');
 const Ac413 = require('./Ac413');
 const Ac0450 = require('./Ac0450');
+const Sf0190 = require('./Sf0190');
 const CtrlEmpresa = require('./CtrlEmpresa');
 const CtrlUsuario = require('./CtrlUsuario');
 const Etapas = require('./Etapas');
@@ -23,5 +24,5 @@ module.exports = {
   CtrlEmpresa, CtrlUsuario, Etapas, 
   EtapaStatus, ModeloDocumento, Cfop,
   Pessoa, Produto, Unidade, NotaFiscal, 
-  SfC800, SfC850  
+  SfC800, SfC850, Sf0190
 }
