@@ -3,6 +3,7 @@ const model = require('./model');
 const utils = require('../utils');
 const parseString = require('xml2js').parseString;
 const fs = require("fs");
+const { municipio } = require('./model/Ac331');
 
 
 //deletar se existe o registro e importar novamnete;
@@ -24,9 +25,9 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         throw new Error(err.message);
       }
 
-			var Empresa = await model.CtrlEmpresa.select(id_empresa);
+			const Empresa = (await model.CtrlEmpresa.select(id_empresa)).rows[0];
 
-			if(Empresa.rows[0].CNPJ_EMPRESA !== result.nfeProc.NFe[0].infNFe[0].emit[0].CNPJ[0]) { //então saida
+			if(Empresa.CNPJ_EMPRESA !== result.nfeProc.NFe[0].infNFe[0].emit[0].CNPJ[0]) { //então saida
 				await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Nota fiscal informada não é uma nota fiscal de saída.');
         throw new Error(err.message);
 			}
@@ -45,7 +46,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
 
 			
-			var inParametro = await Oracle.select(
+			var inParametro = (await Oracle.select(
 				`SELECT DM_IMPORTAXML_DEPARA, /*para nfe entrada*/
 								NVL(DM_APURACAO_DTEMISSAO, 'N') DM_APURACAO_DTEMISSAO, 
 								NVL(DM_IMPXML_CNPJ_PROD, 'N') DM_IMPXML_CNPJ_PROD, 
@@ -53,28 +54,23 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 					FROM IN_PARAMETRO_EMPRESA 
 					WHERE ID_EMPRESA = :ID_EMPRESA`, 
 				{ID_EMPRESA: id_empresa}
-			);
+			)).rows[0];
 
       //result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0]
 			//result.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ ou result.nfeProc.NFe[0].infNFe[0].dest[0].CPF
 			//result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0]? EX : 
-      let dhEmi = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(result.nfeProc.NFe[0].infNFe[0].ide[0].dhEmi, result.nfeProc.NFe[0].infNFe[0].ide[0].dEmi)[0]);
-      let dSaiEnt = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(result.nfeProc.NFe[0].infNFe[0].ide[0].dhSaiEnt, result.nfeProc.NFe[0].infNFe[0].ide[0].dSaiEnt)[0]);
-      dSaiEnt = utils.Validar.ifthen(
-        inParametro.rows[0].DM_APURACAO_DTEMISSAO === 'N',
-        dSaiEnt,
-        dhEmi
-      );
-      let cd_modelo_documento = utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].mod, 0);
-      let cpfOrCnpj = utils.Validar.ifelse(result.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ, result.nfeProc.NFe[0].infNFe[0].dest[0].CPF)[0];
-      let id_ref_331_pais = (await model.Ac331.pais.select(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].cPais[0])).rows[0].ID_REF_331_PAIS;
-      let id_ref_331_municipio = (await model.Ac331.municipio.select(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].cMun[0])).rows[0].ID_REF_331_MUNICIPIO;
-      let cd_pessoa = '';
-      let pm;
+      const dhEmi = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(result.nfeProc.NFe[0].infNFe[0].ide[0].dhEmi, result.nfeProc.NFe[0].infNFe[0].ide[0].dEmi)[0]);
+      const dSaiEnt = inParametro.DM_APURACAO_DTEMISSAO === 'N' ? utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(result.nfeProc.NFe[0].infNFe[0].ide[0].dhSaiEnt, result.nfeProc.NFe[0].infNFe[0].ide[0].dSaiEnt)[0]) : dhEmi;
+      const cd_modelo_documento = utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].mod, 0, "");
+      const cpfOrCnpj = utils.Validar.ifelse(result.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ, result.nfeProc.NFe[0].infNFe[0].dest[0].CPF)[0];
+      const Pais = (await model.Ac331.pais.select(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].cPais[0])).rows[0];
+      const Municipio = (await model.Ac331.municipio.select(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].cMun[0])).rows[0];
 
-      if (result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0] == 'EX'){
-        pm = await model.Pessoa.Mestre.selectByRazaoSocial(result.nfeProc.NFe[0].infNFe[0].dest[0].xNome[0], id_empresa);
-        if (pm.rows.length == 0){
+      let cd_pessoa = '';
+
+      if (result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0] == 'EX') {
+        const PessoaMestre = (await model.Pessoa.Mestre.selectByRazaoSocial(result.nfeProc.NFe[0].infNFe[0].dest[0].xNome[0], id_empresa)).rows[0];
+        if (PessoaMestre === undefined){
           let id_pessoa = await Oracle.proxCod("IN_PESSOA_MESTRE");
           cd_pessoa = id_pessoa + '-EX';
           await model.Pessoa.Mestre.insert({
@@ -84,25 +80,21 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
             id_usuario: id_usuario
           })
         } else {
-          cd_pessoa = pm.rows[0].CD_PESSOA;
+          cd_pessoa = PessoaMestre.CD_PESSOA;
         }
       } else {      
-        pm = await model.Pessoa.Mestre.selectByCpfOrCpnj(
-          cpfOrCnpj,
-          dhEmi,
-          id_empresa
-        );
+        const PessoaMestre = (await model.Pessoa.Mestre.selectByCpfOrCpnj(cpfOrCnpj,dhEmi,id_empresa)).rows[0];
 
-        if (pm.rows.length > 0){
-          cd_pessoa = pm.rows[0].CD_PESSOA;
+        if (PessoaMestre !== undefined){
+          cd_pessoa = PessoaMestre.CD_PESSOA;
         }
       }
 
-      if (result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0] == 'EX'){
+      if (result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF[0] == 'EX') {
         if (cd_pessoa.endsWith('-EX')){
           //importo
         }
-      } else if (cd_pessoa.length == 0){
+      } else if (cd_pessoa.length == 0) {
         cd_pessoa = cpfOrCnpj;
         //importo
       }
@@ -115,9 +107,9 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         nm_razao_social: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].xNome, 0),
         ds_endereco: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].xLgr, 0),
         ds_bairro: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].xBairro, 0),
-        id_ref_331_municipio: id_ref_331_municipio,
+        id_ref_331_municipio: Municipio.ID_REF_331_MUNICIPIO,
         uf: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].UF, 0),
-        id_ref_331_pais: id_ref_331_pais,
+        id_ref_331_pais: Pais.ID_REF_331_PAIS,
         nr_cep: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].enderDest[0].CEP, 0),
         nr_cnpj_cpf: cpfOrCnpj,
         nr_inscricao_estadual: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].dest[0].IE, 0),
@@ -131,131 +123,64 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       });
 
-      let dm_entrada_saida = utils.Validar.ifthen(
-        utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].tpNF, 0) == "1",
-        "S", "E"
-      );
-      let id_pessoa_destinatario = await model.Pessoa.Mestre.selectByCdPessoa(cd_pessoa, id_empresa).rows[0].ID_PESSOA;
-      let id_modelo_documento = await model.ModeloDocumento.selectByCdModeloDocumento(cd_modelo_documento).rows[0].ID_MODELO_DOCUMENTO;
-      let serie_subserie_documento = utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].serie, 0)
-      let nr_documento =  utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].nNF, 0)
+      let dm_entrada_saida = utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].tpNF, 0, "") == "1" ? "S" : "E"
       
-      let vl_outras_despesas = utils.Validar.ifthen(
-        utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].det[0].ICMSTot[0].vOutro, 0) !== "",
-        parseFloat(utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vOutro, 0).replace('.',',')),
-        0
-      )
-
-      let cfop = await model.Cfop.selectByCdCfop(result.nfeProc.NFe[0].infNFe[0].total[0].prod[0].CFOP[0]).rows[0];
+      const PessoaDestinatario = (await model.Pessoa.Mestre.selectByCdPessoa(cd_pessoa, id_empresa)).rows[0];
+      const ModeloDocumento = (await model.ModeloDocumento.selectByCdModeloDocumento(cd_modelo_documento)).rows[0].ID_MODELO_DOCUMENTO;
+      const Ac413 = (await model.Ac413.selectByCodigo('00')).rows[0];
+      const serie_subserie_documento = utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].serie, 0)
+      const nr_documento =  utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].nNF, 0)
+      
+      let vl_outras_despesas = parseFloat(utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].det[0].ICMSTot[0].vOutro, 0, "0").replace('.',','))
+      
+      const Cfop = (await model.Cfop.selectByCdCfop(result.nfeProc.NFe[0].infNFe[0].total[0].prod[0].CFOP[0])).rows[0];
       if (['3', '7'].includes(result.nfeProc.NFe[0].infNFe[0].total[0].prod[0].CFOP[0][0])){
-        if (cfop.DM_ICMS_VL_CONTABIL === 'S'){
+        if (Cfop.DM_ICMS_VL_CONTABIL === 'S'){
           vl_outras_despesas = vl_outras_despesas + 
             parseFloat(utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vOutro, 0).replace('.',','));
         }
-        if (cfop.DM_VLCONTABIL_PISCOFINS === 'S'){
+        if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S'){
           vl_outras_despesas = vl_outras_despesas + 
             parseFloat(utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vPIS, 0).replace('.',',')) +
             parseFloat(utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vCOFINS, 0).vCOFINS('.',','));
         }
-        if (cfop.DM_VLCONTABIL_II === 'S'){
+        if (Cfop.DM_VLCONTABIL_II === 'S'){
           vl_outras_despesas = vl_outras_despesas + 
             parseFloat(utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vII, 0).vCOFINS('.',','));
         }
       }
 
-      let id_ref_413 = await model.Ac413.selectByCodigo('00').rows[0].ID_REF_413;
-
       //C100
       await model.NotaFiscal.Saida.Produto.insert({
         dm_entrada_saida: dm_entrada_saida,
-        id_pessoa_destinatario: id_pessoa_destinatario,
-        id_modelo_documento: id_modelo_documento,
+        id_pessoa_destinatario: PessoaDestinatario.ID_PESSOA,
+        id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
         serie_subserie_documento: serie_subserie_documento,
         nr_documento: nr_documento,
-        dm_tipo_fatura: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].indPag, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].indPag, 0),
-          "0"
-        ),
+        dm_tipo_fatura: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].indPag, 0, "0"),
         dt_emissao_documento: dhEmi,
         dt_entrada_saida: dSaiEnt,
         vl_total_nota_fiscal: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vNF, 0).replace('.',','),
-        vl_desconto: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vDesc, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vDesc, 0).replace('.',','),
-          "0"
-        ),
-        vl_icms_substituicao: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vST, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vST, 0).replace('.',','),
-          "0"
-        ),
+        vl_desconto: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vDesc, 0, "0").replace('.',','),
+        vl_icms_substituicao: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vST, 0, "0").replace('.',','),
         vl_outras_despesas: vl_outras_despesas,
-        vl_total_mercadoria: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vProd, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vProd, 0).replace('.',','),
-          "0"
-        ),
-        vl_frete: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFrete, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFrete, 0).replace('.',','),
-          "0"
-        ),
-        vl_ipi: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vIPI, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vIPI, 0).replace('.',','),
-          "0"
-        ),
-        vl_seguro: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vSeg, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vSeg, 0).replace('.',','),
-          "0"
-        ),
-        dm_modalidade_frete: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].transp[0].modFrete, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].transp[0].modFrete, 0).replace('.',','),
-          "0"
-        ),
-        id_ref_413: id_ref_413,
-        vl_icms_desonerado: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSDeson, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSDeson, 0).replace('.',','),
-          "0"
-        ),
+        vl_total_mercadoria: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vProd, 0, "0").replace('.',','),
+        vl_frete: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFrete, 0, "0").replace('.',','),
+        vl_ipi: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vIPI, 0, "0").replace('.',','),
+        vl_seguro: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vSeg, 0, "0").replace('.',','),
+        dm_modalidade_frete: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].transp[0].modFrete, 0, "0").replace('.',','),
+        id_ref_413: Ac413.ID_REF_413,
+        vl_icms_desonerado: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSDeson, 0, "0").replace('.',','),
         dm_cancelamento: 'N',
         dm_gare: 'N',
         dm_gnre: 'N',
         nr_chave_nf_eletronica: result.nfeProc.NFe[0].infNFe[0].$.Id.toUpperCase().replace('NFE'),
         id_pessoa_remetente_cte: '', //VAZIO
-        vl_icms_fcp: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFCPUFDest, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFCPUFDest, 0).replace('.',','),
-          "0"
-        ),
-        vl_icms_uf_dest: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSUFDest, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSUFDest, 0).replace('.',','),
-          "0"
-        ),
-        vl_icms_uf_remet: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSUFRemet, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSUFRemet, 0).replace('.',','),
-          "0"
-        ),
-        nr_chave_nf_eletron_ref_cat83: utils.Validar.ifthen(
-          result.nfeProc.NFe[0].infNFe[0].ide[0].NFref === undefined,
-          "",
-          utils.Validar.ifthen(
-            utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].NFref[0].refNFe, 0) !== "",
-            utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].NFref[0].refNFe, 0).replace('.',','),
-            "0"
-          )
-        ),
-        vl_fcp_st: utils.Validar.ifthen(
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFCPST, 0) !== "",
-          utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFCPST, 0).replace('.',','),
-          "0"
-        ),
+        vl_icms_fcp: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFCPUFDest, 0, "0").replace('.',','),
+        vl_icms_uf_dest: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSUFDest, 0, "0").replace('.',','),
+        vl_icms_uf_remet: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vICMSUFRemet, 0, "0").replace('.',','),
+        nr_chave_nf_eletron_ref_cat83: result.nfeProc.NFe[0].infNFe[0].ide[0].NFref === undefined ? "" : utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].NFref[0].refNFe, 0, "0").replace('.',','),
+        vl_fcp_st: utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].total[0].ICMSTot[0].vFCPST, 0, "0").replace('.',','),
         id_ref_331_munic_orig: '',
         id_ref_331_munic_dest: '',
         dm_tipo_cte: '',
@@ -267,25 +192,25 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
       if (result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic !== undefined){
 
         if (result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infCpl !== undefined){
-          var ac0450 = await model.Ac0450.select(
+          let ac0450 = (await model.Ac0450.select(
             result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infCpl[0],
             id_empresa,
             dhEmi
-          );
+          )).rows[0];
 
-          let id_ref_0450
-          if (ac0450.rows.length == 0){
-            id_ref_0450 = await model.Ac0450.insert(
+          var id_ref_0450
+          if (ac0450 == undefined){
+            id_ref_0450 = (await model.Ac0450.insert(
               result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infCpl[0],
               id_empresa,
               dhEmi
-            )
+            ))
           } else {
-            id_ref_0450 = ac0450.rows[0].ID_REF_0450
+            id_ref_0450 = ac0450.ID_REF_0450
           }
           //C110
           await model.NotaFiscal.Saida.Produto.SfC110.insert({
-            id_modelo_documento: id_modelo_documento,
+            id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
             dm_entrada_saida: dm_entrada_saida,
             serie_subserie_documento: serie_subserie_documento,
             nr_documento: nr_documento,
@@ -299,26 +224,26 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         }
 
         if (result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infAdFisco !== undefined){
-          var ac0450 = await model.Ac0450.select(
+          var ac0450 = (await model.Ac0450.select(
             result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infAdFisco[0],
             id_empresa,
             dhEmi
-          );
+          )).rows[0];
 
           let id_ref_0450
-          if (ac0450.rows.length == 0){
-            id_ref_0450 = await model.Ac0450.insert(
+          if (ac0450 == undefined){
+            id_ref_0450 = (await model.Ac0450.insert(
               result.nfeProc.NFe[0].infNFe[0].ide[0].infAdic[0].infAdFisco[0],
               id_empresa,
               dhEmi
-            )
+            ))
           } else {
-            id_ref_0450 = ac0450.rows[0].ID_REF_0450
+            id_ref_0450 = ac0450.ID_REF_0450
           }
           //C110
           await model.NotaFiscal.Saida.Produto.SfC110.insert({
             dm_entrada_saida: dm_entrada_saida,
-            id_modelo_documento: id_modelo_documento,
+            id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
             serie_subserie_documento: serie_subserie_documento,
             nr_documento: nr_documento,
             dt_emissao_documento: dhEmi,
@@ -333,7 +258,6 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
       for (let i = 0; i < result.nfeProc.NFe[0].infNFe[0].det.length; i++) {
         const det = result.nfeProc.NFe[0].infNFe[0].det[i];
-        
         const prod = await model.Produto.Mestre.selectByCodigo(det.prod[0].cProd[0], id_empresa);
         let id_produto_servico;
 
@@ -341,16 +265,14 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
         }
 
-        if (inParametro.rows[0].DM_APURACAO_DTEMISSAO === 'S'){
+        if (inParametro.DM_APURACAO_DTEMISSAO === 'S'){
 
         }
 
-        let ds_unidade = utils.Validar.ifthen(
-          utils.Validar.getValueArray(det.prod[0].uCom, 0) !== "",
-          utils.Validar.getValueArray(det.prod[0].uCom, 0),
-          'XX'
-        );
-        let unidade = await model.Sf0190.selectyDsUnidade(ds_unidade, id_empresa, dhEmi).rows[0]
+        let ds_unidade = utils.Validar.getValueArray(det.prod[0].uCom, 0, "XX");
+
+
+        let unidade = await model.Sf0190.selectByDsUnidade(ds_unidade, id_empresa, dhEmi).rows[0];
 
         if (unidade.length === 0){
           //0190
@@ -361,42 +283,49 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
             dt_movimento: dhEmi,
             id_empresa: id_empresa,
             id_usuario: id_usuario
-          })
+          });
         } else {
           ds_unidade = unidade[0].DS_UNIDADE;
         }
 
+        let cd_produto_servico = utils.FormatarString.removeCaracteresEspeciais(det.prod[0].cProd[0])
+        let produto = (await model.Produto.Item.selectByCodigo(cd_produto_servico, id_empresa, dhEmi)).rows[0];
+        
         await model.Produto.insert({
-          cd_produto_servico:'',
-          cd_barra:'',
-          ds_produto_servico:'',
-          id_ref_331_ncm:'',
-          id_ref_331_ex_ipi:'',
-          dm_tipo_item:'',
-          unidade:'',
-          id_0190:'',
-          dt_inicial:'',
-          dt_movimento:'',
-          id_cest:'',
+          cd_produto_servico: cd_produto_servico,
+          cd_barra: det.prod[0].cEANTrib[0],
+          ds_produto_servico: det.prod[0].xProd[0],
+          id_ref_331_ncm: det.prod[0].NCM[0],
+          id_ref_331_ex_ipi: det.prod[0].EXTIPI[0],
+          dm_tipo_item: produto.length === 0 ? '99' : produto.DM_TIPO_ITEM,
+          unidade: ds_unidade,
+          id_0190: ds_unidade,
+          dt_inicial: dhEmi,
+          dt_movimento: dhEmi,
+          id_cest: utils.Validar.getValueArray(det.prod[0].CEST, 0, ""),
           id_empresa: id_empresa,
           id_usuario: id_usuario
         })
 
+        await model.Produto.sp_gera_produto_mestre_item();
+
+        await model.Produto.Item.selectByCodigo(cd_produto_servico, id_empresa, dhEmi);
+
         //C170
         await model.NotaFiscal.Saida.Produto.Item.insert({
           dm_entrada_saida: dm_entrada_saida,
-          id_modelo_documento: id_modelo_documento,
+          id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
           serie_subserie_documento: serie_subserie_documento,
           nr_documento: nr_documento,
           dt_emissao_documento: dhEmi,
           nr_sequencia: det.$.nItem,
           id_produto_servico: id_produto_servico,
-          id_0190:'',
-          vl_unitario:'',
-          vl_total_item:'',
-          vl_desconto_item:'',
-          dm_movimentacao_fisica:'',
-          cd_fiscal_operacao:'',
+          id_0190: ds_unidade,
+          vl_unitario: utils.Validar.getValueArray(det.prod[0].vUnCom, 0, "0").replace('.',','),
+          vl_total_item: utils.Validar.getValueArray(det.prod[0].vProd, 0, "0").replace('.',','),
+          vl_desconto_item: utils.Validar.getValueArray(det.prod[0].vDesc, 0, "0").replace('.',','),
+          dm_movimentacao_fisica: 'S',
+          cd_fiscal_operacao: det.prod[0].CFOP[0],
           nr_fci:'',
           id_ref_431:'',
           vl_base_calculo_icms:'',
@@ -518,9 +447,9 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
         throw new Error(err.message);
       }
 
-			var Empresa = await model.CtrlEmpresa.select(id_empresa);
+			const Empresa = (await model.CtrlEmpresa.select(id_empresa)).rows[0];
 
-			if(Empresa.rows[0].CNPJ_EMPRESA !== result.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ[0]){ //então entrada
+			if(Empresa.CNPJ_EMPRESA !== result.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ[0]){ //então entrada
 				await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Nota fiscal informada não é uma nota fiscal de entrada.');
         throw new Error(err.message);
 			}

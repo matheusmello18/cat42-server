@@ -1,12 +1,11 @@
-module.exports.ifelse = (param1, param2) => {
-  console.log(param1, param2)
-  return (param1 ? param1 : (param2 ? param2 : ""))
+module.exports.isArray = (param) => {
+  return Array.isArray(param);
 }
 
-module.exports.getValueArray = (array, pos) => {
-  return (array ? array[pos] : "")
+module.exports.ifelse = (param1, param2, valueDefault = "") => {
+  return (param1 ? param1 : (param2 ? param2 : valueDefault))
 }
 
-module.exports.ifthen = (bool, valTrue, valFalse) => {
-  return bool ? valTrue : valFalse;
+module.exports.getValueArray = (array, pos, valueDefault = "") => {
+  return (this.isArray(array) ? (array[pos] == undefined ? valueDefault : array[pos]) : valueDefault)
 }

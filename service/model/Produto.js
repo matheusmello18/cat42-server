@@ -34,4 +34,22 @@ module.exports.Mestre = {
     }
   }
 }
-module.exports.item = {}
+module.exports.Item = {
+	selectByCodigo: async (cd_produto_servico, id_empresa, dt_inicial) => {
+    let sql = `select psm.cd_produto_servico, psi.ds_produto_servico, psi.dm_tipo_item
+								 from in_produto_servico_mestre psm 
+								 left join in_produto_servico_item psi on (psm.id_produto_servico = psi.id_produto_servico) 
+							  where psm.id_empresa = :id_empresa
+								  and upper(psm.cd_produto_servico) = upper(:cd_produto_servico) 
+								  and (psi.dt_inicial = (select max(item.dt_inicial) 
+									 												 from in_produto_servico_item item 
+																				  where item.id_produto_servico = psi.id_produto_servico 
+																					  and item.dt_inicial <= to_date(:dt_inicial, 'DD/MM/YYYY')) 
+									    or psi.dt_inicial is null) `;
+    try {
+      return await Oracle.select(sql, {id_empresa: id_empresa, cd_produto_servico: cd_produto_servico, dt_inicial: dt_inicial})
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+}

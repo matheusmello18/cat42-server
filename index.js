@@ -48,11 +48,14 @@ serve.post('*', (req, res) => {
 
 
 async function getT(){
-  var retorno1 = await model.CtrlEmpresa.select(77);
-  console.log(retorno1)
+  var retorno1 = (await model.CtrlEmpresa.select(77)).rows;
+  console.log(retorno1.length)
+  console.log(retorno1[0])
   
-  var retorno = await model.Ac331.municipio.select('3534302');
-  console.log(retorno.rows)
+  console.log("----")
+
+  var retorno = (await model.Ac331.municipio.select('3534302')).rows;
+  console.log(retorno)
 }
 //getT();
 
