@@ -1,6 +1,7 @@
 const Ac331 = require('./Ac331');
 const AcC700 = require('./AcC700');
 const Ac413 = require('./Ac413');
+const Ac431 = require('./Ac431');
 const Ac0450 = require('./Ac0450');
 const Sf0190 = require('./Sf0190');
 const CtrlEmpresa = require('./CtrlEmpresa');
@@ -19,7 +20,7 @@ const ProdutoSimulador = require('./ProdutoSimulador');
 const Sf_Importa_Arquivo = require('./Sf_Importa_Arquivo');
 
 module.exports = {
-  Ac331, Ac0450, Ac413, AcC700,
+  Ac331, Ac0450, Ac413, Ac431, AcC700,
   ProdutoSimulador, Sf_Importa_Arquivo, 
   CtrlEmpresa, CtrlUsuario, Etapas, 
   EtapaStatus, ModeloDocumento, Cfop,

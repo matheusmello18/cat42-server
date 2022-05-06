@@ -9,6 +9,7 @@ module.exports.insert = async (Sf0190 = {}) => {
 	try {
 		await Oracle.insert(sql, Sf0190)
 	} catch (err) {
+		// fazer tratamento se houver retorno do banco 20211, se houver este código ignorar
 		throw new Error(err);
 	}
 }

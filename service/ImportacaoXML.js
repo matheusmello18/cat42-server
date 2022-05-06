@@ -123,6 +123,9 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       });
 
+      // melhorar esta chamada com o then e catch
+      await model.Pessoa.sp_gera_pessoa_mestre_item();
+
       let dm_entrada_saida = utils.Validar.getValueArray(result.nfeProc.NFe[0].infNFe[0].ide[0].tpNF, 0, "") == "1" ? "S" : "E"
       
       const PessoaDestinatario = (await model.Pessoa.Mestre.selectByCdPessoa(cd_pessoa, id_empresa)).rows[0];
@@ -257,7 +260,19 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
       }
 
       for (let i = 0; i < result.nfeProc.NFe[0].infNFe[0].det.length; i++) {
+
         const det = result.nfeProc.NFe[0].infNFe[0].det[i];
+
+        const chaveC100 = {
+          dm_entrada_saida: dm_entrada_saida,
+          id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
+          serie_subserie_documento: serie_subserie_documento,
+          nr_documento: nr_documento,
+          dt_emissao_documento: dhEmi,
+          nr_sequencia: det.$.nItem,
+          nr_item: det.$.nItem,
+        };
+        
         const prod = await model.Produto.Mestre.selectByCodigo(det.prod[0].cProd[0], id_empresa);
         let id_produto_servico;
 
@@ -274,7 +289,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
         let unidade = await model.Sf0190.selectByDsUnidade(ds_unidade, id_empresa, dhEmi).rows[0];
 
-        if (unidade.length === 0){
+        if (unidade === undefined){
           //0190
           await model.Unidade.insert({
             ds_unidade: ds_unidade,
@@ -285,7 +300,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
             id_usuario: id_usuario
           });
         } else {
-          ds_unidade = unidade[0].DS_UNIDADE;
+          ds_unidade = unidade.DS_UNIDADE;
         }
 
         let cd_produto_servico = utils.FormatarString.removeCaracteresEspeciais(det.prod[0].cProd[0])
@@ -297,7 +312,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           ds_produto_servico: det.prod[0].xProd[0],
           id_ref_331_ncm: det.prod[0].NCM[0],
           id_ref_331_ex_ipi: det.prod[0].EXTIPI[0],
-          dm_tipo_item: produto.length === 0 ? '99' : produto.DM_TIPO_ITEM,
+          dm_tipo_item: produto === undefined ? '99' : produto.DM_TIPO_ITEM,
           unidade: ds_unidade,
           id_0190: ds_unidade,
           dt_inicial: dhEmi,
@@ -311,14 +326,78 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
         await model.Produto.Item.selectByCodigo(cd_produto_servico, id_empresa, dhEmi);
 
+        const vlrsICMS = {};
+
+        let impostoICMS;
+        
+        if (det.imposto[0].ICMS[0].ICMS00 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMS00[0];
+
+          vlrsICMS.id_ref_431 = '';
+
+          await model.Ac431.selectByCodigo(
+            utils.Validar.getValueArray(impostoICMS.orig, 0, "") + utils.Validar.getValueArray(impostoICMS.CST, 0, "")
+          ).then(async (result) => {
+            const ac431 = result.rows[0];
+
+            if (ac431 === undefined)
+              await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Código CST Inválido.');
+            else
+              vlrsICMS.id_ref_431 = ac431.ID_REF_431; //sCST_ICMS
+
+          }).catch(async (err) => {
+            await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err);
+          });
+
+          vlrsICMS.vl_base_calculo_icms = utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace('.',','); //sVl_Bc_ICMS
+          vlrsICMS.vl_icms = utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',','); //sVl_ICMS
+          vlrsICMS.aliq_icms = utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace('.',','); //sAliq_ICMS
+          vlrsICMS.vl_base_calculo_icms_subst = '0'; //sVl_Bc_ICMS_ST
+          vlrsICMS.vl_icms_substituicao = '0'; //sVl_ICMS_ST
+          vlrsICMS.aliq_icms_subs = '0'; //sAliq_ICMS_ST
+          vlrsICMS.vl_reducao_bc_icms = '0'; //sVl_Red_ICMS
+
+        }else if (det.imposto[0].ICMS[0].ICMS10 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMS10[0];
+        }else if (det.imposto[0].ICMS[0].ICMS20 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMS20[0];
+        }else if (det.imposto[0].ICMS[0].ICMS30 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMS30[0];
+        }else if (det.imposto[0].ICMS[0].ICMS40 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMS40[0];
+        }else if (det.imposto[0].ICMS[0].ICMS51 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMS51[0];
+        }else if (det.imposto[0].ICMS[0].ICMS60 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMS60[0];
+        }else if (det.imposto[0].ICMS[0].ICMS70 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMS70[0];
+        }else if (det.imposto[0].ICMS[0].ICMS90 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMS90[0];
+        }else if (det.imposto[0].ICMS[0].ICMSPart !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMSPart[0];
+        }else if (det.imposto[0].ICMS[0].ICMSST !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMSST[0];
+        }else if (det.imposto[0].ICMS[0].ICMSSN101 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMSSN101[0];
+        }else if (det.imposto[0].ICMS[0].ICMSSN102 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMSSN102[0];
+        }else if (det.imposto[0].ICMS[0].ICMSSN201 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMSSN201[0];
+        }else if (det.imposto[0].ICMS[0].ICMSSN202 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMSSN202[0];
+        }else if (det.imposto[0].ICMS[0].ICMSSN500 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMSSN500[0];
+        }else if (det.imposto[0].ICMS[0].ICMSSN900 !== undefined){
+          impostoICMS = det.imposto[0].ICMS[0].ICMSSN900[0];
+        }
+
+        /*sLinha := sLinha + sCST_ICMS + '|' + sVl_Bc_ICMS + '|' + sVl_ICMS + '|'
+          + sVl_Bc_ICMS_ST + '|' + sAliq_ICMS_ST + '|' + sVl_ICMS_ST + '|' +
+          sAliq_ICMS + '|' + sVl_Red_ICMS + '|'; */
+
         //C170
         await model.NotaFiscal.Saida.Produto.Item.insert({
-          dm_entrada_saida: dm_entrada_saida,
-          id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
-          serie_subserie_documento: serie_subserie_documento,
-          nr_documento: nr_documento,
-          dt_emissao_documento: dhEmi,
-          nr_sequencia: det.$.nItem,
+          ...chaveC100,
           id_produto_servico: id_produto_servico,
           id_0190: ds_unidade,
           vl_unitario: utils.Validar.getValueArray(det.prod[0].vUnCom, 0, "0").replace('.',','),
@@ -326,15 +405,17 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           vl_desconto_item: utils.Validar.getValueArray(det.prod[0].vDesc, 0, "0").replace('.',','),
           dm_movimentacao_fisica: 'S',
           cd_fiscal_operacao: det.prod[0].CFOP[0],
-          nr_fci:'',
-          id_ref_431:'',
-          vl_base_calculo_icms:'',
-          vl_icms:'',
-          vl_base_calculo_icms_subst:'',
-          aliq_icms_subs:'',
-          vl_icms_substituicao:'',
-          aliq_icms:'',
-          vl_reducao_bc_icms:'',
+          nr_fci: utils.Validar.getValueArray(det.prod[0].nFCI, 0, ""),
+
+          id_ref_431:'', //sCST_ICMS
+          vl_base_calculo_icms:'', //sVl_Bc_ICMS
+          vl_icms:'', //sVl_ICMS
+          vl_base_calculo_icms_subst:'', //sVl_Bc_ICMS_ST
+          aliq_icms_subs:'', //sAliq_ICMS_ST
+          vl_icms_substituicao:'', //sVl_ICMS_ST
+          aliq_icms:'', //sAliq_ICMS
+          vl_reducao_bc_icms:'', //sVl_Red_ICMS
+
           vl_perc_red_icms:'',
           vl_perc_red_icms_st:'',
           dm_mod_bc_icms:'',
@@ -350,7 +431,6 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           vl_outras_despesas:'',
           vl_frete:'',
           vl_seguro:'',
-          nr_item:'',
           ds_complementar:'',
           dm_mot_desc_icms:'',
           vl_icms_desonerado:'',
@@ -381,8 +461,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         })
 
         await model.NotaFiscal.Saida.Produto.Item.AcC050.insert({
-          dm_entrada_saida:'',
-          id_modelo_documento:'',
+          ...chaveC100,
           id_ref_433:'',
           aliq_pis:'',
           vl_bc_pis:'',
@@ -398,26 +477,15 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           vl_cofins_st:'',
           qtde_bc_cofins:'',
           id_nota_fiscal_saida:'',
-          dt_emissao_documento:'',
-          nr_documento:'',
-          nr_item:'',
-          nr_sequencia:'',
-          serie_subserie_documento:'',
           id_empresa: id_empresa,
           id_usuario: id_usuario
         })
 
         await model.NotaFiscal.Saida.Produto.SfC195.insert({
-          dm_entrada_saida:'',
+          ...chaveC100,
           id_0460:'',
           ds_complementar:'',
           id_nota_fiscal_saida:'',
-          nr_item:'',
-          id_modelo_documento:'',
-          serie_subserie_documento:'',
-          nr_documento:'',
-          dt_emissao_documento:'',
-          nr_sequencia:'',
           id_empresa: id_empresa,
           id_usuario: id_usuario
         })
@@ -465,7 +533,6 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
   
       if (result.nfeProc.NFe[0].infNFe[0].ide[0].ver)
         console.log(result.nfeProc.NFe[0].infNFe[0].ide[0].ver)
-
 
 
       await model.Pessoa.insert({

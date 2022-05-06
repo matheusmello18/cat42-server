@@ -54,8 +54,16 @@ async function getT(){
   
   console.log("----")
 
-  var retorno = (await model.Ac331.municipio.select('3534302')).rows;
-  console.log(retorno)
+  /*var retorno = (await model.Ac331.municipio.select('3534302')).rows[0];
+  console.log(retorno)*/ // se não encontrou vem como undefined
+
+  console.log("---->")
+
+  await model.Ac331.municipio.select('3534302').then((e) => {
+    console.log(e.rows[0])
+  }).catch((r) => {
+    console.log(r)
+  });
 }
 //getT();
 
