@@ -39,6 +39,13 @@ serve.post('*', (req, res) => {
 })
 
 
+/*
+console.log(jsonNfe.nfeProc.NFe[0].infNFe[0].det[0].imposto[0].ICMS[0]);
+console.log(Object.keys(jsonNfe.nfeProc.NFe[0].infNFe[0].det[0].imposto[0].ICMS[0]));
+console.log(['ICMS00', 'ICMS10', 'ICMS20', 'ICMS90'].some((value) => {
+  return value == Object.keys(jsonNfe.nfeProc.NFe[0].infNFe[0].det[0].imposto[0].ICMS[0])[0]
+}))
+*/
 
 //console.log(utils.Validar.ifelse(jsonNfe.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ, jsonNfe.nfeProc.NFe[0].infNFe[0].dest[0].CPF));
 

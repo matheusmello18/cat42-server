@@ -269,7 +269,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           serie_subserie_documento: serie_subserie_documento,
           nr_documento: nr_documento,
           dt_emissao_documento: dhEmi,
-          nr_sequencia: det.$.nItem,
+          nr_sequencia: det.$.nItem, //sItem_Seq
           nr_item: det.$.nItem,
         };
         
@@ -326,39 +326,281 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
         await model.Produto.Item.selectByCodigo(cd_produto_servico, id_empresa, dhEmi);
 
-        const vlrsICMS = {};
+        const paramC170 = {
+          /**
+           * @param {integer} id_produto_servico
+           */
+          id_produto_servico: id_produto_servico,
+          /**
+           * @param {string} ds_unidade
+           */
+          id_0190: ds_unidade,
+          /**
+           * @param {number} det.prod[0].vUnCom
+           */
+          vl_unitario: utils.Validar.getValueArray(det.prod[0].vUnCom, 0, "0").replace('.',','),
+          /**
+           * @param {number} det.prod[0].vProd
+           */
+          vl_total_item: utils.Validar.getValueArray(det.prod[0].vProd, 0, "0").replace('.',','),
+          /**
+           * @param {number} det.prod[0].vDesc
+           */
+          vl_desconto_item: utils.Validar.getValueArray(det.prod[0].vDesc, 0, "0").replace('.',','),
+          /**
+           * @param {string} 'S'
+           */
+          dm_movimentacao_fisica: 'S',
+          /**
+           * @param {string} det.prod[0].CFOP[0]
+           */
+          cd_fiscal_operacao: det.prod[0].CFOP[0],
+          /**
+           * @param {string} det.prod[0].nFCI
+           */
+          nr_fci: utils.Validar.getValueArray(det.prod[0].nFCI, 0, ""),
+          /**
+           * @param {string} sCST_ICMS
+           */
+          id_ref_431:'', //sCST_ICMS
+          /**
+           * @param {number} sVl_Bc_ICMS
+           */
+          vl_base_calculo_icms: 0, //sVl_Bc_ICMS
+          /**
+           * @param {number} sVl_ICMS
+           */
+          vl_icms: 0, //sVl_ICMS
+          /**
+           * @param {number} sVl_Bc_ICMS_ST
+           */
+          vl_base_calculo_icms_subst: 0, //sVl_Bc_ICMS_ST
+          /**
+           * @param {number} sAliq_ICMS_ST
+           */
+          aliq_icms_subs: 0, //sAliq_ICMS_ST
+          /**
+           * @param {number} sVl_ICMS_ST
+           */
+          vl_icms_substituicao: 0, //sVl_ICMS_ST
+          /**
+           * @param {number} sAliq_ICMS
+           */
+          aliq_icms: 0, //sAliq_ICMS
+          /**
+           * @param {number} sVl_Red_ICMS
+           */
+          vl_reducao_bc_icms: 0, //sVl_Red_ICMS
+          /**
+           * @param {number} sAliq_Red_ICMS
+           */
+          vl_perc_red_icms: 0, // sAliq_Red_ICMS
+          /**
+           * @param {number} sAliq_Red_ICMS_ST
+           */
+          vl_perc_red_icms_st: 0, //sAliq_Red_ICMS_ST
+          /**
+           * @param {string} sModBC
+           */
+          dm_mod_bc_icms:'', //sModBC
+          /**
+           * @param {string} sModBC_ST
+           */
+          dm_mod_bc_icms_st:'', //sModBC_ST
+          /**
+           * @param {string} '5'
+           */
+          dm_tributacao_icms: '5', //esta fixo no fonte
+          /**
+           * @param {string} sCST_IPI
+           */
+          id_ref_432:'', //sCST_IPI
+          /**
+           * @param {number} sVl_Bc_IPI
+           */
+          vl_base_calculo_ipi: 0, //sVl_Bc_IPI
+          /**
+           * @param {number} sVl_IPI
+           */
+          vl_ipi: 0, //sVl_IPI
+          /**
+           * @param {number} sAliq_IPI
+           */
+          aliq_ipi: 0, //sAliq_IPI
+          /**
+           * @param {number} qQtde
+           */
+          qtde: 0, //qQtde
+          /**
+           * @param {string} qUnid
+           */
+          unidade:'', // qUnid
+          /**
+           * @param {string} '5'
+           */
+          dm_tributacao_ipi: '5', // esta fixo no fonte
+          /**
+           * @param {number} nVl_Icms_Outro
+           */
+          vl_outras_despesas: 0, //nVl_Icms_Outro
+          /**
+           * @param {number} svFrete
+           */
+          vl_frete: 0, //svFrete
+          /**
+           * @param {number} svSeg
+           */
+          vl_seguro: 0, //svSeg
+          /**
+           * @param {string} sDs_Prod
+           */
+          ds_complementar: det.prod[0].xProd[0], //sDs_Prod
+          /**
+           * @param {string} sMotDesoner
+           */
+          dm_mot_desc_icms:'', //sMotDesoner
+          /**
+           * @param {number} sVl_Desoner
+           */
+          vl_icms_desonerado: 0, //sVl_Desoner
+          /**
+           * @param {number} sVl_Bc_II
+           */
+          vl_bc_ii: 0, //sVl_Bc_II
+          /**
+           * @param {number} sVl_Desp_Adu
+           */
+          vl_desp_adu: 0, //sVl_Desp_Adu
+          /**
+           * @param {number} sVl_II
+           */
+          vl_ii: 0, //sVl_II
+          /**
+           * @param {number} sVl_IOF
+           */
+          vl_iof: 0, //sVl_IOF
+          /**
+           * @param {number} nBc_ICMS_Difal
+           */
+          vl_bc_icms_uf_dest: 0, //nBc_ICMS_Difal
+          /**
+           * @param {number} nPerc_FCP
+           */
+          perc_icms_fcp: 0, //nPerc_FCP
+          /**
+           * @param {number} nAliq_UF_Dest
+           */
+          aliq_icms_uf_dest: 0, //nAliq_UF_Dest
+          /**
+           * @param {number} nAliq_Interest
+           */
+          aliq_icms_interestadual: 0, //nAliq_Interest
+          /**
+           * @param {number} nPerc_Partilha
+           */
+          perc_icms_partilha: 0, //nPerc_Partilha
+          /**
+           * @param {number} nVlICMS_FCP
+           */
+          vl_icms_fcp: 0, //nVlICMS_FCP
+          /**
+           * @param {number} nVlICMS_UF_Dest
+           */
+          vl_icms_uf_dest: 0, //nVlICMS_UF_Dest
+          /**
+           * @param {number} nVlICMS_UF_Remet
+           */
+          vl_icms_uf_remet: 0, //nVlICMS_UF_Remet
+          /**
+           * @param {string} sEnquadra
+           */
+          id_ref_453: '', //sEnquadra
+          /**
+           * @param {number} sBC_FCP_OP
+           */
+          vl_bc_fcp_op: 0, //sBC_FCP_OP
+          /**
+           * @param {number} sAliq_FCP_OP
+           */
+          aliq_fcp_op: 0, //sAliq_FCP_OP
+          /**
+           * @param {number} sFCP_OP
+           */
+          vl_fcp_op: 0, //sFCP_OP
+          /**
+           * @param {number} sBC_FCP_ST
+           */
+          vl_bc_fcp_st: 0, //sBC_FCP_ST
+          /**
+           * @param {number} sAliq_FCP_ST
+           */
+          aliq_fcp_st: 0, //sAliq_FCP_ST
+          /**
+           * @param {number} sFCP_ST
+           */
+          vl_fcp_st: 0, //sFCP_ST
+          /**
+           * @param {number} sVl_Bc_ICMS_ST_OBS
+           */
+          vl_bc_icms_st_obs: 0, //sVl_Bc_ICMS_ST_OBS
+          /**
+           * @param {number} sVl_ICMS_ST_OBS
+           */
+          vl_icms_st_obs: 0, 
+          /**
+           * @param {integer} sQtdeTrib
+           */
+          qtde_tributada: 0, //sQtdeTrib
+        };
 
         let impostoICMS;
         
         if (det.imposto[0].ICMS[0].ICMS00 !== undefined){
           impostoICMS = det.imposto[0].ICMS[0].ICMS00[0];
 
-          vlrsICMS.id_ref_431 = '';
+          paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace('.',',')); //sVl_Bc_ICMS
+          paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace('.',',')); //sAliq_ICMS
+          paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',',')); //sVl_ICMS
 
-          await model.Ac431.selectByCodigo(
-            utils.Validar.getValueArray(impostoICMS.orig, 0, "") + utils.Validar.getValueArray(impostoICMS.CST, 0, "")
-          ).then(async (result) => {
-            const ac431 = result.rows[0];
+          if (['3', '7'].includes(result.nfeProc.NFe[0].infNFe[0].total[0].prod[0].CFOP[0][0])){
+            if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
+              paramC170.vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; //nVl_Icms_Outro
+          }
 
-            if (ac431 === undefined)
-              await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Código CST Inválido.');
-            else
-              vlrsICMS.id_ref_431 = ac431.ID_REF_431; //sCST_ICMS
-
-          }).catch(async (err) => {
-            await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err);
-          });
-
-          vlrsICMS.vl_base_calculo_icms = utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace('.',','); //sVl_Bc_ICMS
-          vlrsICMS.vl_icms = utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',','); //sVl_ICMS
-          vlrsICMS.aliq_icms = utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace('.',','); //sAliq_ICMS
-          vlrsICMS.vl_base_calculo_icms_subst = '0'; //sVl_Bc_ICMS_ST
-          vlrsICMS.vl_icms_substituicao = '0'; //sVl_ICMS_ST
-          vlrsICMS.aliq_icms_subs = '0'; //sAliq_ICMS_ST
-          vlrsICMS.vl_reducao_bc_icms = '0'; //sVl_Red_ICMS
+          paramC170.dm_mod_bc_icms = utils.Validar.getValueArray(impostoICMS.modBC, 0, ""); //sModBC
+          paramC170.aliq_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCP, 0, "0").replace('.',',')); //sAliq_FCP_OP
+          paramC170.vl_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCP, 0, "0").replace('.',',')); //sFCP_OP
+          
+          if (paramC170.vl_fcp_op > 0)
+            paramC170.vl_bc_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "").replace('.',',')); //sFCP_OP
 
         }else if (det.imposto[0].ICMS[0].ICMS10 !== undefined){
           impostoICMS = det.imposto[0].ICMS[0].ICMS10[0];
+
+          paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace('.',',')); //sVl_Bc_ICMS
+          paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace('.',',')); //sAliq_ICMS
+          paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',',')); //sVl_ICMS
+
+          if (['3', '7'].includes(result.nfeProc.NFe[0].infNFe[0].total[0].prod[0].CFOP[0][0])){
+            if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
+              paramC170.vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; //nVl_Icms_Outro
+          }
+
+          paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace('.',',')); 
+          paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace('.',',')); 
+          paramC170.aliq_icms_subs = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace('.',',')); 
+          paramC170.vl_perc_red_icms_st = parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBCST, 0, "0").replace('.',',')); 
+          paramC170.dm_mod_bc_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.modBC, 0, "")); 
+          paramC170.dm_mod_bc_icms_st = parseFloat(utils.Validar.getValueArray(impostoICMS.modBCST, 0, ""));
+
+          paramC170.vl_bc_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCFCP, 0, "").replace('.',','));
+          paramC170.aliq_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCP, 0, "0").replace('.',',')); 
+          paramC170.vl_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCP, 0, "0").replace('.',',')); 
+          
+          paramC170.vl_bc_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCFCPST, 0, "").replace('.',','));
+          paramC170.aliq_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCPST, 0, "0").replace('.',',')); 
+          paramC170.vl_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCPST, 0, "0").replace('.',',')); 
+
         }else if (det.imposto[0].ICMS[0].ICMS20 !== undefined){
           impostoICMS = det.imposto[0].ICMS[0].ICMS20[0];
         }else if (det.imposto[0].ICMS[0].ICMS30 !== undefined){
@@ -391,71 +633,38 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           impostoICMS = det.imposto[0].ICMS[0].ICMSSN900[0];
         }
 
-        /*sLinha := sLinha + sCST_ICMS + '|' + sVl_Bc_ICMS + '|' + sVl_ICMS + '|'
-          + sVl_Bc_ICMS_ST + '|' + sAliq_ICMS_ST + '|' + sVl_ICMS_ST + '|' +
-          sAliq_ICMS + '|' + sVl_Red_ICMS + '|'; */
+        if (['ICMS00', 'ICMS10', 'ICMS20', 'ICMS30', 'ICMS40', 'ICMS51',
+             'ICMS60', 'ICMS70', 'ICMS90', 'ICMSPart', 'ICMSST'].some((value) => { 
+          return value == Object.keys(det.imposto[0].ICMS[0])[0];
+        })) {
+          impostoICMS.codAc431 = utils.Validar.getValueArray(impostoICMS.orig, 0, "") + utils.Validar.getValueArray(impostoICMS.CST, 0, "")
+        } else if (['ICMSSN101', 'ICMSSN102', 'ICMSSN201', 
+                    'ICMSSN202', 'ICMSSN500', 'ICMSSN900'].some((value) => { 
+          return value == Object.keys(det.imposto[0].ICMS[0])[0];
+        })){
+          impostoICMS.codAc431 = utils.Validar.getValueArray(impostoICMS.CSOSN, 0, "")
+        } else {
+          impostoICMS.codAc431 = '';
+        }
+
+        await model.Ac431.selectByCodigo(
+          impostoICMS.codAc431
+        ).then(async (result) => {
+          const ac431 = result.rows[0];
+
+          if (ac431 === undefined)
+            await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Código CST Inválido.');
+          else
+            paramC170.id_ref_431 = ac431.ID_REF_431; //sCST_ICMS
+
+        }).catch(async (err) => {
+          await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err);
+        });
 
         //C170
         await model.NotaFiscal.Saida.Produto.Item.insert({
           ...chaveC100,
-          id_produto_servico: id_produto_servico,
-          id_0190: ds_unidade,
-          vl_unitario: utils.Validar.getValueArray(det.prod[0].vUnCom, 0, "0").replace('.',','),
-          vl_total_item: utils.Validar.getValueArray(det.prod[0].vProd, 0, "0").replace('.',','),
-          vl_desconto_item: utils.Validar.getValueArray(det.prod[0].vDesc, 0, "0").replace('.',','),
-          dm_movimentacao_fisica: 'S',
-          cd_fiscal_operacao: det.prod[0].CFOP[0],
-          nr_fci: utils.Validar.getValueArray(det.prod[0].nFCI, 0, ""),
-
-          id_ref_431:'', //sCST_ICMS
-          vl_base_calculo_icms:'', //sVl_Bc_ICMS
-          vl_icms:'', //sVl_ICMS
-          vl_base_calculo_icms_subst:'', //sVl_Bc_ICMS_ST
-          aliq_icms_subs:'', //sAliq_ICMS_ST
-          vl_icms_substituicao:'', //sVl_ICMS_ST
-          aliq_icms:'', //sAliq_ICMS
-          vl_reducao_bc_icms:'', //sVl_Red_ICMS
-
-          vl_perc_red_icms:'',
-          vl_perc_red_icms_st:'',
-          dm_mod_bc_icms:'',
-          dm_mod_bc_icms_st:'',
-          dm_tributacao_icms:'',
-          id_ref_432:'',
-          vl_base_calculo_ipi:'',
-          vl_ipi:'',
-          aliq_ipi:'',
-          qtde:'',
-          unidade:'',
-          dm_tributacao_ipi:'',
-          vl_outras_despesas:'',
-          vl_frete:'',
-          vl_seguro:'',
-          ds_complementar:'',
-          dm_mot_desc_icms:'',
-          vl_icms_desonerado:'',
-          vl_bc_ii:'',
-          vl_desp_adu:'',
-          vl_ii:'',
-          vl_iof:'',
-          vl_bc_icms_uf_dest:'',
-          perc_icms_fcp:'',
-          aliq_icms_uf_dest:'',
-          aliq_icms_interestadual:'',
-          perc_icms_partilha:'',
-          vl_icms_fcp:'',
-          vl_icms_uf_dest:'',
-          vl_icms_uf_remet:'',
-          id_ref_453:'',
-          vl_bc_fcp_op:'',
-          aliq_fcp_op:'',
-          vl_fcp_op:'',
-          vl_bc_fcp_st:'',
-          aliq_fcp_st:'',
-          vl_fcp_st:'',
-          vl_bc_icms_st_obs:'',
-          vl_icms_st_obs:'',
-          qtde_tributada:'',
+          
           id_empresa: id_empresa,
           id_usuario: id_usuario
         })
