@@ -38,7 +38,18 @@ serve.post('*', (req, res) => {
   res.json({msg: "rota não existe"})
 })
 
+/*
+const obj = {
+  person: {
+    name: 'Foo',
+    age: 50
+  }
+};
 
+console.log(obj.person.name);
+console.log(obj.myperson?.name);
+console.log(obj.myperson.name);
+*/
 /*
 console.log(jsonNfe.nfeProc.NFe[0].infNFe[0].det[0].imposto[0].ICMS[0]);
 console.log(Object.keys(jsonNfe.nfeProc.NFe[0].infNFe[0].det[0].imposto[0].ICMS[0]));
