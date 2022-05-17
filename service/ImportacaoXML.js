@@ -13,13 +13,13 @@ const { municipio } = require('./model/Ac331');
 module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2) => {
 
   fs.readFile(path, "utf8", async (err, xml) => {
-    if (err){
+    if (err) {
       /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
       await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
       throw new Error(err.message);
     }
     parseString(xml, async function (err, result) {
-      if (err){
+      if (err) {
         /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
         await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
         throw new Error(err.message);
@@ -70,7 +70,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
       if (result.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.enderdest[0]?.UF[0] == 'EX') {
         const PessoaMestre = (await model.Pessoa.Mestre.selectByRazaoSocial(result.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.xNome[0], id_empresa)).rows[0];
-        if (PessoaMestre === undefined){
+        if (PessoaMestre === undefined) {
           let id_pessoa = await Oracle.proxCod("IN_PESSOA_MESTRE");
           cd_pessoa = id_pessoa + '-EX';
           await model.Pessoa.Mestre.insert({
@@ -85,13 +85,13 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
       } else {      
         const PessoaMestre = (await model.Pessoa.Mestre.selectByCpfOrCpnj(cpfOrCnpj,dhEmi,id_empresa)).rows[0];
 
-        if (PessoaMestre !== undefined){
+        if (PessoaMestre !== undefined) {
           cd_pessoa = PessoaMestre.CD_PESSOA;
         }
       }
 
       if (result.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.enderdest[0]?.UF[0] == 'EX') {
-        if (cd_pessoa.endsWith('-EX')){
+        if (cd_pessoa.endsWith('-EX')) {
           //importo
         }
       } else if (cd_pessoa.length == 0) {
@@ -137,17 +137,17 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
       let vl_outras_despesas = parseFloat(utils.Validar.getValueArray(result.nfeProc?.NFe[0]?.infNFe[0]?.det[0].ICMSTot[0]?.vOutro, 0, "0").replace('.',','))
       
       const Cfop = (await model.Cfop.selectByCdCfop(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0])).rows[0];
-      if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])){
-        if (Cfop.DM_ICMS_VL_CONTABIL === 'S'){
+      if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
+        if (Cfop.DM_ICMS_VL_CONTABIL === 'S') {
           vl_outras_despesas = vl_outras_despesas + 
             parseFloat(utils.Validar.getValueArray(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vOutro, 0).replace('.',','));
         }
-        if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S'){
+        if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S') {
           vl_outras_despesas = vl_outras_despesas + 
             parseFloat(utils.Validar.getValueArray(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vPIS, 0).replace('.',',')) +
             parseFloat(utils.Validar.getValueArray(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vCOFINS, 0).vCOFINS('.',','));
         }
-        if (Cfop.DM_VLCONTABIL_II === 'S'){
+        if (Cfop.DM_VLCONTABIL_II === 'S') {
           vl_outras_despesas = vl_outras_despesas + 
             parseFloat(utils.Validar.getValueArray(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vII, 0).vCOFINS('.',','));
         }
@@ -192,9 +192,9 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         id_usuario: id_usuario
       });
 
-      if (result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic !== undefined){
+      if (result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic !== undefined) {
 
-        if (result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl !== undefined){
+        if (result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl !== undefined) {
           let ac0450 = (await model.Ac0450.select(
             result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl[0],
             id_empresa,
@@ -202,7 +202,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           )).rows[0];
 
           var id_ref_0450
-          if (ac0450 == undefined){
+          if (ac0450 == undefined) {
             id_ref_0450 = (await model.Ac0450.insert(
               result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl[0],
               id_empresa,
@@ -226,7 +226,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           })
         }
 
-        if (result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco !== undefined){
+        if (result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco !== undefined) {
           var ac0450 = (await model.Ac0450.select(
             result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco[0],
             id_empresa,
@@ -234,7 +234,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           )).rows[0];
 
           let id_ref_0450
-          if (ac0450 == undefined){
+          if (ac0450 == undefined) {
             id_ref_0450 = (await model.Ac0450.insert(
               result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco[0],
               id_empresa,
@@ -276,20 +276,20 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         const prod = await model.Produto.Mestre.selectByCodigo(det.prod[0]?.cProd[0], id_empresa);
         let id_produto_servico;
 
-        if (prod.rows.length === 0){
+        if (prod.rows.length === 0) {
 
         }
 
-        if (inParametro.DM_APURACAO_DTEMISSAO === 'S'){
+        if (inParametro.DM_APURACAO_DTEMISSAO === 'S') {
 
         }
 
         let ds_unidade = utils.Validar.getValueArray(det.prod[0]?.uCom, 0, "XX");
 
 
-        let unidade = await model.Sf0190.selectByDsUnidade(ds_unidade, id_empresa, dhEmi).rows[0];
+        let unidade = (await model.Sf0190.selectByDsUnidade(ds_unidade, id_empresa, dhEmi)).rows[0];
 
-        if (unidade === undefined){
+        if (unidade === undefined) {
           //0190
           await model.Unidade.insert({
             ds_unidade: ds_unidade,
@@ -323,7 +323,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         })
 
         await model.Produto.sp_gera_produto_mestre_item();
-
+// errado
         await model.Produto.Item.selectByCodigo(cd_produto_servico, id_empresa, dhEmi);
 
         const paramC170 = {
@@ -336,7 +336,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
            */
           id_0190: ds_unidade,
           /**
-           * @param {number} det.prod[0]?.vUnCom
+           * @param {number} det.prod[0]?.vUnCom //nVl_Uni
            */
           vl_unitario: utils.Validar.getValueArray(det.prod[0]?.vUnCom, 0, "0").replace('.',','),
           /**
@@ -344,7 +344,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
            */
           vl_total_item: utils.Validar.getValueArray(det.prod[0]?.vProd, 0, "0").replace('.',','),
           /**
-           * @param {number} det.prod[0]?.vDesc
+           * @param {number} det.prod[0]?.vDesc //sVl_Desc
            */
           vl_desconto_item: utils.Validar.getValueArray(det.prod[0]?.vDesc, 0, "0").replace('.',','),
           /**
@@ -553,18 +553,82 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           qtde_tributada: 0, //sQtdeTrib
         };
 
+        const paramC050 = {
+          /**
+           * @param {string} sCST_PIS
+           */
+          id_ref_433: '99',
+           /**
+           * @param {number} sAliq_PIS
+           */
+          aliq_pis: 0,
+          /**
+           * @param {number}  sVl_Bc_PIS
+           */
+          vl_bc_pis: 0,
+          /**
+           * @param {number}  sVl_PIS
+           */
+          vl_pis: 0,
+          /**
+           * @param {number} sAliq_PIS_R
+           */
+          vl_aliq_pis: 0,
+          /**
+           * @param {number} default = 0
+           */
+          vl_pis_st: 0,
+          /**
+           * @param {number} sQTD_PIS
+           */
+          qtde_bc_pis: 0,
+          /**
+           * @param {string} sCST_COF
+           */
+          id_ref_434: '99',
+          /**
+           * @param {number} sAliq_COF
+           */
+          aliq_cofins: 0,
+          /**
+           * @param {number} sVl_Bc_COF
+           */
+          vl_bc_cofins: 0,
+          /**
+           * @param {number} sVl_COF
+           */
+          vl_cofins: 0,
+          /**
+           * @param {number} sAliq_COF_R
+           */
+          vl_aliq_cofins: 0,
+          /**
+           * @param {number} default = 0
+           */
+          vl_cofins_st: 0,
+          /**
+           * @param {number}  sQTD_COF
+           */
+          qtde_bc_cofins: 0,
+          /**
+           * @param {string} verificar como fazer
+           */
+          id_nota_fiscal_saida: '',
+        }
+
         let impostoICMS;
+        impostoICMS.calcReBC = false
         
-        if (det.imposto[0]?.ICMS[0]?.ICMS00 !== undefined){
+        if (det.imposto[0]?.ICMS[0]?.ICMS00 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS00[0];
 
           paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace('.',',')); //sVl_Bc_ICMS
           paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace('.',',')); //sAliq_ICMS
           paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',',')); //sVl_ICMS
 
-          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])){
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
             if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-              paramC170.vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; //nVl_Icms_Outro
+              vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; //nVl_Icms_Outro
           }
 
           paramC170.dm_mod_bc_icms = utils.Validar.getValueArray(impostoICMS.modBC, 0, ""); //sModBC
@@ -574,16 +638,16 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           if (paramC170.vl_fcp_op > 0)
             paramC170.vl_bc_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "").replace('.',',')); //sFCP_OP
 
-        }else if (det.imposto[0]?.ICMS[0]?.ICMS10 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMS10 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS10[0];
 
           paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace('.',',')); 
           paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace('.',',')); 
           paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',',')); 
 
-          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])){
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
             if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-              paramC170.vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+              vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
           }
 
           paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace('.',',')); 
@@ -603,19 +667,20 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.aliq_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCPST, 0, "0").replace('.',',')); 
           paramC170.vl_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCPST, 0, "0").replace('.',',')); 
 
-        }else if (det.imposto[0]?.ICMS[0]?.ICMS20 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMS20 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS20[0];
+          impostoICMS.calcReBC = true;
 
           paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace('.',',')); 
           paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace('.',',')); 
           paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',',')); 
 
-          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])){
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
             if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-              paramC170.vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+              vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
           }
 
-          if (impostoICMS.motDesICMS !== undefined){
+          if (impostoICMS.motDesICMS !== undefined) {
             paramC170.dm_mot_desc_icms = utils.Validar.getValueArray(impostoICMS.motDesICMS, 0, "").padStart(2, '0');
             paramC170.vl_icms_desonerado = impostoICMS.vICMSDeson !== undefined ? parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSDeson, 0, "0").replace('.',',')) : parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',','));
           }
@@ -628,7 +693,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.aliq_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCP, 0, "0").replace('.',',')); 
           paramC170.vl_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCP, 0, "0").replace('.',','));         
 
-        }else if (det.imposto[0]?.ICMS[0]?.ICMS30 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMS30 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS30[0];
 
           paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace('.',',')); 
@@ -638,7 +703,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.vl_perc_red_icms_st = utils.Validar.getValueArray(impostoICMS.pRedBCST, 0, "0").replace('.',',');
           paramC170.dm_mod_bc_icms_st = utils.Validar.getValueArray(impostoICMS.modBCST, 0, "");
 
-          if (impostoICMS.motDesICMS !== undefined){
+          if (impostoICMS.motDesICMS !== undefined) {
             paramC170.dm_mot_desc_icms = utils.Validar.getValueArray(impostoICMS.motDesICMS, 0, "").padStart(2, '0');
             paramC170.vl_icms_desonerado = impostoICMS.vICMSDeson !== undefined ? parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSDeson, 0, "0").replace('.',',')) : parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',','));
           }
@@ -647,23 +712,25 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.aliq_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCPST, 0, "0").replace('.',',')); 
           paramC170.vl_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCPST, 0, "0").replace('.',',')); 
 
-        }else if (det.imposto[0]?.ICMS[0]?.ICMS40 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMS40 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS40[0];
           
-          if (impostoICMS.motDesICMS !== undefined){
+          if (impostoICMS.motDesICMS !== undefined) {
             paramC170.dm_mot_desc_icms = utils.Validar.getValueArray(impostoICMS.motDesICMS, 0, "").padStart(2, '0');
             paramC170.vl_icms_desonerado = impostoICMS.vICMSDeson !== undefined ? parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSDeson, 0, "0").replace('.',',')) : parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',','));
           }
 
-        }else if (det.imposto[0]?.ICMS[0]?.ICMS51 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMS51 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS51[0];
+          impostoICMS.calcReBC = true;
+
           paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace('.',',')); 
           paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace('.',',')); 
           paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',',')); 
 
-          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])){
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
             if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-              paramC170.vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+              vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
           }
 
           paramC170.vl_reducao_bc_icms = paramC170.vl_total_item * ((parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace('.',',')) / 100) / 100); 
@@ -674,7 +741,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.aliq_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCP, 0, "0").replace('.',',')); 
           paramC170.vl_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCP, 0, "0").replace('.',','));   
           
-        }else if (det.imposto[0]?.ICMS[0]?.ICMS60 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMS60 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS60[0];
 
           paramC170.vl_bc_icms_st_obs = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCSTRet, 0, "0").replace('.',',')); 
@@ -684,16 +751,17 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.aliq_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCPSTRet, 0, "0").replace('.',',')); 
           paramC170.vl_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCPSTRet, 0, "0").replace('.',','));   
 
-        }else if (det.imposto[0]?.ICMS[0]?.ICMS70 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMS70 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS70[0];
+          impostoICMS.calcReBC = true;
 
           paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace('.',',')); 
           paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace('.',',')); 
           paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',',')); 
 
-          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])){
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
             if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-              paramC170.vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+              vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
           }
 
           paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace('.',',')); 
@@ -707,7 +775,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.dm_mod_bc_icms = utils.Validar.getValueArray(impostoICMS.modBC, 0, ""); 
           paramC170.dm_mod_bc_icms_st = utils.Validar.getValueArray(impostoICMS.modBCST, 0, "");
 
-          if (impostoICMS.motDesICMS !== undefined){
+          if (impostoICMS.motDesICMS !== undefined) {
             paramC170.dm_mot_desc_icms = utils.Validar.getValueArray(impostoICMS.motDesICMS, 0, "").padStart(2, '0');
             paramC170.vl_icms_desonerado = impostoICMS.vICMSDeson !== undefined ? parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSDeson, 0, "0").replace('.',',')) : parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',','));
           }
@@ -720,16 +788,17 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.aliq_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCPST, 0, "0").replace('.',',')); 
           paramC170.vl_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCPST, 0, "0").replace('.',','));
           
-        }else if (det.imposto[0]?.ICMS[0]?.ICMS90 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMS90 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS90[0];
+          impostoICMS.calcReBC = true;
 
           paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace('.',',')); 
           paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace('.',',')); 
           paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',',')); 
           
-          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])){
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
             if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-              paramC170.vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+              vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
           }
 
           paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace('.',',')); 
@@ -743,7 +812,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.dm_mod_bc_icms = utils.Validar.getValueArray(impostoICMS.modBC, 0, "");
           paramC170.dm_mod_bc_icms_st = utils.Validar.getValueArray(impostoICMS.modBCST, 0, "");
 
-          if (impostoICMS.motDesICMS !== undefined){
+          if (impostoICMS.motDesICMS !== undefined) {
             paramC170.dm_mot_desc_icms = utils.Validar.getValueArray(impostoICMS.motDesICMS, 0, "").padStart(2, '0');
             paramC170.vl_icms_desonerado = impostoICMS.vICMSDeson !== undefined ? parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSDeson, 0, "0").replace('.',',')) : parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',','));
           }
@@ -756,16 +825,17 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.aliq_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCPST, 0, "0").replace('.',',')); 
           paramC170.vl_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCPST, 0, "0").replace('.',','));
 
-        }else if (det.imposto[0]?.ICMS[0]?.ICMSPart !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMSPart !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMSPart[0];
+          impostoICMS.calcReBC = true;
 
           paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace('.',',')); 
           paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace('.',',')); 
           paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',',')); 
           
-          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])){
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
             if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-              paramC170.vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+              vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
           }
 
           paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace('.',',')); 
@@ -779,34 +849,34 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.dm_mod_bc_icms = utils.Validar.getValueArray(impostoICMS.modBC, 0, "");
           paramC170.dm_mod_bc_icms_st = utils.Validar.getValueArray(impostoICMS.modBCST, 0, "");
 
-        }else if (det.imposto[0]?.ICMS[0]?.ICMSST !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMSST !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMSST[0];
 
           paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCSTDest, 0, "0").replace('.',','));
           paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCSTDest, 0, "0").replace('.',','));
 
-        }else if (det.imposto[0]?.ICMS[0]?.ICMSSN101 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMSSN101 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMSSN101[0];
 
           paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vCredICMSSN, 0, "0").replace('.',','));
           
-          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])){
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
             if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-              paramC170.vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+              vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
           }
 
           paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pCredSN, 0, "0").replace('.',',')); 
 
-        }else if (det.imposto[0]?.ICMS[0]?.ICMSSN102 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMSSN102 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMSSN102[0]; // não tem valores
-        }else if (det.imposto[0]?.ICMS[0]?.ICMSSN201 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMSSN201 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMSSN201[0];
 
           paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vCredICMSSN, 0, "0").replace('.',','));
           
-          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])){
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
             if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-              paramC170.vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+              vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
           }
 
           paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pCredSN, 0, "0").replace('.',',')); 
@@ -823,7 +893,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.aliq_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCPST, 0, "0").replace('.',',')); 
           paramC170.vl_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCPST, 0, "0").replace('.',','));
 
-        }else if (det.imposto[0]?.ICMS[0]?.ICMSSN202 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMSSN202 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMSSN202[0];
 
           paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace('.',',')); 
@@ -845,7 +915,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.aliq_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCPSTRet, 0, "0").replace('.',',')); 
           paramC170.vl_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCPSTRet, 0, "0").replace('.',','));   
 
-        }else if (det.imposto[0]?.ICMS[0]?.ICMSSN500 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMSSN500 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMSSN500[0];
           
           paramC170.vl_bc_icms_st_obs = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCSTRet, 0, "0").replace('.',',')); 
@@ -855,16 +925,16 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           paramC170.aliq_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCPSTRet, 0, "0").replace('.',',')); 
           paramC170.vl_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCPSTRet, 0, "0").replace('.',','));   
 
-        }else if (det.imposto[0]?.ICMS[0]?.ICMSSN900 !== undefined){
+        } else if (det.imposto[0]?.ICMS[0]?.ICMSSN900 !== undefined) {
           impostoICMS = det.imposto[0]?.ICMS[0]?.ICMSSN900[0];
 
           paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace('.',',')); 
           paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace('.',',')); 
           paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace('.',',')); 
 
-          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])){
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
             if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-              paramC170.vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+              vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
           }
 
           paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace('.',',')); 
@@ -891,7 +961,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         } else if (['ICMSSN101', 'ICMSSN102', 'ICMSSN201', 
                     'ICMSSN202', 'ICMSSN500', 'ICMSSN900'].some((value) => { 
           return value == Object.keys(det.imposto[0]?.ICMS[0])[0];
-        })){
+        })) {
           impostoICMS.codAc431 = utils.Validar.getValueArray(impostoICMS.CSOSN, 0, "")
         } else {
           impostoICMS.codAc431 = '';
@@ -916,19 +986,178 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
         if(impostoICMS.codAc431.length == 0)
           impostoICMS.codAc431 = '090';
-
-        if(impostoICMS.codAc431.length == 2)
-          impostoICMS.codAc431 = '0' + impostoICMS.codAc431;
           
         const Sf453 = (await model.Sf453.selectByCodigo(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.cEnq, 0, ""))).rows[0];
         paramC170.id_ref_453 = Sf453 === undefined ? Sf453.ID_REF_453 : "";
 
-        if (det.imposto[0]?.IPI[0]?.IPITrib !== undefined){
-
+        if (det.imposto[0]?.IPI[0]?.IPITrib !== undefined) {
+          paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.CST, 0, "");
+          paramC170.vl_base_calculo_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vBC, 0, "").replace('.',','));
+          paramC170.vl_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vIPI, 0, "").replace('.',','));
+          paramC170.aliq_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.pIPI, 0, "0").replace('.',','));
+          
+          if (paramC170.vl_base_calculo_ipi === NaN && 
+              paramC170.vl_ipi === NaN &&
+              det.imposto[0]?.IPI[0]?.IPITrib[0]?.qUnid !== undefined &&
+              det.imposto[0]?.IPI[0]?.IPITrib[0]?.vUnid !== undefined) {
+            paramC170.id_ref_432 = "99";
+          }
+        } else if (det.imposto[0]?.IPI[0]?.IPINT !== undefined) {
+          paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.CST, 0, "");
         }
 
-        //paramC170.id_ref_432
-        
+        if (det.imposto[0]?.II !== undefined) {
+          paramC170.vl_bc_ii = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.II[0]?.vBC, 0, "0").replace('.',','));
+          paramC170.vl_desp_adu = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.II[0]?.vDespAdu, 0, "0").replace('.',','));
+          paramC170.vl_ii = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.II[0]?.vII, 0, "0").replace('.',','));
+          paramC170.vl_iof = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.II[0]?.vIOF, 0, "0").replace('.',','));
+
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
+            if (Cfop.DM_VLCONTABIL_II === 'S')
+              vl_outras_despesas = vl_outras_despesas + paramC170.vl_ii; 
+          }
+        }
+
+        if (det.imposto[0]?.PIS[0]?.PISAliq !== undefined) {
+          paramC050.id_ref_433 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISAliq[0]?.CST, 0, "");
+          paramC050.vl_bc_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISAliq[0]?.vBC, 0, "0").replace('.',','));
+          paramC050.aliq_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISAliq[0]?.pPIS, 0, "0").replace('.',','));
+          paramC050.vl_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISAliq[0]?.vPIS, 0, "0").replace('.',','));
+
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
+            if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+              vl_outras_despesas = vl_outras_despesas + paramC050.vl_pis;
+          }
+        } else if (det.imposto[0]?.PIS[0]?.PISQtde !== undefined) {
+          paramC050.id_ref_433 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISQtde[0]?.CST, 0, "");
+          paramC050.vl_aliq_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISQtde[0]?.vAliqProd, 0, "0").replace('.',','));
+          paramC050.vl_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISQtde[0]?.vPIS, 0, "0").replace('.',','));
+          paramC050.qtde_bc_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISQtde[0]?.qBCProd, 0, "0").replace('.',','));
+
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
+            if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+              vl_outras_despesas = vl_outras_despesas + paramC050.vl_pis;
+          }
+        } else if (det.imposto[0]?.PIS[0]?.PISNT !== undefined) {
+          paramC050.id_ref_433 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISNT[0]?.CST, 0, "");
+        } else if (det.imposto[0]?.PIS[0]?.PISOutr !== undefined) {
+          paramC050.id_ref_433 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISOutr[0]?.CST, 0, "");
+          paramC050.vl_bc_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISOutr[0]?.vBC, 0, "0").replace('.',','));
+          paramC050.aliq_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISOutr[0]?.pPIS, 0, "0").replace('.',','));
+          paramC050.vl_aliq_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISOutr[0]?.vAliqProd, 0, "0").replace('.',','));
+          paramC050.vl_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISOutr[0]?.vPIS, 0, "0").replace('.',','));
+          paramC050.qtde_bc_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISOutr[0]?.qBCProd, 0, "0").replace('.',','));
+
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
+            if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+              vl_outras_despesas = vl_outras_despesas + paramC050.vl_pis;
+          }
+        } else if (det.imposto[0]?.PIS[0]?.PISST !== undefined) {
+          paramC050.id_ref_433 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISST[0]?.CST, 0, "");
+          paramC050.vl_bc_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISST[0]?.vBC, 0, "0").replace('.',','));
+          paramC050.aliq_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISST[0]?.pPIS, 0, "0").replace('.',','));
+          paramC050.vl_aliq_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISST[0]?.vAliqProd, 0, "0").replace('.',','));
+          paramC050.vl_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISST[0]?.vPIS, 0, "0").replace('.',','));
+          paramC050.qtde_bc_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISST[0]?.qBCProd, 0, "0").replace('.',','));
+
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
+            if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+              vl_outras_despesas = vl_outras_despesas + paramC050.vl_pis;
+          }
+        }
+
+        if (det.imposto[0]?.COFINS[0]?.COFINSAliq !== undefined) {
+          paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSAliq[0]?.CST, 0, "");
+          paramC050.vl_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSAliq[0]?.vBC, 0, "0").replace('.',','));
+          paramC050.aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSAliq[0]?.pCOFINS, 0, "0").replace('.',','));          
+          paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSAliq[0]?.vCOFINS, 0, "0").replace('.',','));
+
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
+            if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+              vl_outras_despesas = vl_outras_despesas + paramC050.vl_cofins;
+          }
+        } else if (det.imposto[0]?.COFINS[0]?.COFINSQtde !== undefined) {
+          paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSQtde[0]?.CST, 0, "");
+          paramC050.vl_aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSQtde[0]?.vAliqProd, 0, "0").replace('.',','));
+          paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSQtde[0]?.vCOFINS, 0, "0").replace('.',','));
+          paramC050.qtde_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSQtde[0]?.qBCProd, 0, "0").replace('.',','));
+
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
+            if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+              vl_outras_despesas = vl_outras_despesas + paramC050.vl_cofins;
+          }
+        } else if (det.imposto[0]?.COFINS[0]?.COFINSNT !== undefined) {
+          paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSNT[0]?.CST, 0, "");
+        } else if (det.imposto[0]?.COFINS[0]?.COFINSOutr !== undefined) { 
+          paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.CST, 0, "");
+          paramC050.vl_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.vBC, 0, "0").replace('.',','));
+          paramC050.aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.pCOFINS, 0, "0").replace('.',','));
+          paramC050.vl_aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.vAliqProd, 0, "0").replace('.',','));
+          paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.vCOFINS, 0, "0").replace('.',','));
+          paramC050.qtde_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.qBCProd, 0, "0").replace('.',','));
+
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
+            if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+              vl_outras_despesas = vl_outras_despesas + paramC050.vl_cofins;
+          }
+        } else if (det.imposto[0]?.COFINS[0]?.COFINSST !== undefined) {
+          paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.CST, 0, "");
+          paramC050.vl_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.vBC, 0, "0").replace('.',','));
+          paramC050.aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.pCOFINS, 0, "0").replace('.',','));
+          paramC050.vl_aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.vAliqProd, 0, "0").replace('.',','));
+          paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.vCOFINS, 0, "0").replace('.',','));
+          paramC050.qtde_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.qBCProd, 0, "0").replace('.',','));
+
+          if (['3', '7'].includes(result.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
+            if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+              vl_outras_despesas = vl_outras_despesas + paramC050.vl_cofins;
+          }
+        }
+
+        const Sf433 = (await model.Sf433.selectByCodigo(paramC050.id_ref_433)).rows[0];
+        paramC050.id_ref_433 = Sf433.ID_REF_433;
+
+        const Sf434 = (await model.Sf434.selectByCodigo(paramC050.id_ref_434)).rows[0];
+        paramC050.id_ref_434 = Sf434.ID_REF_434;
+
+        if (det.imposto[0]?.ICMSUFDest !== undefined) {
+          paramC170.vl_bc_icms_uf_dest = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.ICMSUFDest[0]?.vBCUFDest, 0, "0").replace('.',','));
+          paramC170.perc_icms_fcp = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.ICMSUFDest[0]?.pFCPUFDest, 0, "0").replace('.',','));
+          paramC170.aliq_icms_uf_dest = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.ICMSUFDest[0]?.pICMSUFDest, 0, "0").replace('.',','));
+          paramC170.aliq_icms_interestadual = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.ICMSUFDest[0]?.pICMSInter, 0, "0").replace('.',','));
+          paramC170.perc_icms_partilha = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.ICMSUFDest[0]?.pICMSInterPart, 0, "0").replace('.',','));
+          paramC170.vl_icms_fcp = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.ICMSUFDest[0]?.vFCPUFDest, 0, "0").replace('.',','));
+          paramC170.vl_icms_uf_dest = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.ICMSUFDest[0]?.vICMSUFDest, 0, "0").replace('.',','));
+          paramC170.vl_icms_uf_remet = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.ICMSUFDest[0]?.vICMSUFRemet, 0, "0").replace('.',','));
+        }
+
+        if (impostoICMS.calcReBC) {
+          let somatoria = 0;
+          if (Cfop.DM_ICMS_VL_CONTABIL == 'S') {
+            somatoria = somatoria + paramC170.vl_icms_substituicao; //sVl_ICMS
+          }
+
+          if (Cfop.DM_VLCONTABIL_PISCOFINS == 'S') {
+            somatoria = somatoria + paramC170.vl_pis; //sVl_PIS
+            somatoria = somatoria + paramC170.vl_cofins; //sVl_COF  
+          }
+
+          if (Cfop.DM_VLCONTABIL_II == 'S') {
+            somatoria = somatoria + paramC170.vl_ii; //sVl_II
+          }
+
+          if (Cfop.DM_VLCONTABIL_ICMSDESCON == 'S') {
+            somatoria = somatoria - paramC170.vl_icms_desonerado; //sVl_Desoner
+          }
+          
+          somatoria = somatoria + (paramC170.qtde * paramC170.vl_unitario) + parseFloat(utils.Validar.getValueArray(result.nfeProc?.NFe[0]?.infNFe[0]?.det[0].ICMSTot[0]?.vOutro, 0, "0").replace('.',',')) +
+            paramC170.vl_frete + paramC170.vl_seguro + paramC170.vl_ipi + paramC170.vl_icms + paramC170.cd_fiscal_operacao - paramC170.vl_desconto_item;
+
+          paramC170.vl_reducao_bc_icms = somatoria * (paramC170.vl_perc_red_icms / 100);
+          
+        }
+
+        paramC170.vl_outras_despesas = vl_outras_despesas;
         //C170
         await model.NotaFiscal.Saida.Produto.Item.insert({
           ...chaveC100,
@@ -939,33 +1168,29 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
         await model.NotaFiscal.Saida.Produto.Item.AcC050.insert({
           ...chaveC100,
-          id_ref_433:'',
-          aliq_pis:'',
-          vl_bc_pis:'',
-          vl_pis:'',
-          vl_aliq_pis:'',
-          vl_pis_st:'',
-          qtde_bc_pis:'',
-          id_ref_434:'',
-          aliq_cofins:'',
-          vl_bc_cofins:'',
-          vl_cofins:'',
-          vl_aliq_cofins:'',
-          vl_cofins_st:'',
-          qtde_bc_cofins:'',
-          id_nota_fiscal_saida:'',
+          ...paramC050,
           id_empresa: id_empresa,
           id_usuario: id_usuario
         })
 
-        await model.NotaFiscal.Saida.Produto.SfC195.insert({
-          ...chaveC100,
-          id_0460:'',
-          ds_complementar:'',
-          id_nota_fiscal_saida:'',
-          id_empresa: id_empresa,
-          id_usuario: id_usuario
-        })
+        if (det?.infAdProd !== undefined){
+          let ds0460 = det?.infAdProd[0];
+          if (ds0460.length > 4000){
+            ds0460 = ds0460.slice(0,4000);
+          }
+          const Sf0460 = (await model.Sf0460.selectByCodigo(ds0460, id_empresa)).rows[0];
+          if (Sf0460 === undefined){
+            (await model.Sf0460.insert({id_empresa: id_empresa, dt_inicial: dhEmi, dt_movimento: dhEmi, id_usuario: id_usuario, ds_obs: ds0460}))
+          }
+          await model.NotaFiscal.Saida.Produto.SfC195.insert({
+            ...chaveC100,
+            id_0460:'',
+            ds_complementar:'',
+            id_nota_fiscal_saida:'',
+            id_empresa: id_empresa,
+            id_usuario: id_usuario
+          })
+        }
       }
     })
   });
@@ -980,13 +1205,13 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2) => {
 
   fs.readFile(path, "utf8", async (err, xml) => {
-    if (err){
+    if (err) {
       /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
       await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
       throw new Error(err.message);
     }
     parseString(xml, async function (err, result) {
-      if (err){
+      if (err) {
         /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
         await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
         throw new Error(err.message);
@@ -994,7 +1219,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
 
 			const Empresa = (await model.CtrlEmpresa.select(id_empresa)).rows[0];
 
-			if(Empresa.CNPJ_EMPRESA !== result.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CNPJ[0]){ //então entrada
+			if(Empresa.CNPJ_EMPRESA !== result.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CNPJ[0]) { //então entrada
 				await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Nota fiscal informada não é uma nota fiscal de entrada.');
         throw new Error(err.message);
 			}
