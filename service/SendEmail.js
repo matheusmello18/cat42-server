@@ -99,7 +99,7 @@ module.exports.cadastro = async (rows) => {
   console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));*/
 }
 
-/**
+/*
  * 
  * @param {rows: [
     {
@@ -259,7 +259,7 @@ module.exports.administrador = async (rows) => {
   });
 }
 
-/**
+/*
  * 
  * @param usuario: { 
     DM_ATIVO: "S"

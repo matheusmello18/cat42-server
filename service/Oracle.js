@@ -17,7 +17,7 @@ module.exports.insert = async (sql,params) => {
   try {
     connection = await oracledb.getConnection(config.db);
 
-    await connection.execute(
+    return await connection.execute(
       sql, params, {autoCommit: true}
     ).catch(err => {
       if (err.errorNum === 1008){

@@ -3,7 +3,7 @@ const Oracle = require('../Oracle');
 /**
  * 
  * @class municipio - desenvolvido para instruções do banco de dados
- * @function [select|insert] 
+ 
  * 
  */
 
@@ -34,7 +34,6 @@ module.exports.municipio = {
 /**
  * 
  * @class pais - desenvolvido para instruções do banco de dados
- * @function [select|insert] 
  * 
  */
 module.exports.pais = {

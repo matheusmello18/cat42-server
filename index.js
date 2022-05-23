@@ -1,17 +1,66 @@
+/**
+ * @name highlightSearchTerm
+ * @file Manages the configuration settings for the widget.
+ * @author Matheus de Mello
+ * @version 1.2.3
+ * @tutorial solver
+ * @since 1.0.1
+ */
+
+/**
+ * Servidor web express 
+ * @requires express
+ */
 const express = require("express");
-const serve = require("./serve");
+const serve = express();
+
+/**
+ * Configurar body para tornar json
+ * @requires body-parser
+ */
 const bodyParser = require("body-parser")
+
+/**
+ * Utilitário para trabalhar com diretório
+ * @requires path
+ */
 const path = require("path")
+
+/**
+ * Configurar permissão de acesso de url externas
+ * @requires cors
+ */
 const cors = require("cors")
 
+/**
+ * Configuração do Site
+ * @requires config
+ */
 const config = require('./config/Config');
+
+/**
+ * A number, or a string containing a number.
+ * @typedef {(number|string)} cliente
+ */
+
+/**
+ * Set the magic number.
+ * @param {cliente} x - The magic number.
+ */
 const cliente = require("./route/v1/cliente")
+
+/**
+ * Class representing a socket connection.
+ *
+ * @class
+ * @tutorial socket-tutorial
+ */
 const users = require("./route/v1/users")
 const etapas = require("./route/v1/etapas")
 
 const model = require('./service/model')
 const utils = require('./utils')
-const jsonNfe = require('./test/35201153309795000180550010005589881507126891.json')
+const jsonNfe = require("./test/35201153309795000180550010005589881507126891.json")
 
 
 var corsOptions = {
@@ -39,6 +88,7 @@ serve.post('*', (req, res) => {
 })
 
 
+
 /*let t = parseFloat("")
 if (t == NaN)
   console.log(t)
@@ -64,17 +114,15 @@ console.log(['ICMS00', 'ICMS10', 'ICMS20', 'ICMS90'].some((value) => {
 */
 
 //console.log(utils.Validar.ifelse(jsonNfe.nfeProc.NFe[0].infNFe[0].dest[0].CNPJ, jsonNfe.nfeProc.NFe[0].infNFe[0].dest[0].CPF));
-
  //console.log(utils.FormatarData.DateOracleToPrimeiroDia("15/02/2020"));
  //console.log(utils.FormatarData.DateOracleToUltimoDia("15/12/2020"));
  //console.log(utils.FormatarData.RetornarMenorDataEmOracle("15/04/2020", "15/03/2020"));
-
  //console.log(jsonNfe.nfeProc.NFe[0].infNFe[0].det[0].imposto[0].ICMS[0].ICMS90[0]?.origX === undefined);
 
 async function getT(){
-  var retorno1 = (await model.CtrlEmpresa.select(77)).rows;
+  /*var retorno1 = (await model.CtrlEmpresa.select(77)).rows;
   console.log(retorno1.length)
-  console.log(retorno1[0])
+  console.log(retorno1[0])*/
   
   console.log("----")
 
@@ -83,11 +131,24 @@ async function getT(){
 
   console.log("---->")
 
-  await model.Ac331.municipio.select('3534302').then((e) => {
+  /*await model.Ac331.municipio.select('3534302').then((e) => {
     console.log(e.rows[0])
   }).catch((r) => {
     console.log(r)
-  });
+  });*/
+
+  // const sf = await model.Sf0460.insert(
+  //   {
+  //     cd_obs: 'c00154', 
+  //     id_empresa: 1, 
+  //     dt_inicial: utils.FormatarData.DateNodeToDateOracleString(new Date()), 
+  //     dt_movimento: utils.FormatarData.DateNodeToDateOracleString(new Date()), 
+  //     id_usuario: 1, 
+  //     ds_obs: 'olá matheus de mello, esteja na good vibes'
+  //   }).then((e) => {
+  //     console.log('matheus');
+  //     console.log(e);
+  //   });
 }
 //getT();
 

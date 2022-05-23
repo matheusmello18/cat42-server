@@ -1,0 +1,11 @@
+{
+  "source": {
+      "include": ["./", "./service", "./service/model"],
+      "includePattern": ".+\\.js(doc|x)?$",
+      "exclude": ["node_modules/*","docs"]
+  },
+  "plugins": [],
+  "opts": {
+      "destination": "docs/"
+  }
+}
