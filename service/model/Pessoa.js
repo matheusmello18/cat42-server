@@ -40,7 +40,7 @@ module.exports.Mestre = {
 							  where cd_pessoa  = :cd_pessoa
 								  and id_empresa = :id_empresa`;
 		try {
-			await Oracle.select(sql, {cd_pessoa: cd_pessoa, id_empresa: id_empresa})
+			return await Oracle.select(sql, {cd_pessoa: cd_pessoa, id_empresa: id_empresa})
 		} catch (err) {
 			throw new Error(err);
 		}
@@ -53,7 +53,7 @@ module.exports.Mestre = {
 								where in_pessoa_item.nm_razao_social = :nm_razao_social 
 									and in_pessoa_mestre.id_empresa    = :id_empresa`;
 		try {
-			await Oracle.select(sql, {nm_razao_social: nm_razao_social, id_empresa: id_empresa})
+			return await Oracle.select(sql, {nm_razao_social: nm_razao_social, id_empresa: id_empresa})
 		} catch (err) {
 			throw new Error(err);
 		}
@@ -73,7 +73,7 @@ module.exports.Mestre = {
 												order by item.dt_inicial desc)
 							  where rownum = 1`;
 		try {
-			await Oracle.select(sql, {nr_cnpj_cpf: nr_cnpj_cpf, dt_inicial: dt_inicial, id_empresa: id_empresa})
+			return await Oracle.select(sql, {nr_cnpj_cpf: nr_cnpj_cpf, dt_inicial: dt_inicial, id_empresa: id_empresa})
 		} catch (err) {
 			throw new Error(err);
 		}

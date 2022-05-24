@@ -10,26 +10,34 @@ const { municipio } = require('./model/Ac331');
 //tomar atenção para este procedimento em outras importação se isso será necessário
 //importar o cupom fiscal c800 e c850
 //criar verificação que aceita somente modelo 55 e cupom fiscal (procurar seu modelo)
-
+/**
+ * 
+ * @param {String} filename 
+ * @param {String} path 
+ * @param {number} id_simul_etapa 
+ * @param {number} id_empresa 
+ * @param {number} id_usuario 
+ * @param {String} dt_periodo 
+ * @param {String} nm_procedure1 
+ * @param {String} nm_procedure2 
+ */
 module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2) => {
 
   fs.readFile(path, "utf8", async (err, xml) => {
     if (err) {
-      /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-      await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
+      await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
       throw new Error(err.message);
     }
     parseString(xml, async function (err, result) {
       if (err) {
-        /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-        await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
+        await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
         throw new Error(err.message);
       }
 
 			const Empresa = (await model.CtrlEmpresa.select(id_empresa)).rows[0];
 
 			if(Empresa.CNPJ_EMPRESA !== result.nfeProc?.NFe[0]?.infNFe[0]?.emit[0].CNPJ[0]) { //senão saida
-				await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Nota fiscal informada não é uma nota fiscal de saída.');
+				await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, 'Nota fiscal informada não é uma nota fiscal de saída.');
         throw new Error(err.message);
 			}
 			
@@ -58,7 +66,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
       if (result.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.enderDest[0]?.UF[0] == 'EX') {
         //// refazer
         /// fazer o insert na direto PESSOA e rodar a procedure sp_gera_pessoa_mestre_item
-        const PessoaMestre = (await model.Pessoa.Mestre.selectByRazaoSocial(result.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.xNome[0], id_empresa)).rows[0];
+        const PessoaMestre = (await model.Pessoa.Mestre.selectByRazaoSocial(result.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.xNome[0], id_empresa) ).rows[0];
         if (PessoaMestre === undefined) {
           let id_pessoa = await Oracle.proxCod("IN_PESSOA_MESTRE");
           cd_pessoa = id_pessoa + '-EX';
@@ -137,7 +145,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
       await model.Pessoa.sp_gera_pessoa_mestre_item()
       .catch(async (err) => {
-        await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
+        await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
         throw new Error(err.message);
       });
 
@@ -341,27 +349,27 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
            */
           id_0190: ds_unidade,
           /**
-           * @param {number} det.prod[0]?.vUnCom //nVl_Uni
+           * @param {number} nVl_Uni det.prod[0]?.vUnCom
            */
           vl_unitario: utils.Validar.getValueArray(det.prod[0]?.vUnCom, 0, "0").replace('.',','),
           /**
-           * @param {number} det.prod[0]?.vProd
+           * @param {number} vl_total_item det.prod[0]?.vProd
            */
           vl_total_item: utils.Validar.getValueArray(det.prod[0]?.vProd, 0, "0").replace('.',','),
           /**
-           * @param {number} det.prod[0]?.vDesc //sVl_Desc
+           * @param {number} sVl_Desc det.prod[0]?.vDesc 
            */
           vl_desconto_item: utils.Validar.getValueArray(det.prod[0]?.vDesc, 0, "0").replace('.',','),
           /**
-           * @param {string} 'S'
+           * @param {string} dm_movimentacao_fisica 'S'
            */
           dm_movimentacao_fisica: 'S',
           /**
-           * @param {string} det.prod[0]?.CFOP[0]
+           * @param {string} cd_fiscal_operacao det.prod[0]?.CFOP[0]
            */
           cd_fiscal_operacao: det.prod[0]?.CFOP[0],
           /**
-           * @param {string} det.prod[0]?.nFCI
+           * @param {string} nr_fci det.prod[0]?.nFCI
            */
           nr_fci: utils.Validar.getValueArray(det.prod[0]?.nFCI, 0, ""),
           /**
@@ -413,7 +421,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
            */
           dm_mod_bc_icms_st:'', //sModBC_ST
           /**
-           * @param {string} '5'
+           * @param {string} dm_tributacao_icms '5'
            */
           dm_tributacao_icms: '5', //esta fixo no fonte
           /**
@@ -441,7 +449,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
            */
           unidade:'', // qUnid
           /**
-           * @param {string} '5'
+           * @param {string} dm_tributacao_ipi '5'
            */
           dm_tributacao_ipi: '5', // esta fixo no fonte
           /**
@@ -560,9 +568,9 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
         const paramC050 = {
           /**
-           * @param {string} sCST_PIS
+           * @param {BigInt} sCST_PIS
            */
-          id_ref_433: '99',
+          id_ref_433: 0,
            /**
            * @param {number} sAliq_PIS
            */
@@ -588,9 +596,9 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
            */
           qtde_bc_pis: 0,
           /**
-           * @param {string} sCST_COF
+           * @param {number} sCST_COF
            */
-          id_ref_434: '99',
+          id_ref_434: 0,
           /**
            * @param {number} sAliq_COF
            */
@@ -616,9 +624,9 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
            */
           qtde_bc_cofins: 0,
           /**
-           * @param {string} verificar como fazer
+           * @param {number} verificar como fazer
            */
-          id_nota_fiscal_saida: '',
+          id_nota_fiscal_saida: null,
         }
 
         let impostoICMS;
@@ -692,7 +700,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
           paramC170.vl_reducao_bc_icms = paramC170.vl_total_item * ((parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace('.',',')) / 100) / 100); 
           paramC170.vl_perc_red_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace('.',','));
-          paramC170.dm_mod_bc_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.modBC, 0, "")); 
+          paramC170.dm_mod_bc_icms = utils.Validar.getValueArray(impostoICMS.modBC, 0, ""); 
 
           paramC170.vl_bc_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCFCP, 0, "0").replace('.',','));
           paramC170.aliq_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCP, 0, "0").replace('.',',')); 
@@ -740,7 +748,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
           paramC170.vl_reducao_bc_icms = paramC170.vl_total_item * ((parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace('.',',')) / 100) / 100); 
           paramC170.vl_perc_red_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace('.',','));
-          paramC170.dm_mod_bc_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.modBC, 0, "")); 
+          paramC170.dm_mod_bc_icms = utils.Validar.getValueArray(impostoICMS.modBC, 0, ""); 
 
           paramC170.vl_bc_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCFCP, 0, "0").replace('.',','));
           paramC170.aliq_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCP, 0, "0").replace('.',',')); 
@@ -978,12 +986,12 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           const ac431 = result.rows[0];
 
           if (ac431 === undefined)
-            await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Código CST Inválido.');
+            await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, 'Código CST Inválido.');
           else
             paramC170.id_ref_431 = ac431.ID_REF_431; //sCST_ICMS
 
         }).catch(async (err) => {
-          await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err);
+          await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err);
         });
 
         if(impostoICMS.codAc431.length == 2)
@@ -1171,12 +1179,13 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
           id_usuario: id_usuario
         })
 
-        await model.NotaFiscal.Saida.Produto.Item.AcC050.insert({
+        const AcC050Saida = {
           ...chaveC170,
           ...paramC050,
           id_empresa: id_empresa,
           id_usuario: id_usuario
-        })
+        }
+        await model.NotaFiscal.Saida.Produto.Item.AcC050.insert(AcC050Saida)
 
         if (det?.infAdProd !== undefined){
           let ds0460 = det?.infAdProd[0];
@@ -1213,7 +1222,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
   //Oracle.execProcedure(nm_procedure1, id_empresa, id_usuario);
   //Oracle.execProcedure(nm_procedure2, id_empresa, id_usuario);
   
-  await model.EtapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
+  await model.EtapaStatus.insert(dt_periodo, 1, id_simul_etapa, id_empresa, id_usuario, 'Dados importado com sucesso.');
 }
 
 
@@ -1222,36 +1231,24 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
   fs.readFile(path, "utf8", async (err, xml) => {
     if (err) {
       /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-      await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
+      await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
       throw new Error(err.message);
     }
     parseString(xml, async function (err, result) {
       if (err) {
         /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-        await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message);
+        await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
         throw new Error(err.message);
       }
 
 			const Empresa = (await model.CtrlEmpresa.select(id_empresa)).rows[0];
 
 			if(Empresa.CNPJ_EMPRESA !== result.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CNPJ[0]) { //então entrada
-				await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Nota fiscal informada não é uma nota fiscal de entrada.');
+				await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, 'Nota fiscal informada não é uma nota fiscal de entrada.');
         throw new Error(err.message);
 			}
 
-      console.log(result.nfeProc?.$.versao)
-      console.dir(result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.cUF[0]);
-      
-      if (result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.cUF)
-        console.log(result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.cUF)
-      
-      if (result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.ver !== undefined)
-        console.dir(result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.ver)
-  
-      if (result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.ver)
-        console.log(result.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.ver)
-
-
+      /*
       await model.Pessoa.insert({
         dt_inicial:'',
         cd_pessoa:'',
@@ -1474,12 +1471,12 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
         id_usuario: id_usuario,
         id_modelo_documento:''
       })
-
+    */
     })
   });
   
   //Oracle.execProcedure(nm_procedure1, id_empresa, id_usuario);
   //Oracle.execProcedure(nm_procedure2, id_empresa, id_usuario);
   
-  await model.EtapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
+  await model.EtapaStatus.insert(dt_periodo, 1, id_simul_etapa, id_empresa, id_usuario, 'Dados importado com sucesso.');
 }

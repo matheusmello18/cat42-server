@@ -14,7 +14,7 @@ module.exports.Saida = {
       throw new Error(err);
     }
   },
-  AcC050
+  AcC050: AcC050.Saida
 }
 
 module.exports.Entrada = {
@@ -30,5 +30,5 @@ module.exports.Entrada = {
       throw new Error(err);
     }
   },
-  AcC050
+  AcC050: AcC050.Entrada
 }

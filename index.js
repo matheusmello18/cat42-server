@@ -1,10 +1,10 @@
 /**
- * @name highlightSearchTerm
- * @file Manages the configuration settings for the widget.
+ * @name SimuladorCat42
+ * @file index
  * @author Matheus de Mello
- * @version 1.2.3
- * @tutorial solver
- * @since 1.0.1
+ * @version 1.0.0
+ * @tutorial serve
+ * @since 01/01/2022
  */
 
 /**
@@ -39,23 +39,21 @@ const cors = require("cors")
 const config = require('./config/Config');
 
 /**
- * A number, or a string containing a number.
- * @typedef {(number|string)} cliente
- */
-
-/**
- * Set the magic number.
- * @param {cliente} x - The magic number.
+ * Rota de cliente
+ * @requires cliente
  */
 const cliente = require("./route/v1/cliente")
 
 /**
- * Class representing a socket connection.
- *
- * @class
- * @tutorial socket-tutorial
+ * Rota de usuário
+ * @requires users
  */
 const users = require("./route/v1/users")
+
+/**
+ * Rota de etapas
+ * @requires etapas
+ */
 const etapas = require("./route/v1/etapas")
 
 const model = require('./service/model')

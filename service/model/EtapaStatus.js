@@ -1,3 +1,6 @@
+/**
+ * @module EtapaStatus
+ */
 const Oracle = require('../Oracle');
 
 const sql = `
@@ -19,14 +22,20 @@ SELECT S.ID_SIMUL_STATUS,
  ORDER BY S.ID_SIMUL_STATUS DESC
 `;
 
+/**
+ * Função para selecionar
+ * @param {number} id_empresa Código da Empresa
+ * @param {number} id_usuario Código do Usuário
+ * @param {number} id_simul_etapa Identificador da Etapa
+ */
 module.exports.select = async (id_empresa, id_usuario, id_simul_etapa) => {
   try {
     let params;
 
     params = {
-      id_simul_etapa: parseInt(id_simul_etapa),
-      id_empresa: parseInt(id_empresa),
-      id_usuario: parseInt(id_usuario),
+      id_simul_etapa: id_simul_etapa,
+      id_empresa: id_empresa,
+      id_usuario: id_usuario,
     };
 
     return await Oracle.select(sql, params);
@@ -42,10 +51,10 @@ values (:id_simul_status,:dt_periodo,:id_simul_tp_status,:id_simul_etapa,:id_emp
 /**
  * Função para inserir status da etapa 
  * @param {string} dt_periodo Data do Período - mascara dd/mm/yyyy
- * @param {string} id_simul_tp_status Status => 1-SUCESSO / 2-ERRO / 3-PENDENCIA
- * @param {string} id_simul_etapa Identificador da Etapa
- * @param {string} id_empresa Código da Empresa
- * @param {string} id_usuario Código do Usuário
+ * @param {number} id_simul_tp_status Status => 1-SUCESSO / 2-ERRO / 3-PENDENCIA
+ * @param {number} id_simul_etapa Identificador da Etapa
+ * @param {number} id_empresa Código da Empresa
+ * @param {number} id_usuario Código do Usuário
  * @param {string} ds_status Descrição do erro
  */
 module.exports.insert = async (dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status) => {
