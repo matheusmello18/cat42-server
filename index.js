@@ -129,12 +129,17 @@ async function getT(){
 
   console.log("---->")
 
-  /*await model.Ac331.municipio.select('3534302').then((e) => {
+  const rows = await model.Ac331.municipio.select('3534302').then((e) => {
     console.log(e.rows[0])
+    
+    return e.rows[0];
   }).catch((r) => {
-    console.log(r)
-  });*/
+    return r;
+    //throw new Error(r.message + 'chupa')
+    //console.log(r)
+  });
 
+  
   // const sf = await model.Sf0460.insert(
   //   {
   //     cd_obs: 'c00154', 
@@ -149,6 +154,7 @@ async function getT(){
   //   });
 }
 //getT();
+
 
 
 serve.listen(8081, function(){
