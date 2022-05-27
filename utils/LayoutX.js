@@ -53,7 +53,8 @@ module.exports.GeraInsertLayoutX = async () => {
 }
 
 module.exports.GeraFunctionInsert = async () => {
-  let codLayouts = [6776,6777,6778,6779,6780,6859,6858,6781,6785,6786,6784,6783,6791,7516,7473,7474,7157,7158];
+//  let codLayouts = [6776,6777,6778,6779,6780,6859,6858,6781,6785,6786,6784,6783,6791,7516,7473,7474,7157,7158];
+  let codLayouts = [7157, 7158]
   let func, sql, campos, fields, tabela, params = ''
   let layoutCampo = {}
 

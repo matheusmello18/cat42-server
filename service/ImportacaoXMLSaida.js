@@ -1348,9 +1348,246 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   if(Empresa.CNPJ_EMPRESA !== xmlObj.CFe?.infCFe[0]?.emit[0].CNPJ[0]) { //senão saida
     throw new Error('Cupom fiscal informada não pertence a empresa.');
   }
-  const chaveCFE = xmlObj.CFe[0].infCFe[0].$.Id.slice(3);
-  const dhEmi = utils.FormatarData.DateXmlToDateOracleString(xmlObj.CFe?.infCFe[0]?.ide[0]?.dEmi[0]);
-  const cpfOrCnpj = utils.Validar.ifelse(xmlObj.CFe?.infCFe[0]?.dest[0]?.CNPJ, xmlObj.CFe?.infCFe[0]?.dest[0]?.CPF)[0];
-  const nomeDestino = utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.dest[0]?.xNome, 0);
 
+  const ModeloDocumento = await model.ModeloDocumento.selectByCdModeloDocumento(xmlObj.CFe?.infCFe[0]?.ide[0]?.mod[0])
+  .then((data) => {
+    return data.rows[0]
+  })
+  .catch((err) => {
+    throw new Error('Falha na busca pelo o model documento cadastrado. Erro: ' + err.message);
+  });
+
+  const Ac413 = await model.Ac413.selectByCodigo('00')
+  .then((data) => {
+    return data.rows[0]
+  })
+  .catch((err) => {
+    throw new Error('Falha na busca pelo o Ac433 cadastrado. Erro: ' + err.message);
+  });
+
+  const SfC800Chave = {
+    /**
+     * @param {number} id_ref_413 default 00
+     */
+    id_ref_413: Ac413.ID_REF_413,
+    /**
+     * @param {string} nr_serie_sat
+     */
+    nr_serie_sat: xmlObj.CFe?.infCFe[0]?.ide[0]?.nserieSAT[0],
+    /**
+     * @param {string} dhEmi
+     */
+    dt_documento: utils.FormatarData.DateXmlToDateOracleString(xmlObj.CFe?.infCFe[0]?.ide[0]?.dEmi[0]), 
+    /**
+     * @param {string} nr_cfe
+     */
+    nr_cfe: xmlObj.CFe?.infCFe[0]?.ide[0]?.nCFe[0]
+  }
+
+  const SfC800 = {
+    ...SfC800Chave,
+    /**
+     * @param {string} chaveCFE
+     */
+    nr_chave_cfe: xmlObj.CFe[0].infCFe[0].$.Id.slice(3),
+    /**
+     * @param {number} id_modelo_documento
+     */
+    id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
+    /**
+     * @param {string} cpfOrCnpj
+     */
+    nr_cnpj_cpf: utils.Validar.ifelse(xmlObj.CFe?.infCFe[0]?.dest[0]?.CNPJ, xmlObj.CFe?.infCFe[0]?.dest[0]?.CPF)[0],
+    /**
+     * @param {string} nr_caixa
+     */
+    nr_caixa: utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.ide[0]?.numeroCaixa, 0),
+    /**
+     * @param {string} sNomeDest
+     */
+    nm_destinatario: utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.dest[0]?.xNome, 0),
+    /**
+     * @param {number} sNomeDest
+     */
+    vl_desconto: parseFloat(utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.total[0]?.ICMSTot[0]?.vDesc, 0, "0").replace('.',',')) + parseFloat(utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.total[0]?.DescAcrEntr[0]?.vDescSubtot, 0, "0").replace('.',',')),
+    /**
+     * @param {number} sNomeDest
+     */
+    vl_mercadoria: parseFloat(utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.total[0]?.ICMSTot[0]?.vProd, 0, "0").replace('.',',')),
+    /**
+     * @param {number} sNomeDest
+     */
+    vl_outras_desp: parseFloat(utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.total[0]?.ICMSTot[0]?.vOutro, 0, "0").replace('.',',')) + parseFloat(utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.total[0]?.DescAcrEntr[0]?.vAcresSubtot, 0, "0").replace('.',',')),
+    /**
+     * @param {number} sNomeDest
+     */
+    vl_icms: parseFloat(utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.total[0]?.ICMSTot[0]?.vICMS, 0, "0").replace('.',',')),
+    /**
+     * @param {number} sNomeDest
+     */
+    vl_pis: parseFloat(utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.total[0]?.ICMSTot[0]?.vPIS, 0, "0").replace('.',',')),
+    /**
+     * @param {number} sNomeDest
+     */
+    vl_pis_st: parseFloat(utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.total[0]?.ICMSTot[0]?.vPISST, 0, "0").replace('.',',')),
+    /**
+     * @param {number} sNomeDest
+     */
+    vl_cofins: parseFloat(utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.total[0]?.ICMSTot[0]?.vCOFINS, 0, "0").replace('.',',')),
+    /**
+     * @param {number} sNomeDest
+     */
+    vl_cofins_st: parseFloat(utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.total[0]?.ICMSTot[0]?.vCOFINSST, 0, "0").replace('.',',')),
+    /**
+     * @param {number} sNomeDest
+     */
+    vl_cfe: parseFloat(utils.Validar.getValueArray(xmlObj.CFe?.infCFe[0]?.total[0]?.vCFe, 0, "0").replace('.',',')),
+    /**
+     * @param {number} sNomeDest
+     */
+    id_empresa: id_empresa,
+    /**
+     * @param {number} id_usuario
+     */
+    id_usuario: id_usuario
+  }
+
+  for (let i = 0; i < xmlObj.CFe?.infCFe[0]?.det.length; i++) {
+    const det = xmlObj.CFe?.infCFe[0]?.det[i];
+
+    /* unidade */
+    let ds_unidade = utils.Validar.getValueArray(det.prod[0]?.uCom, 0, "XX");
+
+    let Unidade = await model.Sf0190.selectByDsUnidade(ds_unidade, id_empresa, SfC800Chave.dt_documento)
+    .then((data) => {
+      return data.rows[0]
+    })
+    .catch((err) => {
+      throw new Error('Falha na busca pela a unidade cadastrada. Erro: ' + err.message);
+    });
+
+    if (Unidade === undefined) {
+      await model.Unidade.insert({
+        ds_unidade: ds_unidade,
+        ds_descricao: ds_unidade,
+        dt_inicial: SfC800Chave.dt_documento,
+        dt_movimento: SfC800Chave.dt_documento,
+        id_empresa: id_empresa,
+        id_usuario: id_usuario
+      });
+    } else {
+      ds_unidade = Unidade.DS_UNIDADE;
+    }
+    /* fim da unidade */
+    /* produto */
+    let cd_produto_servico = utils.FormatarString.removeCaracteresEspeciais(det.prod[0]?.cProd[0])
+    let produto = await model.Produto.Item.selectByCodigo(cd_produto_servico, id_empresa, SfC800Chave.dt_documento)
+    .then((data) => {
+      return data.rows[0]
+    })
+    .catch((err) => {
+      throw new Error('Falha na busca pelo o produto cadastrada. Erro: ' + err.message);
+    });
+    
+    await model.Produto.insert({
+      cd_produto_servico: cd_produto_servico,
+      cd_barra: det.prod[0]?.cEAN[0],
+      ds_produto_servico: det.prod[0]?.xProd[0],
+      id_ref_331_ncm: '',
+      id_ref_331_ex_ipi: '',
+      dm_tipo_item: produto === undefined ? '99' : produto.DM_TIPO_ITEM,
+      unidade: ds_unidade,
+      id_0190: ds_unidade,
+      dt_inicial: SfC800Chave.dt_documento,
+      dt_movimento: SfC800Chave.dt_documento,
+      id_cest: utils.Validar.getValueArray(det.prod[0]?.CEST, 0, ""),
+      id_empresa: id_empresa,
+      id_usuario: id_usuario
+    })
+    .then((data) => {
+      return data;
+    })
+    .catch((err) => {
+      throw new Error('Falha ao inserir o produto no cadastrado. Erro: ' + err.message);
+    });
+
+    await model.Produto.sp_gera_produto_mestre_item()
+    .catch(async (err) => {
+      throw new Error('Falha na geração Mestre Item do Produto. Erro: ' + err.message);
+    });
+
+    const prod = await model.Produto.Item.selectByCodigo(cd_produto_servico, id_empresa, SfC800Chave.dt_documento)
+    .then((data) => {
+      return data.rows[0]
+    })
+    .catch((err) => {
+      throw new Error('Falha na busca pelo o produto cadastrada. Erro: ' + err.message);
+    });
+    /* fim do produto */
+
+    /* 0460 */
+    let Sf0460
+    if (det?.infAdProd !== undefined){
+      let ds0460 = det?.infAdProd[0];
+      if (ds0460.length > 4000){
+        ds0460 = ds0460.slice(0,4000);
+      }
+      
+      Sf0460 = await model.Sf0460.selectByCodigo(ds0460, id_empresa)
+      .then((data) => {
+        return data.rows[0]
+      })
+      .catch((err) => {
+        throw new Error('Falha na busca pelo o Sf0460 cadastrado. Erro: ' + err.message);
+      });
+
+      if (Sf0460 === undefined){
+        Sf0460 = await model.Sf0460.insert({
+          id_empresa: id_empresa, 
+          dt_inicial: SfC800Chave.dt_documento, 
+          dt_movimento: SfC800Chave.dt_documento, 
+          id_usuario: id_usuario, 
+          ds_obs: ds0460
+        })
+        .then((data) => {
+          return data;
+        })
+        .catch((err) => {
+          throw new Error('Falha ao inserir o Sf046 no cadastrado. Erro: ' + err.message);
+        });
+      }
+    }
+  
+    /* fim 0460*/
+    const SfC850 = {
+      nr_item: det.$.nItem,
+      ...SfC800Chave,
+      cd_fiscal_operacao: utils.Validar.getValueArray(det.prod[0].vItem, 0, "0"),
+      id_produto_servico: prod.ID_PRODUTO_SERVCO,
+      vl_total_item: parseFloat(utils.Validar.getValueArray(det.prod[0].vItem, 0, "0").replace('.',',')),
+      id_0460: Sf0460?.ID_0460 !== undefined ? Sf0460.ID_0460 : "",
+      id_ref_431: '',
+      aliq_icms: '',
+      vl_bc_icms: '',
+      vl_icms: '',
+      id_ref_433: '',
+      aliq_pis: '',
+      vl_bc_pis: '',
+      vl_pis: '',
+      vl_aliq_pis: '',
+      vl_qtde_bc_pis: '',
+      id_ref_434: '',
+      vl_bc_cofins: '',
+      aliq_cofins: '',
+      vl_cofins: '',
+      vl_aliq_cofins: '',
+      vl_qtde_bc_cofins: '',
+      vl_desconto: parseFloat(utils.Validar.getValueArray(det.prod[0].vRatDesc, 0, "0").replace('.',',')) + parseFloat(utils.Validar.getValueArray(det.prod[0].vDesc, 0, "0").replace('.',',')),
+      vl_outras_desp: parseFloat(utils.Validar.getValueArray(det.prod[0].vRatAcr, 0, "0").replace('.',',')),
+      qtde: parseFloat(utils.Validar.getValueArray(det.prod[0].qCom, 0, "0").replace('.',',')), 
+      vl_unitario: parseFloat(utils.Validar.getValueArray(det.prod[0].vUnCom, 0, "0").replace('.',',')),
+      id_empresa: id_empresa,
+      id_usuario:id_usuario
+    } 
+  }
 }
