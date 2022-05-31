@@ -18,7 +18,33 @@ module.exports.Saida = {
         throw new Error(err);
       }
     },
-		
+		/**
+		 * 
+		 * @typedef {Object} chaveC100
+ 		 * @property {String} dm_entrada_saida 1 - Entrada | 2 - Saída
+ 		 * @property {Number} id_modelo_documento Identificador do modelo Documento
+		 * @property {String} nr_documento Número do Documento
+		 * @property {String} dt_emissao_documento Data da emissão do documento
+		 * @property {Number} id_empresa Identificação da Empresa
+		 * @param {chaveC100} chaveC100
+		 */
+		delete: async (chaveC100) => {
+			let sql = `
+			DELETE IN_NOTA_FISCAL_SAIDA
+				WHERE DM_ENTRADA_SAIDA                      = :dm_entrada_saida
+					AND (NVL(TRIM(SERIE_SUBSERIE_DOCUMENTO),0) = NVL(TRIM(:serie_subserie_documento),0)
+					OR F_STRZERO(NVL(SERIE_SUBSERIE_DOCUMENTO, '0'), 3) = F_STRZERO(NVL(:serie_subserie_documento, '0'), 3))
+					AND NR_DOCUMENTO                          = :nr_documento
+					AND DT_EMISSAO_DOCUMENTO                  = :dt_emissao_documento
+					AND ID_EMPRESA                            = :id_empresa
+			`;
+
+			try {
+        return await Oracle.delete(sql, chaveC100);
+      } catch (err) {
+        throw new Error(err);
+      }
+		},
     Item: NotaFiscalItem.Saida,
 		SfC110: SfC110.Saida,
 		SfC195: SfC195.Saida

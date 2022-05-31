@@ -1,4 +1,5 @@
 const Oracle = require('../Oracle');
+const SfC850 = require('./SfC850');
 
 module.exports.insert = async (SfC800 = {}) => {
 	let sql = `insert into sf_c800 
@@ -12,3 +13,5 @@ module.exports.insert = async (SfC800 = {}) => {
 		throw new Error(err);
 	}
 }
+
+module.exports.SfC850 = SfC850;

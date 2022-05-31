@@ -15,7 +15,7 @@ module.exports.insert = async (InPessoa = {}) => {
 
 module.exports.sp_gera_pessoa_mestre_item = async () => {
   try {
-    await Oracle.execProcedure('SP_GERA_PESSOA_MESTRE_ITEM');
+    return await Oracle.execProcedure('SP_GERA_PESSOA_MESTRE_ITEM');
   } catch (err) {
     throw new Error(err);
   }
