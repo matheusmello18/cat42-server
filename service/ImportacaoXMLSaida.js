@@ -1,6 +1,7 @@
 const Oracle = require('./Oracle');
 const model = require('./model');
 const utils = require('../utils');
+const { parseString } = require('xml2js');
 
 //deletar se existe o registro e importar novamnete;
 //tomar atenção para este procedimento em outras importação se isso será necessário
@@ -208,26 +209,50 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
   //#region C100
   const chaveC100 = {
+    /**
+     * @param {String} dm_entrada_saida
+     */
     dm_entrada_saida: dm_entrada_saida,
-    id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
-    serie_subserie_documento: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.serie, 0),
-    nr_documento: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.nNF, 0),
+    /**
+     * @param {String} nr_documento
+     */
+    nr_documento: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.nNF, 0, ""),
+    /**
+     * @param {String} serie_subserie_documento
+     */
+    serie_subserie_documento: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.serie, 0, ""),
+    /**
+     * @param {String} dt_emissao_documento
+     */
     dt_emissao_documento: dhEmi,
+    /**
+     * @param {Number} id_empresa
+     */
+    id_empresa: id_empresa
   };
 
-  //await model.NotaFiscal.Saida.Produto.SfC110
-  //await model.NotaFiscal.Saida.Produto.Item
-  //await model.NotaFiscal.Saida.Produto.Item.AcC050
-  //await model.NotaFiscal.Saida.Produto.SfC195
+  
+  await model.NotaFiscal.Saida.Produto.SfC110.delete({
+    ...chaveC100,
+  });
+  /*await model.NotaFiscal.Saida.Produto.Item.delete({
+    ...chaveC100,
+  })
+  await model.NotaFiscal.Saida.Produto.Item.AcC050.delete({
+    ...chaveC100,
+  })
+  await model.NotaFiscal.Saida.Produto.SfC195.delete({
+    ...chaveC100,
+  })
 
   await model.NotaFiscal.Saida.Produto.delete({
     ...chaveC100,
-    id_empresa: id_empresa
-  })
+  })*/
 
   //C100
   await model.NotaFiscal.Saida.Produto.insert({
     ...chaveC100,
+    id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
     dt_entrada_saida: dSaiEnt,
     id_pessoa_destinatario: PessoaDestinatario.ID_PESSOA,
     dm_tipo_fatura: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.indPag, 0, "0"),
@@ -256,7 +281,6 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     id_ref_331_munic_dest: '',
     dm_tipo_cte: '',
     dm_finalidade: '',
-    id_empresa: id_empresa,
     id_usuario: id_usuario
   })
   .then((data) => {
@@ -293,14 +317,17 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         id_ref_0450 = ac0450.ID_REF_0450
       }
       //C110
-      await model.NotaFiscal.Saida.Produto.SfC110.insert({
-        ...chaveC100,
-        nr_item_imp: "1",
-        id_ref_0450: id_ref_0450,
-        ds_complementar: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl[0].substring(1,3980),
-        id_empresa: id_empresa,
-        id_usuario: id_usuario
-      }).then((data) => {
+      const SfC110Saida = {
+        chaveC100Saida: chaveC100,
+        CamposC110Saida: {
+          id_modelo_documento: parseInt(ModeloDocumento.ID_MODELO_DOCUMENTO),
+          nr_item_imp: "1",
+          id_ref_0450: parseInt(id_ref_0450),
+          ds_complementar: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl[0].substring(1,3980),
+          id_usuario: id_usuario
+        }
+      }
+      await model.NotaFiscal.Saida.Produto.SfC110.insert(SfC110Saida).then((data) => {
         return data;
       })
       .catch((err) => {
@@ -333,10 +360,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       //C110
       await model.NotaFiscal.Saida.Produto.SfC110.insert({
         ...chaveC100,
+        id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
         nr_item_imp: "1",
         id_ref_0450: id_ref_0450,
         ds_complementar: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco[0],
-        id_empresa: id_empresa,
         id_usuario: id_usuario
       }).then((data) => {
         return data;
@@ -354,6 +381,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     const chaveC170 = {
       ...chaveC100,
+      id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
       nr_sequencia: det.$.nItem, //sItem_Seq
       nr_item: det.$.nItem,
     };
@@ -1299,7 +1327,6 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     await model.NotaFiscal.Saida.Produto.Item.insert({
       ...chaveC170,
       ...paramC170,
-      id_empresa: id_empresa,
       id_usuario: id_usuario
     })
     .then((data) => {
@@ -1314,7 +1341,6 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     const AcC050Saida = {
       ...chaveC170,
       ...paramC050,
-      id_empresa: id_empresa,
       id_usuario: id_usuario
     }
 
@@ -1363,7 +1389,6 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         id_0460: Sf0460.ID_0460,
         ds_complementar: Sf0460.DS_OBS,
         id_nota_fiscal_saida: '',
-        id_empresa: id_empresa,
         id_usuario: id_usuario
       })
       .then((data) => {

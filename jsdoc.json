@@ -1,7 +1,7 @@
 {
   "source": {
-      "include": ["./", "./utils", "./service", "./service/model", "./route/v1"],
-      "exclude": ["node_modules/*","docs"],
+      "include": ["./utils", "./service", "./route", "./node_modules/archiver"],
+      "exclude": ["docs"],
       "includePattern": ".+\\.js(doc|x)?$",
       "excludePattern": "(^|\\/|\\\\)_"
   },

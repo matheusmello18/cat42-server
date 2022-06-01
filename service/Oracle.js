@@ -96,7 +96,7 @@ module.exports.delete = async (sql,params) => {
   try {
     connection = await oracledb.getConnection(config.db);
 
-    await connection.execute(
+    return await connection.execute(
       sql, params, {autoCommit: true}
     ).catch(err => {
       throw new Error(err);

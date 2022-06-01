@@ -20,15 +20,15 @@ module.exports.Saida = {
     },
 		/**
 		 * 
-		 * @typedef {Object} chaveC100
+		 * @typedef {Object} chaveC100Saida
  		 * @property {String} dm_entrada_saida 1 - Entrada | 2 - Saída
  		 * @property {Number} id_modelo_documento Identificador do modelo Documento
 		 * @property {String} nr_documento Número do Documento
 		 * @property {String} dt_emissao_documento Data da emissão do documento
 		 * @property {Number} id_empresa Identificação da Empresa
-		 * @param {chaveC100} chaveC100
+		 * @param {chaveC100Saida} chaveC100Saida
 		 */
-		delete: async (chaveC100) => {
+		delete: async (chaveC100Saida) => {
 			let sql = `
 			DELETE IN_NOTA_FISCAL_SAIDA
 				WHERE DM_ENTRADA_SAIDA                      = :dm_entrada_saida
@@ -40,7 +40,7 @@ module.exports.Saida = {
 			`;
 
 			try {
-        return await Oracle.delete(sql, chaveC100);
+        return await Oracle.delete(sql, chaveC100Saida);
       } catch (err) {
         throw new Error(err);
       }
