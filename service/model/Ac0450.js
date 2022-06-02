@@ -1,6 +1,35 @@
+/**
+ * Modulo Ac0450
+ * 
+ * @module model/Ac0450
+ * @license [MIT] {@link http://https://github.com/PainelFsical/master/LICENSE}
+ * @copyright (c) 2008-2022 Painel Fiscal
+ * @since 1.0
+ * @see http://www.painelfiscal.com.br/
+ */
+
 const Oracle = require('../Oracle');
 
-module.exports.select = async (ds_observacao, id_empresa, dt_inicial) => {
+/**
+ * Classe de Ac0450
+ * 
+ * @constructor
+ */
+var Ac0450 = function(){
+  if(!(this instanceof Ac0450))
+    return new Ac0450();
+};
+
+/**
+ * Função busca os dados do Ac0450 por observação
+ * 
+ * @param {string} ds_observacao Descrição da observação
+ * @param {number} id_empresa Id da Empresa
+ * @param {string} dt_inicial Data da emissão
+ * @returns {Promise} Promrise<Result<T>>
+ */
+
+Ac0450.prototype.select = async (ds_observacao, id_empresa, dt_inicial) => {
   let sql = `select ac.id_ref_0450, ac.cd_observacao, 
                     ac.dt_inicial,  ac.dt_movimento, 
                     ac.ds_observacao
@@ -19,7 +48,15 @@ module.exports.select = async (ds_observacao, id_empresa, dt_inicial) => {
   }
 }
 
-module.exports.insert = async (ds_observacao, id_empresa, dt_inicial) => {
+/**
+ * Inserir dados do Ac0450
+ * 
+ * @param {string} ds_observacao Descrição da observação
+ * @param {number} id_empresa Id da Empresa
+ * @param {string} dt_inicial Data da emissão
+ * @returns {Promise} Contém o Código da Observação
+ */
+Ac0450.prototype.insert = async (ds_observacao, id_empresa, dt_inicial) => {
   const nProx_Codigo = await Oracle.proxCod("SIMUL_CADASTRO");
   let cd_observacao = parseInt(nProx_Codigo) + 1;
   let sql = `insert into ac_0450(cd_observacao, 
@@ -41,3 +78,5 @@ module.exports.insert = async (ds_observacao, id_empresa, dt_inicial) => {
     throw new Error(err);
   }
 }
+
+module.exports.Ac0450 = Ac0450;

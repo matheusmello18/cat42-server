@@ -1,6 +1,33 @@
+/**
+ * Modulo Ac431
+ * 
+ * @module model/Ac431
+ * @license [MIT] {@link http://https://github.com/PainelFsical/master/LICENSE}
+ * @copyright (c) 2008-2022 Painel Fiscal
+ * @since 1.0
+ * @see http://www.painelfiscal.com.br/
+ */
+
 const Oracle = require('../Oracle');
 
-module.exports.selectByCodigo = async (cd_codigo) => {
+/**
+ * Classe de Ac431
+ * 
+ * @constructor
+ */
+ var Ac431 = function(){
+  if(!(this instanceof Ac431))
+    return new Ac431();
+};
+
+/**
+ * Função busca os dados do Ac431 por código
+ * 
+ * @param {string} cd_codigo Código 431
+ * @returns {Promise} Promrise<Result<T>>
+ */
+
+ Ac431.prototype.selectByCodigo = async (cd_codigo) => {
   let sql = `select id_ref_431, cd_strib, ds_strib
                from ac_431
               where cd_strib = trim(:cd_codigo)`;
@@ -10,3 +37,5 @@ module.exports.selectByCodigo = async (cd_codigo) => {
     throw new Error(err);
   }
 }
+
+module.exports.Ac431 = Ac431;

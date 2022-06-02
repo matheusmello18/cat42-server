@@ -1,11 +1,100 @@
 /**
- * @module AcC050
+ * Modulo AcC050
+ * 
+ * @module model/AcC050
+ * @license [MIT] {@link http://https://github.com/PainelFsical/master/LICENSE}
+ * @copyright (c) 2008-2022 Painel Fiscal
+ * @since 1.0
+ * @see http://www.painelfiscal.com.br/
  */
+
 const Oracle = require('../Oracle');
+
+
+/**
+ * Classe de AcC050Saida
+ * 
+ * @constructor
+ */
+ var AcC050Saida = function(){
+  if(!(this instanceof AcC050Saida))
+    return new AcC050Saida();
+};
+
+/**
+ * Função inserir os dados do AcC050
+ * 
+ * @param {dataAcC050Saida} dataAcC050Saida 
+ * @returns {Promise} Promrise<Result<T>>
+ */
+
+AcC050Saida.prototype.insert = async (dataAcC050Saida) => {
+	let sql = `insert into ac_c050_saida 
+						( dm_entrada_saida, id_modelo_documento, id_ref_433, aliq_pis, vl_bc_pis, vl_pis, vl_aliq_pis, vl_pis_st, qtde_bc_pis, id_ref_434, aliq_cofins, vl_bc_cofins, vl_cofins, vl_aliq_cofins, vl_cofins_st, qtde_bc_cofins, id_nota_fiscal_saida, dt_emissao_documento, nr_documento, nr_item, nr_sequencia, serie_subserie_documento, id_empresa, id_usuario) 
+						values 
+						( :dm_entrada_saida, :id_modelo_documento, :id_ref_433, :aliq_pis, :vl_bc_pis, :vl_pis, :vl_aliq_pis, :vl_pis_st, :qtde_bc_pis, :id_ref_434, :aliq_cofins, :vl_bc_cofins, :vl_cofins, :vl_aliq_cofins, :vl_cofins_st, :qtde_bc_cofins, :id_nota_fiscal_saida, :dt_emissao_documento, :nr_documento, :nr_item, :nr_sequencia, :serie_subserie_documento, :id_empresa, :id_usuario)
+						`;
+	try {
+		return await Oracle.insert(sql, dataAcC050Saida)
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+/**
+ * Função alterar os dados do AcC050
+ * 
+ * @param {dataAcC050Saida} dataAcC050Saida 
+ * @returns {Promise} Promrise<Result<T>>
+ */
+ AcC050Saida.prototype.update = async (dataAcC050Saida) => {
+	let sql = ``;
+	try {
+		return await Oracle.insert(sql, dataAcC050Saida)
+	} catch (err) {
+		throw new Error(err);
+	}
+}
+
+module.exports.AcC050Saida = AcC050Saida;
+
+
+/**
+ * Classe de AcC050Entrada
+ * 
+ * @constructor
+ */
+ var AcC050Entrada = function(){
+  if(!(this instanceof AcC050Entrada))
+    return new AcC050Entrada();
+};
+
+/**
+ * Função inserir os dados do AcC050
+ * 
+ * @param {dataAcC050Entrada} dataAcC050Entrada 
+ * @returns {Promise} Promrise<Result<T>>
+ */
+
+AcC050Entrada.prototype.insert = async (dataAcC050Entrada) => {
+	let sql = `insert into ac_c050_entrada 
+		( id_ref_433, aliq_pis, vl_bc_pis, vl_pis, vl_aliq_pis, vl_pis_st, qtde_bc_pis, id_ref_434, aliq_cofins, vl_bc_cofins, vl_cofins, vl_aliq_cofins, vl_cofins_st, qtde_bc_cofins, id_nota_fiscal_entrada, dt_emissao_documento, id_pessoa_remetente, nr_documento, nr_item, nr_sequencia, serie_suserie_documento, id_empresa, id_usuario, id_modelo_documento) 
+		values 
+		( :id_ref_433, :aliq_pis, :vl_bc_pis, :vl_pis, :vl_aliq_pis, :vl_pis_st, :qtde_bc_pis, :id_ref_434, :aliq_cofins, :vl_bc_cofins, :vl_cofins, :vl_aliq_cofins, :vl_cofins_st, :qtde_bc_cofins, :id_nota_fiscal_entrada, :dt_emissao_documento, :id_pessoa_remetente, :nr_documento, :nr_item, :nr_sequencia, :serie_suserie_documento, :id_empresa, :id_usuario, :id_modelo_documento)
+	`;
+	try {
+		return await Oracle.insert(sql, dataAcC050Entrada)
+	} catch (err) {
+		throw new Error(err);
+	}
+}
+
+module.exports.AcC050Entrada = AcC050Entrada;
+
 
 /**
  * teste
- * @typedef {Object} AcC050Saida
+ * @typedef {Object} dataAcC050Saida
  * @property {String} dm_entrada_saida 1 - Entrada | 2 - Saída
  * @property {Number} id_modelo_documento Identificador do modelo Documento
  * @property {Number} id_ref_433 Identificador do 433
@@ -30,47 +119,11 @@ const Oracle = require('../Oracle');
  * @property {String} serie_subserie_documento
  * @property {Number} id_empresa
  * @property {Number} id_usuario
+ * @global
  */
 
-module.exports.Saida = {
-
-	/**
-	 * Returns the sum of a and b
-	 * @function Saida/insert
-	 * @param {AcC050Saida} AcC050Saida
-	 * @returns {Promise} xxxxxxxx
-	 */
-  insert: async (AcC050Saida) => {
-    let sql = `insert into ac_c050_saida 
-              ( dm_entrada_saida, id_modelo_documento, id_ref_433, aliq_pis, vl_bc_pis, vl_pis, vl_aliq_pis, vl_pis_st, qtde_bc_pis, id_ref_434, aliq_cofins, vl_bc_cofins, vl_cofins, vl_aliq_cofins, vl_cofins_st, qtde_bc_cofins, id_nota_fiscal_saida, dt_emissao_documento, nr_documento, nr_item, nr_sequencia, serie_subserie_documento, id_empresa, id_usuario) 
-              values 
-              ( :dm_entrada_saida, :id_modelo_documento, :id_ref_433, :aliq_pis, :vl_bc_pis, :vl_pis, :vl_aliq_pis, :vl_pis_st, :qtde_bc_pis, :id_ref_434, :aliq_cofins, :vl_bc_cofins, :vl_cofins, :vl_aliq_cofins, :vl_cofins_st, :qtde_bc_cofins, :id_nota_fiscal_saida, :dt_emissao_documento, :nr_documento, :nr_item, :nr_sequencia, :serie_subserie_documento, :id_empresa, :id_usuario)
-              `;
-    try {
-      return await Oracle.insert(sql, AcC050Saida)
-    } catch (err) {
-      throw new Error(err);
-    }
-  },
-
-	/**
-	 * Returns the sum of a and b
-	 * @function Saida/update
-	 * @param {AcC050Saida} AcC050Saida
-	 * @returns {Promise}
-	 */
-	 update: async (AcC050Saida) => {
-    let sql = ``;
-    try {
-      return await Oracle.insert(sql, AcC050Saida)
-    } catch (err) {
-      throw new Error(err);
-    }
-  }
-}
-
 /**
- * @typedef {Object} AcC050Entrada
+ * @typedef {Object} dataAcC050Entrada
  * @property {String} dm_entrada_saida
  * @property {Number} id_modelo_documento
  * @property {Number} id_ref_433
@@ -94,83 +147,5 @@ module.exports.Saida = {
  * @property {String} serie_subserie_documento
  * @property {Number} id_empresa
  * @property {Number} id_usuario
+ * @global
  */
-
-module.exports.Entrada = {
-	/**
-	 * Returns xxxxxxx
-	 * @function Entrada/insert
-	 * @param {AcC050Entrada} AcC050Entrada
-	 * @returns {Promise}
-	 */
-  insert: async (AcC050Entrada) => {
-    let sql = `insert into ac_c050_entrada 
-              ( id_ref_433, aliq_pis, vl_bc_pis, vl_pis, vl_aliq_pis, vl_pis_st, qtde_bc_pis, id_ref_434, aliq_cofins, vl_bc_cofins, vl_cofins, vl_aliq_cofins, vl_cofins_st, qtde_bc_cofins, id_nota_fiscal_entrada, dt_emissao_documento, id_pessoa_remetente, nr_documento, nr_item, nr_sequencia, serie_suserie_documento, id_empresa, id_usuario, id_modelo_documento) 
-              values 
-              ( :id_ref_433, :aliq_pis, :vl_bc_pis, :vl_pis, :vl_aliq_pis, :vl_pis_st, :qtde_bc_pis, :id_ref_434, :aliq_cofins, :vl_bc_cofins, :vl_cofins, :vl_aliq_cofins, :vl_cofins_st, :qtde_bc_cofins, :id_nota_fiscal_entrada, :dt_emissao_documento, :id_pessoa_remetente, :nr_documento, :nr_item, :nr_sequencia, :serie_suserie_documento, :id_empresa, :id_usuario, :id_modelo_documento)
-              `;
-    try {
-      await Oracle.insert(sql, AcC050Entrada)
-    } catch (err) {
-      throw new Error(err);
-    }
-  }
-}
-
-/** require('./model').AcC050.Entrada.insert
-	AcC050.Entrada.insert({
-		id_ref_433:'',
-		aliq_pis:'',
-		vl_bc_pis:'',
-		vl_pis:'',
-		vl_aliq_pis:'',
-		vl_pis_st:'',
-		qtde_bc_pis:'',
-		id_ref_434:'',
-		aliq_cofins:'',
-		vl_bc_cofins:'',
-		vl_cofins:'',
-		vl_aliq_cofins:'',
-		vl_cofins_st:'',
-		qtde_bc_cofins:'',
-		id_nota_fiscal_entrada:'',
-		dt_emissao_documento:'',
-		id_pessoa_remetente:'',
-		nr_documento:'',
-		nr_item:'',
-		nr_sequencia:'',
-		serie_suserie_documento:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario,
-		id_modelo_documento:''
-	})
-*/
-
-/** require('./model').AcC050.Saida.insert
-	AcC050.Saida.insert({
-		dm_entrada_saida:'',
-		id_modelo_documento:'',
-		id_ref_433:'',
-		aliq_pis:'',
-		vl_bc_pis:'',
-		vl_pis:'',
-		vl_aliq_pis:'',
-		vl_pis_st:'',
-		qtde_bc_pis:'',
-		id_ref_434:'',
-		aliq_cofins:'',
-		vl_bc_cofins:'',
-		vl_cofins:'',
-		vl_aliq_cofins:'',
-		vl_cofins_st:'',
-		qtde_bc_cofins:'',
-		id_nota_fiscal_saida:'',
-		dt_emissao_documento:'',
-		nr_documento:'',
-		nr_item:'',
-		nr_sequencia:'',
-		serie_subserie_documento:'',
-		id_empresa: id_empresa,
-		id_usuario: id_usuario
-	})
-*/

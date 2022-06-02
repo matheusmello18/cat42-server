@@ -1,12 +1,12 @@
 {
   "source": {
-      "include": ["./utils", "./service", "./route", "./node_modules/archiver"],
-      "exclude": ["docs"],
+      "include": ["./utils", "./service", "./route"],
+      "exclude": ["./node_modules", "docs"],
       "includePattern": ".+\\.js(doc|x)?$",
       "excludePattern": "(^|\\/|\\\\)_"
   },
   "plugins": [],
   "opts": {
-      "destination": "docs/"
+      "destination": "docs/",
   }
 }
