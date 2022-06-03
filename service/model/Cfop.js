@@ -1,4 +1,32 @@
-module.exports.selectByCdCfop = async (cd_cfop) => {
+/**
+ * Modulo CFOP
+ * 
+ * @module model/Cfop
+ * @license [MIT] {@link http://https://github.com/PainelFsical/master/LICENSE}
+ * @copyright (c) 2008-2022 Painel Fiscal
+ * @since 1.0
+ * @see http://www.painelfiscal.com.br/
+ */
+ const Oracle = require('../Oracle');
+
+/**
+ * Classe de CFOP
+ * 
+ * @constructor
+ */
+var CFOP = function(){
+  if(!(this instanceof CFOP))
+    return new CFOP();
+};
+
+/**
+ * Função busca configuração do CFOP pelo seu código
+ * 
+ * @param {string} cd_cfop
+ * @returns {Promise} Promrise<Result<T>>
+ */
+  
+CFOP.prototype.selectByCdCfop = async (cd_cfop) => {
   let sql = `select nvl(dm_icms_vl_contabil,    'N') dm_icms_vl_contabil, 
                     nvl(dm_vlcontabil_piscofins,'N') dm_vlcontabil_piscofins, 
                     nvl(dm_vlcontabil_ii,       'N') dm_vlcontabil_ii 
@@ -12,3 +40,5 @@ module.exports.selectByCdCfop = async (cd_cfop) => {
     throw new Error(err);
   }
 }
+
+module.exports.CFOP = CFOP;

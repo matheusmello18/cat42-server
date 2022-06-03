@@ -399,7 +399,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     if (Unidade === undefined) {
       //0190
-      await model.Unidade.insert({
+      await model.Sf0190.insert({
         ds_unidade: ds_unidade,
         ds_descricao: ds_unidade,
         dt_inicial: dhEmi,

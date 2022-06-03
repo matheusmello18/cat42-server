@@ -1,16 +1,20 @@
 {
-  "name": "server",
+  "name": "app-server",
+  "author": "Matheus de Mello",
+  "email": "matheus.mello@painelfsical.com.br",
   "version": "1.0.0",
   "description": "Servidor da Cat42",
+  "license": "MIT",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "startdev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-docs": "node_modules/.bin/jsdoc -c jsdoc.json",
     "doc": "jsdoc -c jsdoc.json -r --debug ./docs ./README.md"
   },
-  "author": "Matheus de Mello",
   "dependencies": {
+    "better-docs": "^2.7.2",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",

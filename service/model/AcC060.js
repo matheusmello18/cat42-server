@@ -1,7 +1,7 @@
 /**
  * Modulo AcC060
  * 
- * @module model/AcC060Entrada
+ * @module model/AcC060
  * @license [MIT] {@link http://https://github.com/PainelFsical/master/LICENSE}
  * @copyright (c) 2008-2022 Painel Fiscal
  * @since 1.0

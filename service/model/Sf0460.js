@@ -1,8 +1,36 @@
-const Oracle = require('../Oracle');
+/**
+ * Modulo Sf0460
+ * 
+ * @module model/Sf0460
+ * @license [MIT] {@link http://https://github.com/PainelFsical/master/LICENSE}
+ * @copyright (c) 2008-2022 Painel Fiscal
+ * @since 1.0
+ * @see http://www.painelfiscal.com.br/
+ */
 
-module.exports.selectByCodigo = async (cd_codigo, id_empresa) => {
+ const Oracle = require('../Oracle');
+
+ /**
+  * Classe de Sf0460
+  * 
+  * @constructor
+  */
+ var Sf0460 = function(){
+   if(!(this instanceof Sf0460))
+     return new Sf0460();
+ };
+  
+/**
+ * Função buscar os dados do Sf0460 por código modelo documetno
+ * 
+ * @param {string} cd_codigo
+ * @param {number} id_empresa
+ * @returns {Promise} Promrise<Result<T>>
+ */
+  
+Sf0460.prototype.selectByCodigo = async (cd_codigo, id_empresa) => {
   let sql = `select id_0460, cd_obs, id_empresa, dt_inicial, dt_movimento, id_usuario, ds_obs 
-               from sf_0460
+                from sf_0460
               where DS_OBS = :cd_codigo
                 and id_empresa = :id_empresa
                 and rownum = 1`;
@@ -12,15 +40,22 @@ module.exports.selectByCodigo = async (cd_codigo, id_empresa) => {
     throw new Error(err);
   }
 }
-module.exports.insert = async (Sf0460 = {}) => {
+
+/**
+ * Função inserir os dados do Sf0460
+ * 
+ * @param {dataSf0460} dataSf0460
+ * @returns {Promise} Promrise<Result<T>>
+ */
+Sf0460.prototype.insert = async (dataSf0460) => {
   const nProx_Codigo = await Oracle.proxCod("SF_0460");
-  Sf0460.cd_obs = parseInt(nProx_Codigo) + 1;
+  dataSf0460.cd_obs = (parseInt(nProx_Codigo) + 1).toString();
 
 	let sql = `insert into SF_0460 (cd_obs, id_empresa, dt_inicial, dt_movimento, id_usuario, ds_obs) 
                  values (:cd_obs, :id_empresa, TO_DATE(:dt_inicial,'DD/MM/YYYY'), TO_DATE(:dt_movimento,'DD/MM/YYYY'), :id_usuario, :ds_obs)
 						`;
 	try {
-		return await Oracle.insert(sql, Sf0460).then(async (e) => {
+		return await Oracle.insert(sql, dataSf0460).then(async (e) => {
       return await Oracle.select('select id_0460, cd_obs, id_empresa, dt_inicial, dt_movimento, id_usuario, ds_obs from sf_0460 where rowid = :id', {id: e.lastRowid})
       .then((e) => {
         return e.rows[0];
@@ -31,3 +66,18 @@ module.exports.insert = async (Sf0460 = {}) => {
 		throw new Error(err);
 	}
 }
+
+module.exports.Sf0460 = Sf0460;
+
+/**
+ * Campos Chave Sf0460
+ * 
+ * @typedef {Object} dataSf0460
+ * @property {String} cd_obs Pessoa Remetente
+ * @property {String} dt_inicial Número do Documento
+ * @property {String} dt_movimento Série e Subserie
+ * @property {String} ds_obs Série e Subserie
+ * @property {Number} id_usuario Data da emissão do documento
+ * @property {Number} id_empresa Identificação da Empresa
+ * @global
+ */

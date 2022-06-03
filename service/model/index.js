@@ -1,3 +1,13 @@
+/**
+ * Modulo Model
+ * 
+ * @module model
+ * @license [MIT] {@link http://https://github.com/PainelFsical/master/LICENSE}
+ * @copyright (c) 2008-2022 Painel Fiscal
+ * @since 1.0
+ * @see http://www.painelfiscal.com.br/
+ */
+
 const Ac331 = require('./Ac331');
 const AcC700 = require('./AcC700');
 const Ac413 = require('./Ac413');
@@ -12,7 +22,7 @@ const ModeloDocumento = require('./ModeloDocumento');
 const Cfop = require('./Cfop');
 const Pessoa = require('./Pessoa');
 const Produto = require('./Produto');
-const Unidade = require('./Unidade');
+//const Unidade = require('./Unidade');
 const NotaFiscal = require('./NotaFiscal');
 const Sf433 = require('./Sf433');
 const Sf434 = require('./Sf434');
@@ -28,7 +38,7 @@ module.exports = {
   ProdutoSimulador, Sf_Importa_Arquivo, 
   CtrlEmpresa, CtrlUsuario, Etapas, 
   EtapaStatus, ModeloDocumento, Cfop,
-  Pessoa, Produto, Unidade, NotaFiscal, 
+  Pessoa, Produto, NotaFiscal, 
   Sf433, Sf434, Sf453, Sf0460, SfC800,
   Sf0190
 }

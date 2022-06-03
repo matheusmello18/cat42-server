@@ -1,24 +1,24 @@
 /**
  * Modulo AcC700
  * 
- * @module model/AcC700Saida
+ * @module model/AcC700
  * @license [MIT] {@link http://https://github.com/PainelFsical/master/LICENSE}
  * @copyright (c) 2008-2022 Painel Fiscal
  * @since 1.0
  * @see http://www.painelfiscal.com.br/
  */
 
- const Oracle = require('../Oracle');
+const Oracle = require('../Oracle');
 
- /**
-	* Classe de AcC700Saida
-	* 
-	* @constructor
-	*/
-	var AcC700Saida = function(){
-	 if(!(this instanceof AcC700Saida))
-		 return new AcC700Saida();
- };
+/**
+ * Classe de AcC700Saida
+ * 
+ * @constructor
+ */
+var AcC700Saida = function(){
+	if(!(this instanceof AcC700Saida))
+		return new AcC700Saida();
+};
  
  /**
 	* Função inserir os dados do AcC700Saida 
