@@ -1,10 +1,14 @@
 /**
+ * Criação da aplicação do server
+ * 
  * @name SimuladorCat42
- * @file index
+ * @module index
+ * @license [MIT] {@link http://https://github.com/PainelFsical/master/LICENSE}
+ * @copyright (c) 2008-2022 Painel Fiscal
+ * @since 1.0
+ * @see http://www.painelfiscal.com.br/
  * @author Matheus de Mello
  * @version 1.0.0
- * @tutorial serve
- * @since 01/01/2022
  */
 
 /**
@@ -122,22 +126,22 @@ async function getT(){
   console.log(retorno1.length)
   console.log(retorno1[0])*/
   
-  console.log("----")
+  // console.log("----")
 
   /*var retorno = (await model.Ac331.municipio.select('3534302')).rows[0];
   console.log(retorno)*/ // se não encontrou vem como undefined
 
-  console.log("---->")
+  // console.log("---->")
 
-  const rows = await model.Ac331.municipio.select('3534302').then((e) => {
-    console.log(e.rows[0])
+  // const rows = await model.Ac331.municipio.select('3534302').then((e) => {
+  //   console.log(e.rows[0])
     
-    return e.rows[0];
-  }).catch((r) => {
-    return r;
-    //throw new Error(r.message + 'chupa')
-    //console.log(r)
-  });
+  //   return e.rows[0];
+  // }).catch((r) => {
+  //   return r;
+  //   //throw new Error(r.message + 'chupa')
+  //   //console.log(r)
+  // });
 
   
   // const sf = await model.Sf0460.insert(

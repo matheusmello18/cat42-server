@@ -2,10 +2,6 @@
  * Modulo Model
  * 
  * @module model
- * @license [MIT] {@link http://https://github.com/PainelFsical/master/LICENSE}
- * @copyright (c) 2008-2022 Painel Fiscal
- * @since 1.0
- * @see http://www.painelfiscal.com.br/
  */
 
 const Ac331 = require('./Ac331');
@@ -23,7 +19,7 @@ const Cfop = require('./Cfop');
 const Pessoa = require('./Pessoa');
 const Produto = require('./Produto');
 //const Unidade = require('./Unidade');
-const NotaFiscal = require('./NotaFiscal');
+const NotaFiscal = require('./NotaFiscalProduto');
 const Sf433 = require('./Sf433');
 const Sf434 = require('./Sf434');
 const Sf453 = require('./Sf453');

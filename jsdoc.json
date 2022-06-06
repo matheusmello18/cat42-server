@@ -1,6 +1,6 @@
 {
   "source": {
-      "include": ["./utils", "./service", "./route"],
+      "include": ["./"],
       "exclude": ["./node_modules", "docs"],
       "includePattern": ".+\\.js(doc|x)?$",
       "excludePattern": "(^|\\/|\\\\)_"
@@ -9,35 +9,28 @@
     "node_modules/better-docs/typescript"
   ],
   "opts": {
-      "destination": "docs/",
+      "destination": "../doc-simulador/doc-fonte/public/",
       "template": "node_modules/better-docs"
   },
   "templates": {
     "cleverLinks": false,
     "monospaceLinks": false,
     "search": true,
-    "default": {
-        "staticFiles": {
-          "include": [
-              "./docs-src/statics"
-          ]
-        }
-    },
-    "better-docs": {
-        "name": "Sample Documentation",
-        "logo": "images/logo.png",
-        "title": "painel fiscal", 
-        "css": "style.css",
-        "trackingCode": "tracking-code-which-will-go-to-the-HEAD",
+       "better-docs": {
+        "name": "Painel Documentation",
+        "logo": "images/painel-fiscal-horizontal-dark.png",
+        "title": "Painel Fiscal", 
+        "css": "styles/mystyle.css",
+        "trackingCode": "",
         "hideGenerator": false,
         "navLinks": [
             {
                 "label": "Github",
-                "href": "https://github.com/SoftwareBrothers/admin-bro"
+                "href": "https://github.com/matheusmello18"
             },
             {
-                "label": "Example Application",
-                "href": "https://admin-bro-example-app-staging.herokuapp.com/admin"
+                "label": "Simulador da Cat42",
+                "href": "http://wwww.simuladorcat42.com.br/"
             }
         ]
     }

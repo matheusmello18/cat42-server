@@ -1,11 +1,7 @@
 /**
  * Modulo Ac331
  * 
- * @module model/Ac331 
- * @license [MIT] {@link http://https://github.com/PainelFsical/master/LICENSE}
- * @copyright (c) 2008-2022 Painel Fiscal
- * @since 1.0
- * @see http://www.painelfiscal.com.br/
+ * @module model/Ac331
  */
 
 const Oracle = require('../Oracle');
@@ -14,6 +10,9 @@ const Oracle = require('../Oracle');
  * Classe de Municipio
  * 
  * @constructor
+ * @example
+ * const model = require('./model');
+ * const ac331 = new model.Ac331();
  */
 var Municipio = function(){
   if(!(this instanceof Municipio))
@@ -24,7 +23,17 @@ var Municipio = function(){
  * Função busca os dados do Município através do código do municipio
  * 
  * @param {string} cd_municipio Código do Municipio
- * @returns {Promise} Promrise<Result<T>>
+ * @returns {Promise} Promise
+ * @example
+ * const rows = (await ac331.Municipio.select('3534302')).rows;
+ * 
+ * ou
+ *
+ * const rows = await ac331.Municipio.select('3534302').then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
  */
 Municipio.prototype.select = async (cd_municipio) => {
   try {

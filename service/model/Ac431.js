@@ -2,10 +2,6 @@
  * Modulo Ac431
  * 
  * @module model/Ac431
- * @license [MIT] {@link http://https://github.com/PainelFsical/master/LICENSE}
- * @copyright (c) 2008-2022 Painel Fiscal
- * @since 1.0
- * @see http://www.painelfiscal.com.br/
  */
 
 const Oracle = require('../Oracle');

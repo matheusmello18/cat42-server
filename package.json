@@ -11,7 +11,7 @@
     "startdev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate-docs": "node_modules/.bin/jsdoc -c jsdoc.json",
-    "doc": "jsdoc -c jsdoc.json -r --debug ./docs ./README.md"
+    "doc": "jsdoc -c jsdoc.json -r --debug ../doc-simulador/doc-fonte/public/ ./README.md"
   },
   "dependencies": {
     "better-docs": "^2.7.2",

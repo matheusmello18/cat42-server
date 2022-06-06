@@ -1,6 +1,22 @@
+/**
+ * Modulo Pessoa
+ * 
+ * @module model/Pessoa
+ */
 const Oracle = require('../Oracle');
 
-module.exports.insert = async (InPessoa = {}) => {
+/**
+ * Classe de Saida.Produto.Item
+ * 
+ * @constructor
+ */
+
+ var Pessoa = function(){
+  if(!(this instanceof Pessoa))
+    return new Pessoa();
+};
+
+Pessoa.prototype.insert = async (InPessoa) => {
 	let sql = `insert into in_pessoa 
 						( dt_inicial, cd_pessoa, nm_razao_social, ds_endereco, ds_bairro, id_ref_331_municipio, uf, id_ref_331_pais, nr_cep, nr_cnpj_cpf, nr_inscricao_estadual, dt_movimento, nr_numero, ds_complemento, nr_fone, dm_contribuinte, nr_id_estrangeiro, id_empresa, id_usuario) 
 						values 
@@ -13,7 +29,7 @@ module.exports.insert = async (InPessoa = {}) => {
 	}
 }
 
-module.exports.sp_gera_pessoa_mestre_item = async () => {
+Pessoa.prototype.sp_gera_pessoa_mestre_item = async () => {
   try {
     return await Oracle.execProcedure('SP_GERA_PESSOA_MESTRE_ITEM');
   } catch (err) {
@@ -21,7 +37,7 @@ module.exports.sp_gera_pessoa_mestre_item = async () => {
   }
 }
 
-module.exports.Mestre = {
+Pessoa.prototype.Mestre = {
 	insert: async (InPessoa = {}) => {
 		let sql = `insert into in_pessoa_mestre
 							( id_pessoa, cd_pessoa, id_empresa, id_usuario) 
