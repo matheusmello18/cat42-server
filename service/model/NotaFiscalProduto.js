@@ -16,13 +16,13 @@ const AcC060 = require('./AcC060');
  * Incluindo SfC110
  * @requires SfC110
  */
-const SfC110 = require('./SfC110').SfC110;
+const SfC110 = require('./SfC110');
 
 /**
  * Incluindo SfC195
  * @requires SfC195
  */
-const SfC195 = require('./SfC195').SfC195;
+const SfC195 = require('./SfC195');
 
 /**
  * Incluindo NotaFiscalItem
@@ -82,8 +82,8 @@ NotaFiscalSaidaProduto.prototype.Item = new NotaFiscalProdutoItem.Saida(),
 /**
  * @property {SfC110Saida} SfC110Saida
  */
-NotaFiscalSaidaProduto.prototype.SfC110 = new SfC110.Saida(),
-NotaFiscalSaidaProduto.prototype.SfC195 = new SfC195.Saida()
+NotaFiscalSaidaProduto.prototype.SfC110 = new SfC110.SfC110Saida(),
+NotaFiscalSaidaProduto.prototype.SfC195 = new SfC195.SfC195Saida()
 
 module.exports.Saida = NotaFiscalSaidaProduto;
 
@@ -112,9 +112,9 @@ NotaFiscalSaidaProduto.prototype.insert =async (InNotaFiscalEntradaProduto = {})
 }
 
 NotaFiscalSaidaProduto.prototype.Item = new NotaFiscalProdutoItem.Entrada(),
-NotaFiscalSaidaProduto.prototype.SfC110 = new SfC110.Entrada(),
+NotaFiscalSaidaProduto.prototype.SfC110 = new SfC110.SfC110Entrada(),
 NotaFiscalSaidaProduto.prototype.AcC060 = new AcC060.AcC060Entrada(),
-NotaFiscalSaidaProduto.prototype.SfC195 = new SfC195.Entrada()
+NotaFiscalSaidaProduto.prototype.SfC195 = new SfC195.SfC195Entrada()
 
 module.exports.Entrada = NotaFiscalEntradaProduto;
 

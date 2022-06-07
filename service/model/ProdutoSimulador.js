@@ -1,10 +1,24 @@
+/**
+ * Modulo Pessoa
+ * 
+ * @module model/ProdutoSimulador
+ */
 const Oracle = require('../Oracle');
 
-const sqlInsert = `insert into simul_produto ( id_produto, cd_produto, ds_produto, ds_unidade_venda, cd_produto_forn, ds_unidade_forn, vl_fator_conversao, aliq_icms, vl_saldo_estoque_inicial, id_empresa, id_usuario )
-values ( :id_produto, :cd_produto, :ds_produto, :ds_unidade_venda, :cd_produto_forn, :ds_unidade_forn, :vl_fator_conversao, :aliq_icms, :vl_saldo_estoque_inicial, :id_empresa, :id_usuario )`;
+/**
+ * Classe de Saida.Produto.Item
+ * 
+ * @constructor
+ */
 
-module.exports.Insert = async (id_produto, cd_produto, ds_produto, ds_unidade_venda, cd_produto_forn, ds_unidade_forn, vl_fator_conversao, aliq_icms, vl_saldo_estoque_inicial, id_empresa, id_usuario) => {
-  
+ var ProdutoSimulador = function(){
+  if(!(this instanceof ProdutoSimulador))
+    return new ProdutoSimulador();
+};
+
+ProdutoSimulador.prototype.Insert = async (id_produto, cd_produto, ds_produto, ds_unidade_venda, cd_produto_forn, ds_unidade_forn, vl_fator_conversao, aliq_icms, vl_saldo_estoque_inicial, id_empresa, id_usuario) => {
+  const sqlInsert = `insert into simul_produto ( id_produto, cd_produto, ds_produto, ds_unidade_venda, cd_produto_forn, ds_unidade_forn, vl_fator_conversao, aliq_icms, vl_saldo_estoque_inicial, id_empresa, id_usuario )
+  values ( :id_produto, :cd_produto, :ds_produto, :ds_unidade_venda, :cd_produto_forn, :ds_unidade_forn, :vl_fator_conversao, :aliq_icms, :vl_saldo_estoque_inicial, :id_empresa, :id_usuario )`;
   try {
     let params = {
       id_produto: id_produto,
@@ -26,9 +40,9 @@ module.exports.Insert = async (id_produto, cd_produto, ds_produto, ds_unidade_ve
   }
 }
 
-const sqlDelete = `delete from simul_produto where id_empresa = :id_empresa and id_usuario = :id_usuario`;
 
-module.exports.Delete = async (id_empresa, id_usuario) => {
+ProdutoSimulador.prototype.Delete = async (id_empresa, id_usuario) => {
+  const sqlDelete = `delete from simul_produto where id_empresa = :id_empresa and id_usuario = :id_usuario`;
   try {
     let params = {
       id_empresa: id_empresa,
@@ -41,3 +55,5 @@ module.exports.Delete = async (id_empresa, id_usuario) => {
     throw new Error(err);
   }
 }
+
+module.exports.ProdutoSimulador = ProdutoSimulador;

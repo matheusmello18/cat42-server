@@ -9,7 +9,7 @@ const Oracle = require('../Oracle');
  * Incluindo AcC050
  * @requires AcC050
  */
-const AcC050 = require('./AcC050').AcC050;
+const AcC050 = require('./AcC050');
 
 
 /**
@@ -36,7 +36,7 @@ NotaFiscalSaidaProdutoItem.prototype.insert = async (InNotaFiscalSaidaItem) => {
   }
 };
 
-NotaFiscalSaidaProdutoItem.prototype.AcC050 = AcC050.Saida;
+NotaFiscalSaidaProdutoItem.prototype.AcC050 = new AcC050.AcC050Saida();
 
 module.exports.Saida = NotaFiscalSaidaProdutoItem;
 
@@ -65,6 +65,6 @@ NotaFiscalEntradaProdutoItem.prototype.insert = async (InNotaFiscalEntradaItem) 
   }
 };
 
-NotaFiscalEntradaProdutoItem.prototype.AcC050 = AcC050.Entrada;
+NotaFiscalEntradaProdutoItem.prototype.AcC050 = new AcC050.AcC050Entrada();
 
 module.exports.Entrada = NotaFiscalEntradaProdutoItem;

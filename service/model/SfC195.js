@@ -44,19 +44,19 @@ module.exports.SfC195Saida = SfC195Saida;
 	* 
 	* @constructor
 	*/
-var SfC195entrada = function(){
-	if(!(this instanceof SfC195entrada))
-		return new SfC195entrada();
+var SfC195Entrada = function(){
+	if(!(this instanceof SfC195Entrada))
+		return new SfC195Entrada();
 };
 
 /**
- * Função inserir os dados do SfC195Saida 
+ * Função inserir os dados do SfC195Entrada
  * 
  * @param {dataSfC195Entrada} dataSfC195Entrada
  * @returns {Promise} Promrise<Result<T>>
  */
 
-SfC195entrada.prototype.insert = async (dataSfC195Entrada) => {
+SfC195Entrada.prototype.insert = async (dataSfC195Entrada) => {
 	let sql = `insert into sf_c195_entrada 
 						( id_0460, ds_complementar, id_nota_fiscal_entrada, serie_subserie_documento, nr_documento, dt_emissao_documento, id_pessoa_remetente, nr_sequencia, nr_item, id_empresa, id_usuario, id_modelo_documento) 
 						values 
@@ -68,6 +68,8 @@ SfC195entrada.prototype.insert = async (dataSfC195Entrada) => {
 		throw new Error(err);
 	}
 }
+
+module.exports.SfC195Entrada = SfC195Entrada;
 
 /**
  * Campos da Tabela dataSfC195Saida
