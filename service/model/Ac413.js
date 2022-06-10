@@ -2,6 +2,8 @@
  * Modulo Ac413
  * 
  * @module model/Ac413
+ * @example
+ * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');
@@ -10,8 +12,11 @@ const Oracle = require('../Oracle');
  * Classe de Ac413
  * 
  * @constructor
+ * @example
+ * const model = require('./model');
+ * const ac413 = new model.Ac413();
  */
- var Ac413 = function(){
+var Ac413 = function() {
   if(!(this instanceof Ac413))
     return new Ac413();
 };
@@ -20,7 +25,17 @@ const Oracle = require('../Oracle');
  * Função busca os dados do Ac413 por código
  * 
  * @param {string} cd_codigo Código 413
- * @returns {Promise} Promrise<Result<T>>
+ * @returns {Promise} Promise
+ * @example
+ * const rows = (await ac413.selectByCodigo('09')).rows;
+ * 
+ * ou
+ *
+ * const rows = await ac413.selectByCodigo('09').then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
  */
 
 Ac413.prototype.selectByCodigo = async (cd_codigo) => {

@@ -2,25 +2,58 @@
  * Modulo AcC060
  * 
  * @module model/AcC060
+ * @example
+ * const model = require('./model');
  */
 
- const Oracle = require('../Oracle');
+const Oracle = require('../Oracle');
 
  /**
 	* Classe de AcC060Entrada
 	* 
 	* @constructor
+	* @example
+	* const model = require('./model');
+	* const acC060Entrada = new model.AcC060.AcC060Entrada();
 	*/
-	var AcC060Entrada = function(){
-	 if(!(this instanceof AcC060Entrada))
-		 return new AcC060Entrada();
- };
+var AcC060Entrada = function(){
+  if(!(this instanceof AcC060Entrada))
+    return new AcC060Entrada();
+};
  
  /**
 	* Função inserir os dados do AcC060Entrada 
 	* 
 	* @param {dataAcC060Entrada} dataAcC060Entrada 
-	* @returns {Promise} Promrise<Result<T>>
+	* @returns {Promise} Promise
+	* @example
+	* var dataAcC060Entrada = {
+	*   dm_importacao: '',
+	*   nr_di: '3',
+	*   dt_registro: 0,
+	*   dt_desembaraco: 0,
+	*   vl_pis: 0,
+	*   vl_cofins: 0,
+	*   id_nota_fiscal_entrada: 1,
+	*   id_pessoa_remetente: 2,
+	*   dt_emissao_documento: '',
+	*   nr_documento: '0',
+	*   nr_item: 1,
+	*   nr_sequencia: 1,
+	*   serie_subserie_documento: '0',
+	*   id_empresa: 1,
+	*   id_usuario: 0,
+  *   id_modelo_documento: 1
+	* }
+	* const rows = (await acC060Entrada.insert(dataAcC060Entrada)).rows;
+	* 
+	* ou
+	*
+	* const rows = await acC060Entrada.insert(dataAcC060Entrada).then((e) => {
+	*    return e.rows;
+	* }).catch((err) => {
+	*    throw new Error(err.message)
+	* })
 	*/
  
  AcC060Entrada.prototype.insert = async (dataAcC060Entrada) => {

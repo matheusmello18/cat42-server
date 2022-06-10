@@ -2,6 +2,8 @@
  * Modulo AcC700
  * 
  * @module model/AcC700
+ * @example
+ * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');
@@ -10,6 +12,9 @@ const Oracle = require('../Oracle');
  * Classe de AcC700Saida
  * 
  * @constructor
+ * @example
+ * const model = require('./model');
+ * const acC700Saida = new model.AcC700.AcC700Saida();
  */
 var AcC700Saida = function(){
 	if(!(this instanceof AcC700Saida))
@@ -20,7 +25,32 @@ var AcC700Saida = function(){
 	* Função inserir os dados do AcC700Saida 
 	* 
 	* @param {dataAcC700Saida} dataAcC700Saida
-	* @returns {Promise} Promrise<Result<T>>
+	* @returns {Promise} Promise
+	* @example
+	* var dataAcC700Saida = {
+	*   dm_entrada_saida: '',
+	*   dm_tipo_ligacao: '',
+	*   dm_grupo_tensao: '',
+	*   id_ref_331_municipio: 1,
+	*   nr_chave_nf_eletronica_ref: '',
+	*   vl_fornecido: 0,
+	*   id_nota_fiscal_saida: 1,
+	*   dt_emissao_documento: '',
+	*   nr_documento: 0,
+	*   serie_subserie_documento: '0',
+	*   id_empresa: 1,
+	*   id_usuario: 0,
+  *   id_modelo_documento: 1
+	* }
+	* const rows = (await acC700Saida.insert(dataAcC700Saida)).rows;
+	* 
+	* ou
+	*
+	* const rows = await acC700Saida.insert(dataAcC700Saida).then((e) => {
+	*    return e.rows;
+	* }).catch((err) => {
+	*    throw new Error(err.message)
+	* })
 	*/
  
  AcC700Saida.prototype.insert = async (dataAcC700Saida) => {
@@ -39,10 +69,13 @@ var AcC700Saida = function(){
 module.exports.AcC700Saida = AcC700Saida;
 
 /**
-	* Classe de AcC700Entrada
-	* 
-	* @constructor
-	*/
+ * Classe de AcC700Entrada
+ * 
+ * @constructor
+ * @example
+ * const model = require('./model');
+ * const acC700Entrada = new model.AcC700.AcC700Entrada();
+*/
 	var AcC700Entrada = function(){
 		if(!(this instanceof AcC700Entrada))
 			return new AcC700Entrada();
@@ -52,7 +85,32 @@ module.exports.AcC700Saida = AcC700Saida;
 	 * Função inserir os dados do AcC700Entrada 
 	 * 
 	 * @param {dataAcC700Entrada} dataAcC700Entrada 
-	 * @returns {Promise} Promrise<Result<T>>
+	 * @returns {Promise} Promise
+	 * @example
+	 * var dataAcC700Entrada = {
+	 *   dm_tipo_ligacao: '',
+	 *   dm_grupo_tensao: '',
+	 *   id_ref_331_municipio: 1,
+	 *   nr_chave_nf_eletronica_ref: '',
+	 *   vl_fornecido: 0,
+	 *   id_nota_fiscal_entrada: 1,
+	 *   dt_emissao_documento: '',
+	 *   nr_documento: 0,
+	 *   serie_subserie_documento: '0',
+	 *   id_pessoa_remetente: 1,
+	 *   id_empresa: 1,
+	 *   id_usuario: 0,
+   *   id_modelo_documento: 1
+	 * }
+	 * const rows = (await acC700Entrada.insert(dataAcC700Entrada)).rows;
+	 * 
+	 * ou
+	 *
+	 * const rows = await acC700Entrada.insert(dataAcC700Entrada).then((e) => {
+	 *    return e.rows;
+	 * }).catch((err) => {
+	 *    throw new Error(err.message)
+	 * })
 	 */
 	
 	AcC700Entrada.prototype.insert = async (dataAcC700Entrada) => {

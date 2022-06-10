@@ -2,6 +2,8 @@
  * Modulo Ac331
  * 
  * @module model/Ac331
+ * @example
+ * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');
@@ -57,6 +59,9 @@ module.exports.Municipio = Municipio;
  * Classe de Pais
  * 
  * @constructor
+ * @example
+ * const model = require('./model');
+ * const ac331 = new model.Pais();
  */
  var Pais = function(){
   if (!(this instanceof Pais))
@@ -67,7 +72,18 @@ module.exports.Municipio = Municipio;
  * Função busca os dados do País através do código do país
  * 
  * @param {string} cd_pais Código do País
- * @return {Promise} Promrise<Result<T>>
+ * @return {Promise} Promrise
+ * 
+ * @example
+ * const rows = (await ac331.Pais.select('01058')).rows;
+ * 
+ * ou
+ *
+ * const rows = await ac331.Pais.select('01058').then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
  */
 
 Pais.prototype.select = async (cd_pais) => {

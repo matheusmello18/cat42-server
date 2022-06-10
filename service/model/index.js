@@ -6,9 +6,9 @@
 
 const Ac331 = require('./Ac331');
 const AcC700 = require('./AcC700');
-const Ac413 = require('./Ac413');
-const Ac431 = require('./Ac431');
-const Ac0450 = require('./Ac0450');
+const Ac413 = require('./Ac413').Ac413;
+const Ac431 = require('./Ac431').Ac431;
+const Ac0450 = require('./Ac0450').Ac0450;
 const Sf0190 = require('./Sf0190');
 const CtrlEmpresa = require('./CtrlEmpresa');
 const CtrlUsuario = require('./CtrlUsuario');

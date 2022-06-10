@@ -2,6 +2,8 @@
  * Modulo Ac431
  * 
  * @module model/Ac431
+ * @example
+ * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');
@@ -10,6 +12,9 @@ const Oracle = require('../Oracle');
  * Classe de Ac431
  * 
  * @constructor
+ * @example
+ * const model = require('./model');
+ * const ac431 = new model.Ac431();
  */
  var Ac431 = function(){
   if(!(this instanceof Ac431))
@@ -20,7 +25,17 @@ const Oracle = require('../Oracle');
  * Função busca os dados do Ac431 por código
  * 
  * @param {string} cd_codigo Código 431
- * @returns {Promise} Promrise<Result<T>>
+ * @returns {Promise} Promise
+ * @example
+ * const rows = (await Ac431.selectByCodigo('560')).rows;
+ * 
+ * ou
+ *
+ * const rows = await Ac431.selectByCodigo('560').then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
  */
 
  Ac431.prototype.selectByCodigo = async (cd_codigo) => {

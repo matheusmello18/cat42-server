@@ -2,6 +2,8 @@
  * Modulo Ac0450
  * 
  * @module model/Ac0450
+ * @example
+ * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');
@@ -10,6 +12,9 @@ const Oracle = require('../Oracle');
  * Classe de Ac0450
  * 
  * @constructor
+ * @example
+ * const model = require('./model');
+ * const ac0450 = new model.Ac0450();
  */
 var Ac0450 = function(){
   if(!(this instanceof Ac0450))
@@ -22,7 +27,17 @@ var Ac0450 = function(){
  * @param {string} ds_observacao Descrição da observação
  * @param {number} id_empresa Id da Empresa
  * @param {string} dt_inicial Data da emissão
- * @returns {Promise} Promrise<Result<T>>
+ * @returns {Promise} Promise
+ * @example
+ * const rows = (await ac0450.select('retorno ref a nf no0039142 de 19/05/2014 |', 1, '01/06/2014')).rows;
+ * 
+ * ou
+ *
+ * const rows = await ac0450.select('retorno ref a nf no0039142 de 19/05/2014 |', 1, '01/06/2014').then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
  */
 
 Ac0450.prototype.select = async (ds_observacao, id_empresa, dt_inicial) => {
@@ -50,7 +65,17 @@ Ac0450.prototype.select = async (ds_observacao, id_empresa, dt_inicial) => {
  * @param {string} ds_observacao Descrição da observação
  * @param {number} id_empresa Id da Empresa
  * @param {string} dt_inicial Data da emissão
- * @returns {Promise} Contém o Código da Observação
+ * @returns {Promise}  Contém o Código da Observação
+ * @example
+ * const id_ref_0450 = (await ac0450.insert('retorno ref a nf no0039142 de 19/05/2014 |', 1, '01/06/2014'));
+ * 
+ * ou
+ *
+ * const id_ref_0450 = await ac0450.insert('retorno ref a nf no0039142 de 19/05/2014 |', 1, '01/06/2014').then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
  */
 Ac0450.prototype.insert = async (ds_observacao, id_empresa, dt_inicial) => {
   const nProx_Codigo = await Oracle.proxCod("SIMUL_CADASTRO");
