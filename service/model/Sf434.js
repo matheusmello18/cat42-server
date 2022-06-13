@@ -2,6 +2,8 @@
  * Modulo Sf434
  * 
  * @module model/Sf434
+ * @example
+ * const model = require('./model');
  */
 
  const Oracle = require('../Oracle');
@@ -10,19 +12,31 @@
   * Classe de Sf434
   * 
   * @constructor
+  * @example
+  * const model = require('./model');
+  * const Sf434 = new model.Sf434();
   */
  var Sf434 = function(){
    if(!(this instanceof Sf434))
      return new Sf434();
  };
-  
-  /**
-   * Função buscar os dados do Sf434 por código
-   * 
-   * @param {string} cd_codigo
-   * @returns {Promise} Promrise<Result<T>>
-   */
-  
+
+/**
+ * Função buscar os dados do Sf434 por código
+ * 
+ * @param {string} cd_codigo
+ * @returns {Promise} Promise
+ * @example
+ * const rows = (await Sf434.selectByCodigo('05')).rows;
+ * 
+ * ou
+ *
+ * const rows = await Sf434.selectByCodigo('05').then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
+ */
 Sf434.prototype.selectByCodigo = async (cd_codigo) => {
     let sql = `select id_ref_434, cd_434, ds_434
     from sf_434

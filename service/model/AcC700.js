@@ -42,14 +42,14 @@ var AcC700Saida = function(){
 	*   id_usuario: 0,
   *   id_modelo_documento: 1
 	* }
-	* const rows = (await acC700Saida.insert(dataAcC700Saida)).rows;
+	* await acC700Saida.insert(dataAcC700Saida);
 	* 
 	* ou
 	*
-	* const rows = await acC700Saida.insert(dataAcC700Saida).then((e) => {
-	*    return e.rows;
+	* const data = await acC700Saida.insert(dataAcC700Saida).then((e) => {
+	*    return e;
 	* }).catch((err) => {
-	*    throw new Error(err.message)
+	*    throw new Error('Erro ao inserir o registro.');
 	* })
 	*/
  
@@ -86,7 +86,7 @@ module.exports.AcC700Saida = AcC700Saida;
 	 * 
 	 * @param {dataAcC700Entrada} dataAcC700Entrada 
 	 * @returns {Promise} Promise
-	 * @example
+	 * @example 
 	 * var dataAcC700Entrada = {
 	 *   dm_tipo_ligacao: '',
 	 *   dm_grupo_tensao: '',
@@ -102,14 +102,14 @@ module.exports.AcC700Saida = AcC700Saida;
 	 *   id_usuario: 0,
    *   id_modelo_documento: 1
 	 * }
-	 * const rows = (await acC700Entrada.insert(dataAcC700Entrada)).rows;
+	 * await acC700Entrada.insert(dataAcC700Entrada);
 	 * 
 	 * ou
 	 *
-	 * const rows = await acC700Entrada.insert(dataAcC700Entrada).then((e) => {
-	 *    return e.rows;
+	 * const data = await acC700Entrada.insert(dataAcC700Entrada).then((e) => {
+	 *    return e;
 	 * }).catch((err) => {
-	 *    throw new Error(err.message)
+	 *    throw new Error('Falha ao inserir o registro C700 Entrada');
 	 * })
 	 */
 	

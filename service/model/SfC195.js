@@ -2,6 +2,8 @@
  * Modulo SfC195
  * 
  * @module model/SfC195
+ * @example
+ * const model = require('./model');
  */
 
  const Oracle = require('../Oracle');
@@ -10,6 +12,9 @@
 	* Classe de SfC195Saida
 	* 
 	* @constructor
+	* @example
+  * const SfC195 = require('./model/SfC195');
+  * const SfC195Saida = new SfC195.SfC195Saida();
 	*/
  var SfC195Saida = function(){
 	 if(!(this instanceof SfC195Saida))
@@ -20,7 +25,31 @@
  * Função inserir os dados do SfC195Saida 
  * 
  * @param {dataSfC195Saida} dataSfC195Saida
- * @returns {Promise} Promrise<Result<T>>
+ * @returns {Promise} Promise
+ * @example
+ * var dataSfC195Saida = {
+ *   dm_entrada_saida: '',
+ *   id_0460, ds_complementar: 0, 
+ *   id_nota_fiscal_saida: 0,
+ *   nr_item: 1,
+ *   id_modelo_documento: 1,
+ *   serie_subserie_documento: '',
+ *   nr_documento: '',
+ *   dt_emissao_documento: '',
+ *   nr_sequencia: 1,
+ *   id_empresa: 1,
+ *   id_usuario: 1
+ * }
+ * 
+ * await SfC195Saida.insert(dataSfC195Saida);
+ * 
+ * ou
+ *
+ * const data = await SfC195Saida.insert(dataSfC195Saida).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao inserir o registro.');
+ * })
  */
 
 SfC195Saida.prototype.insert = async (dataSfC195Saida) => {
@@ -43,6 +72,9 @@ module.exports.SfC195Saida = SfC195Saida;
 	* Classe de SfC195Entrada
 	* 
 	* @constructor
+	* @example
+  * const SfC195 = require('./model/SfC195');
+  * const SfC195Entrada = new SfC195.SfC195Entrada();
 	*/
 var SfC195Entrada = function(){
 	if(!(this instanceof SfC195Entrada))
@@ -53,7 +85,32 @@ var SfC195Entrada = function(){
  * Função inserir os dados do SfC195Entrada
  * 
  * @param {dataSfC195Entrada} dataSfC195Entrada
- * @returns {Promise} Promrise<Result<T>>
+ * @returns {Promise} Promise
+ * @example
+ * var dataSfC195Entrada = {
+ *   id_0460: 1,
+ *   ds_complementar: '',
+ *   id_nota_fiscal_entrada: 1,
+ *   serie_subserie_documento: '',
+ *   nr_documento: '',
+ *   dt_emissao_documento: '',
+ *   id_pessoa_remetente: 1,
+ *   nr_sequencia: 1,
+ *   nr_item: 1,
+ *   id_empresa: 1,
+ *   id_usuario: 1,
+ *   id_modelo_documento: 1
+ * }
+ * 
+ * await SfC195Entrada.insert(dataSfC195Entrada);
+ * 
+ * ou
+ *
+ * const data = await SfC195Entrada.insert(dataSfC195Entrada).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao inserir o registro.');
+ * })
  */
 
 SfC195Entrada.prototype.insert = async (dataSfC195Entrada) => {

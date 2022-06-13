@@ -72,7 +72,7 @@ module.exports.Municipio = Municipio;
  * Função busca os dados do País através do código do país
  * 
  * @param {string} cd_pais Código do País
- * @return {Promise} Promrise
+ * @return {Promise} Promise
  * 
  * @example
  * const rows = (await ac331.Pais.select('01058')).rows;
@@ -99,3 +99,4 @@ Pais.prototype.select = async (cd_pais) => {
     throw new Error(err);
   }
 }
+module.exports.Pais = Pais;

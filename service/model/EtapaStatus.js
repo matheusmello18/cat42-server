@@ -2,6 +2,8 @@
  * Modulo EtapaStatus
  * 
  * @module model/EtapaStatus
+ * @example
+ * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');
@@ -10,6 +12,9 @@ const Oracle = require('../Oracle');
  * Classe de EtapaStatus
  * 
  * @constructor
+ * @example
+ * const model = require('./model');
+ * const EtapaStatus = new model.EtapaStatus();
  */
 var EtapaStatus = function(){
 	if(!(this instanceof EtapaStatus))
@@ -23,6 +28,16 @@ var EtapaStatus = function(){
  * @param {number} id_empresa Código da Empresa
  * @param {number} id_usuario Código do Usuário
  * @param {number} id_simul_etapa Identificador da Etapa
+ * @example
+ * const rows = (await EtapaStatus.select(1, 1, 2)).rows;
+ * 
+ * ou
+ *
+ * const rows = await EtapaStatus.select(1, 1, 2).then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
  */
 EtapaStatus.prototype.select = async (id_empresa, id_usuario, id_simul_etapa) => {
   const sql = `
@@ -70,6 +85,16 @@ EtapaStatus.prototype.select = async (id_empresa, id_usuario, id_simul_etapa) =>
  * @param {number} id_empresa Código da Empresa
  * @param {number} id_usuario Código do Usuário
  * @param {string} ds_status Descrição do erro
+ * @exemplo
+ * await EtapaStatus.insert('01/08/2022', 1, 1, 1, 1 , 'teste');
+ * 
+ * ou
+ *
+ * const data = await EtapaStatus.insert('01/08/2022', 1, 1, 1, 1 , 'teste').then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao inserir o registro.');
+ * })
  */
 EtapaStatus.prototype.insert = async (dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status) => {
   const sqlInsert = `insert into simul_etapa_status (id_simul_status,dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status,dt_status)

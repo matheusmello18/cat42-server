@@ -2,6 +2,8 @@
  * Modulo SfC110
  * 
  * @module model/SfC110
+ * @example
+ * const SfC110 = require('./model/SfC110');
  */
 
 const Oracle = require('../Oracle');
@@ -11,6 +13,9 @@ const Oracle = require('../Oracle');
  * 
  * @class SfC110
  * @constructor
+ * @example
+ * const SfC110 = require('./model/SfC110');
+ * const SfC110Saida = new SfC110.SfC110Saida();
  */
 var SfC110Saida = function(){
   if (!(this instanceof SfC110Saida))
@@ -21,7 +26,30 @@ var SfC110Saida = function(){
  * Inserir o C110 Saída
  * 
  * @param {paramSfC110Saida} paramSfC110Saida
- * @return {Promise} Promrise<Result<T>>
+ * @return {Promise} Promise
+ * @example
+ * var paramSfC110Saida = {
+ *   id_modelo_documento: 0,
+ *   dm_entrada_saida: '',
+ *   serie_subserie_documento: '',
+ *   nr_documento: '',
+ *   dt_emissao_documento: '',
+ *   nr_item_imp: 0,
+ *   id_ref_0450: 0,
+ *   ds_complementar: '',
+ *   id_empresa: 1,
+ *   id_usuario: 1
+ * }
+ * 
+ * await SfC110Saida.insert(paramSfC110Saida);
+ * 
+ * ou
+ *
+ * const data = await SfC110Saida.insert(paramSfC110Saida).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao inserir o registro.');
+ * })
  */
  SfC110Saida.prototype.insert = async (paramSfC110Saida) => {
   let sql = `insert into sf_c110_saida 
@@ -43,7 +71,25 @@ var SfC110Saida = function(){
  * Deletar C110 Saída atraves da chave do C100 Saída
  *
  * @param {chaveC100Saida} chaveC100Saida 
- * @return {Promise} Promrise<Result<T>>
+ * @return {Promise} Promise
+ * @example
+ * var chaveC100Saida = {
+ *   dm_entrada_saida: '',
+ *   serie_subserie_documento: '',
+ *   nr_documento: '',
+ *   dt_emissao_documento: '',
+ *   id_empresa: 1
+ * }
+ * 
+ * await SfC110Saida.delete(chaveC100Saida);
+ * 
+ * ou
+ *
+ * const data = await SfC110Saida.delete(chaveC100Saida).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao inserir o registro.');
+ * })
  */
  SfC110Saida.prototype.delete = async (chaveC100Saida) => {
  let sql = `
@@ -106,6 +152,9 @@ module.exports.SfC110Saida = SfC110Saida;
  * Classe SfC110 para Entrada
  * 
  * @constructor
+ * @example
+ * const SfC110 = require('./model/SfC110');
+ * const SfC110Entrada = new SfC110.SfC110Entrada();
  */
 var SfC110Entrada = function() {
   if(!(this instanceof SfC110Entrada))
@@ -116,7 +165,30 @@ var SfC110Entrada = function() {
  * Inserir o C110 Entrada
  * 
  * @param {paramSfC110Entrada} paramSfC110Entrada
- * @return {Promise} Promrise<Result<T>>
+ * @return {Promise} Promise
+ * @example
+ * var paramSfC110Entrada = {
+ *   serie_subserie_documento: '',
+ *   nr_documento: '',
+ *   dt_emissao_documento: '',
+ *   id_pessoa_remetente: 0,
+ *   nr_item_imp: 0,
+ *   id_ref_0450: 0,
+ *   ds_complementar: '',
+ *   id_empresa: 1,
+ *   id_usuario: 1,
+ *   id_modelo_documento: 0
+ * }
+ * 
+ * await SfC110Entrada.insert(paramSfC110Entrada);
+ * 
+ * ou
+ *
+ * const data = await SfC110Entrada.insert(paramSfC110Entrada).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao inserir o registro.');
+ * })
  */
  SfC110Entrada.prototype.insert = async (paramSfC110Entrada) => {
   let sql = `insert into sf_c110_entrada 

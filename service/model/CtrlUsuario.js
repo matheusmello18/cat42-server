@@ -2,6 +2,8 @@
  * Modulo CtrlUsuario
  * 
  * @module model/CtrlUsuario
+ * @example
+ * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');
@@ -10,6 +12,9 @@ const Oracle = require('../Oracle');
  * Classe de CtrlUsuario
  * 
  * @constructor
+ * @example
+ * const model = require('./model');
+ * const CtrlUsuario = new model.CtrlUsuario();
  */
 var CtrlUsuario = function(){
 	if(!(this instanceof CtrlUsuario))
@@ -21,7 +26,17 @@ var CtrlUsuario = function(){
  * 
  * @param {string} email
  * @param {string} senha
- * @returns {Promise} Promrise<Result<T>>
+ * @returns {Promise} Promise
+ * @example
+ * const rows = (await CtrlUsuario.select('matheus.mello@painelfiscal.com.br','123456')).rows;
+ * 
+ * ou
+ *
+ * const rows = await CtrlUsuario.select('matheus.mello@painelfiscal.com.br','123456').then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
  */
 
 CtrlUsuario.prototype.select = async (email, senha = '') => {
@@ -81,7 +96,17 @@ const sqlWhereSenha = ` AND C.SENHA_USUARIO_WEB = :SENHA_USUARIO_WEB`;
  * 
  * @param {number} id
  * @param {string} hash
- * @returns {Promise} Promrise<Result<T>>
+ * @returns {Promise} Promise
+ * @example
+ * await CtrlUsuario.updateHash(1, 'AF8ADF87D5F45AF4787SDF');
+ * 
+ * ou
+ *
+ * await CtrlUsuario.updateHash(1, 'AF8ADF87D5F45AF4787SDF').then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao realizar alteração da hash');
+ * })
  */
 CtrlUsuario.prototype.updateHash = async (id, hash) => {
   const sqlUpdate = `UPDATE CTRL_USUARIO 
@@ -104,7 +129,17 @@ CtrlUsuario.prototype.updateHash = async (id, hash) => {
  * Função busca os dados do CtrlUsuario pelo hash recovery
  * 
  * @param {string} hash
- * @returns {Promise} Promrise<Result<T>>
+ * @returns {Promise} Promise
+ * @example
+ * const rows = (await CtrlUsuario.selectByHash('AF8ADF87D5F45AF4787SDF')).rows;
+ * 
+ * ou
+ *
+ * const rows = await CtrlUsuario.selectByHash('AF8ADF87D5F45AF4787SDF').then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
  */
 CtrlUsuario.prototype.selectByHash = async (hash) => {
 
@@ -150,7 +185,17 @@ CtrlUsuario.prototype.selectByHash = async (hash) => {
  * @param {number} id
  * @param {string} senhaWeb
  * @param {string} senha
- * @returns {Promise} Promrise<Result<T>>
+ * @returns {Promise} Promise
+ * @example
+ * await CtrlUsuario.updateSenha(1, '123456', '123456');
+ * 
+ * ou
+ *
+ * await CtrlUsuario.updateSenha(1, '123456', '123456').then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao realizar alteração da senha')
+ * })
  */
 
 CtrlUsuario.prototype.updateSenha = async (id, senhaWeb, senha) => {

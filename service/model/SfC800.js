@@ -2,6 +2,8 @@
  * Modulo SfC800
  * 
  * @module model/SfC800
+ * @example
+ * const model = require('./model');
  */
 
  const Oracle = require('../Oracle');
@@ -11,18 +13,53 @@
   * Classe de SfC800
   * 
   * @constructor
+  * @example
+  * const model = require('./model');
+  * const SfC800 = new model.SfC800();
   */
  var SfC800 = function(){
    if(!(this instanceof SfC800))
      return new SfC800();
  };
   
-  /**
-   * Função buscar os dados do SfC800 por código modelo documetno
-   * 
-   * @param {dataSfC800} dataSfC800
-   * @returns {Promise} Promrise<Result<T>>
-   */
+/**
+ * Função buscar os dados do SfC800 por código modelo documetno
+ * 
+ * @param {dataSfC800} dataSfC800
+ * @returns {Promise} Promise
+ * @example
+ * var dataSfC800 = {
+ *   nr_chave_cfe: '',
+ *   id_modelo_documento: 1,
+ *   id_ref_413: 1,
+ *   dt_documento: '',
+ *   nr_cnpj_cpf: '',
+ *   nr_serie_sat: '',
+ *   nr_cfe: '',
+ *   nr_caixa: '',
+ *   nm_destinatario: '',
+ *   vl_desconto: 0,
+ *   vl_mercadoria: 0,
+ *   vl_outras_desp: 0,
+ *   vl_icms: 0,
+ *   vl_pis: 0,
+ *   vl_pis_st: 0,
+ *   vl_cofins: 0,
+ *   vl_cofins_st: 0,
+ *   vl_cfe: 0,
+ *   id_empresa: 1,
+ *   id_usuario: 1
+ * }
+ * await SfC800.insert(dataSfC800);
+ * 
+ * ou
+ *
+ * const data = await SfC800.insert(dataSfC800).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao inserir o registro.');
+ * })
+ */
   
 SfC800.prototype.insert = async (dataSfC800) => {
 	let sql = `insert into sf_c800 
@@ -39,7 +76,7 @@ SfC800.prototype.insert = async (dataSfC800) => {
 
 /**
  * Classe SfC850
- * @param	{SfC850} SfC850 teste
+ * @param	{SfC850} SfC850 
  * @constructor
  */
 SfC800.prototype.SfC850 = new SfC850();

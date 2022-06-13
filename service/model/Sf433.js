@@ -2,6 +2,8 @@
  * Modulo Sf433
  * 
  * @module model/Sf433
+ * @example
+ * const model = require('./model');
  */
 
  const Oracle = require('../Oracle');
@@ -10,6 +12,9 @@
   * Classe de Sf433
   * 
   * @constructor
+  * @example
+  * const model = require('./model');
+  * const Sf433 = new model.Sf433();
   */
  var Sf433 = function(){
    if(!(this instanceof Sf433))
@@ -20,7 +25,17 @@
    * Função buscar os dados do Sf433  por código modelo documetno
    * 
    * @param {string} cd_codigo
-   * @returns {Promise} Promrise<Result<T>>
+   * @returns {Promise} Promise
+   * @example
+   * const rows = (await Sf433.selectByCodigo('05')).rows;
+   * 
+   * ou
+   *
+   * const rows = await Sf433.selectByCodigo('05').then((e) => {
+   *    return e.rows;
+   * }).catch((err) => {
+   *    throw new Error(err.message)
+   * })
    */
   
   Sf433.prototype.selectByCodigo = async (cd_codigo) => {

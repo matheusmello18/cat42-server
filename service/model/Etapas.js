@@ -2,6 +2,8 @@
  * Modulo Etapas
  * 
  * @module model/Etapas
+ * @example
+ * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');
@@ -10,6 +12,9 @@ const Oracle = require('../Oracle');
  * Classe de Etapas
  * 
  * @constructor
+ * @example
+ * const model = require('./model');
+ * const Etapas = new model.Etapas();
  */
  var Etapas = function(){
 	if(!(this instanceof Etapas))
@@ -22,8 +27,19 @@ const Oracle = require('../Oracle');
  * @param {number} id_empresa
  * @param {number} id_usuario
  * @param {string} dt_periodo
- * @param {number} id_simul_etapa
- * @returns {Promise} Promrise<Result<T>>
+ * @param {number|null} id_simul_etapa
+ * @returns {Promise} Promise
+ *
+ * @example
+ * const rows = (await Etapas.select(1, 1, '01/08/2022', 1)).rows;
+ * 
+ * ou
+ *
+ * const rows = await Etapas.select(1, 1, '01/08/2022', 1).then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
  */
 
 Etapas.prototype.select = async (id_empresa, id_usuario, dt_periodo, id_simul_etapa = NaN) => {

@@ -2,6 +2,8 @@
  * Modulo CFOP
  * 
  * @module model/Cfop
+ * @example
+ * const model = require('./model');
  */
  const Oracle = require('../Oracle');
 
@@ -9,6 +11,9 @@
  * Classe de CFOP
  * 
  * @constructor
+ * @example
+ * const model = require('./model');
+ * const CFOP = new model.CFOP();
  */
 var CFOP = function(){
   if(!(this instanceof CFOP))
@@ -19,7 +24,17 @@ var CFOP = function(){
  * Função busca configuração do CFOP pelo seu código
  * 
  * @param {string} cd_cfop
- * @returns {Promise} Promrise<Result<T>>
+ * @returns {Promise} Promise
+ * @example
+ * const rows = (await CFOP.selectByCdCfop('5991')).rows;
+ * 
+ * ou
+ *
+ * const rows = await CFOP.selectByCdCfop('5991').then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
  */
   
 CFOP.prototype.selectByCdCfop = async (cd_cfop) => {

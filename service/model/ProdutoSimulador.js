@@ -1,14 +1,16 @@
 /**
- * Modulo Pessoa
+ * Modulo ProdutoSimulador
  * 
  * @module model/ProdutoSimulador
  */
 const Oracle = require('../Oracle');
 
 /**
- * Classe de Saida.Produto.Item
+ * Classe de ProdutoSimulador
  * 
  * @constructor
+ * @example
+ * const ProdutoSimulador = new ProdutoSimulador();
  */
 
  var ProdutoSimulador = function(){
@@ -16,6 +18,32 @@ const Oracle = require('../Oracle');
     return new ProdutoSimulador();
 };
 
+/**
+ * Função inserir os dados do AcC700Saida 
+ * 
+ * @param {Number} id_produto
+ * @param {String} cd_produto
+ * @param {String} ds_produto
+ * @param {String} ds_unidade_venda
+ * @param {String} cd_produto_forn
+ * @param {String} ds_unidade_forn
+ * @param {Number} vl_fator_conversao
+ * @param {Number} aliq_icms
+ * @param {Number} vl_saldo_estoque_inicial
+ * @param {Number} id_empresa
+ * @param {Number} id_usuario
+ * @returns {Promise} Promise
+ * @example
+ * await ProdutoSimulador.insert('1','descricao', 1, 1, '01/08/2019', '31/08/2019', 1, 1, 1, 'descricao');
+ * 
+ * ou
+ *
+ * const data = await ProdutoSimulador.insert('1','descricao', 1, 1, '01/08/2019', '31/08/2019', 1, 1, 1, 'descricao').then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao inserir o registro.');
+ * })
+ */
 ProdutoSimulador.prototype.Insert = async (id_produto, cd_produto, ds_produto, ds_unidade_venda, cd_produto_forn, ds_unidade_forn, vl_fator_conversao, aliq_icms, vl_saldo_estoque_inicial, id_empresa, id_usuario) => {
   const sqlInsert = `insert into simul_produto ( id_produto, cd_produto, ds_produto, ds_unidade_venda, cd_produto_forn, ds_unidade_forn, vl_fator_conversao, aliq_icms, vl_saldo_estoque_inicial, id_empresa, id_usuario )
   values ( :id_produto, :cd_produto, :ds_produto, :ds_unidade_venda, :cd_produto_forn, :ds_unidade_forn, :vl_fator_conversao, :aliq_icms, :vl_saldo_estoque_inicial, :id_empresa, :id_usuario )`;
@@ -40,7 +68,23 @@ ProdutoSimulador.prototype.Insert = async (id_produto, cd_produto, ds_produto, d
   }
 }
 
-
+/**
+ * Função inserir os dados do AcC700Saida 
+ * 
+ * @param {Number} id_empresa
+ * @param {Number} id_usuario
+ * @returns {Promise} Promise
+ * @example
+ * await ProdutoSimulador.Delete('1','descricao', 1, 1, '01/08/2019', '31/08/2019', 1, 1, 1, 'descricao');
+ * 
+ * ou
+ *
+ * const data = await ProdutoSimulador.Delete('1','descricao', 1, 1, '01/08/2019', '31/08/2019', 1, 1, 1, 'descricao').then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao inserir o registro.');
+ * })
+ */
 ProdutoSimulador.prototype.Delete = async (id_empresa, id_usuario) => {
   const sqlDelete = `delete from simul_produto where id_empresa = :id_empresa and id_usuario = :id_usuario`;
   try {

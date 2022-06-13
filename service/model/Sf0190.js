@@ -2,6 +2,8 @@
  * Modulo Sf0190
  * 
  * @module model/Sf0190
+ * @example
+ * const model = require('./model');
  */
 
  const Oracle = require('../Oracle');
@@ -10,22 +12,34 @@
   * Classe de Sf0190
   * 
   * @constructor
+  * @example
+  * const model = require('./model');
+  * const Sf0190 = new model.Sf0190();
   */
  var Sf0190 = function(){
    if(!(this instanceof Sf0190))
      return new Sf0190();
  };
   
-  /**
-   * Função buscar os dados do Sf0190 por unidade medida
-   * 
-   * @param {string} ds_unidade
-   * @param {number} id_empresa
-   * @param {string} dt_inicial
-   * @returns {Promise} Promrise<Result<T>>
-   */
-  
-  Sf0190.prototype.selectByDsUnidade = async (ds_unidade, id_empresa, dt_inicial) => {
+/**
+ * Função buscar os dados do Sf0190 por unidade medida
+ * 
+ * @param {string} ds_unidade
+ * @param {number} id_empresa
+ * @param {string} dt_inicial
+ * @returns {Promise} Promise
+ * @example
+ * const rows = (await Sf0190.selectByDsUnidade('UNIDAD', 1, '01/08/2013')).rows;
+ * 
+ * ou
+ *
+ * const rows = await Sf0190.selectByDsUnidade('UNIDAD', 1, '01/08/2013').then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
+ */
+Sf0190.prototype.selectByDsUnidade = async (ds_unidade, id_empresa, dt_inicial) => {
   let sql = `select id_0190, ds_unidade, ds_descricao, id_empresa, id_usuario, dt_inicial, dt_movimento, dm_tipo_unidade 
                from sf_0190 
               where id_empresa = :id_empresa 
@@ -43,15 +57,24 @@
   }
 }
 
-  /**
-   * Função buscar os dados do Sf0190 por unidade medida e cnpj
-   * 
-   * @param {string} ds_unidade_entrada
-   * @param {string} cnpj_principal
-   * @param {number} id_empresa
-   * @returns {Promise} Promrise<Result<T>>
-   */
-
+/**
+ * Função buscar os dados do Sf0190 por unidade medida e cnpj
+ * 
+ * @param {string} ds_unidade_entrada
+ * @param {string} cnpj_principal
+ * @param {number} id_empresa
+ * @returns {Promise} Promise
+ * @example
+ * const rows = (await Sf0190.selectDePara('PC', '04665945000183', 1)).rows;
+ * 
+ * ou
+ *
+ * const rows = await Sf0190.selectDePara('PC', '04665945000183' ,1).then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
+ */
 Sf0190.prototype.selectDePara = async (ds_unidade_entrada, cnpj_principal, id_empresa) => {
   let sql = `select ds_unidade_saida, ds_descricao_saida, 
                     ds_unidade_entrada, cnpj_principal, id_empresa 
@@ -70,7 +93,26 @@ Sf0190.prototype.selectDePara = async (ds_unidade_entrada, cnpj_principal, id_em
 	* Função busca os dados do Sf0190 por código
 	* 
 	* @param {dataSf0190} dataSf0190 
-	* @returns {Promise} Promrise<Result<T>>
+	* @returns {Promise} Promise
+  * @example
+  * var dataSf0190 = {
+  *   ds_unidade: '',
+  *   ds_descricao: '',
+  *   dt_inicial: '',
+  *   dt_movimento: '',
+  *   id_empresa: 1,
+  *   id_usuario: 1
+  * };
+  * 
+  * await Sf0190.insert(dataSf0190);
+  * 
+  * ou
+  *
+  * const data = await Sf0190.insert(dataSf0190).then((e) => {
+  *    return e;
+  * }).catch((err) => {
+  *    throw new Error('Erro ao inserir o registro.')
+  * })
 	*/
 
 Sf0190.prototype.insert = async (dataSf0190) => {
@@ -80,7 +122,7 @@ Sf0190.prototype.insert = async (dataSf0190) => {
             ( :ds_unidade, :ds_descricao, :dt_inicial, :dt_movimento, :id_empresa, :id_usuario)
             `;
   try {
-    return await Oracle.insert(sql, Sf0190)
+    return await Oracle.insert(sql, dataSf0190)
   } catch (err) {
     // fazer tratamento se houver retorno do banco 20211, se houver este código ignorar
     throw new Error(err);

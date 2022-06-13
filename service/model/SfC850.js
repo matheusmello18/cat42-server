@@ -2,6 +2,8 @@
  * Modulo SfC850
  * 
  * @module model/SfC850
+ * @example
+ * const model = require('./model');
  */
 
  const Oracle = require('../Oracle');
@@ -10,6 +12,9 @@
   * Classe de SfC850
   * 
   * @constructor
+  * @example
+  * const SfC850 = require('./model/SfC850').SfC850;
+  * const SfC850 = new model.SfC850();
   */
  var SfC850 = function(){
    if(!(this instanceof SfC850))
@@ -20,7 +25,51 @@
    * Função buscar os dados do SfC850 por código modelo documetno
    * 
    * @param {dataSfC850} dataSfC850
-   * @returns {Promise} Promrise<Result<T>>
+   * @returns {Promise} Promise
+   * @example
+   * var dataSfC850 = {
+   *   nr_item: 1,
+   *   dt_documento: '',
+   *   nr_cfe: '',
+   *   id_ref_413: 0,
+   *   nr_serie_sat: '',
+   *   cd_fiscal_operacao: '',
+   *   id_produto_servico: 0,
+   *   vl_total_item: 0,
+   *   id_0460: 0,
+   *   id_ref_431: 0,
+   *   aliq_icms: 0,
+   *   vl_bc_icms: 0,
+   *   vl_icms: 0,
+   *   id_ref_433: 0,
+   *   aliq_pis: 0,
+   *   vl_bc_pis: 0,
+   *   vl_pis: 0,
+   *   vl_aliq_pis: 0,
+   *   vl_qtde_bc_pis: 0,
+   *   id_ref_434: 0,
+   *   vl_bc_cofins: 0,
+   *   aliq_cofins: 0,
+   *   vl_cofins: 0,
+   *   vl_aliq_cofins: 0,
+   *   vl_qtde_bc_cofins: 0,
+   *   vl_desconto: 0,
+   *   vl_outras_desp: 0,
+   *   qtde: 0,
+   *   vl_unitario: 0,
+   *   id_empresa: 1,
+   *   id_usuario: 1
+   * }
+   * 
+   * await SfC850.insert(dataSfC850);
+   * 
+   * ou
+   *
+   * const data = await SfC850.insert(dataSfC850).then((e) => {
+   *    return e;
+   * }).catch((err) => {
+   *    throw new Error('Erro ao inserir o registro.');
+   * })
    */
   
   SfC850.prototype.insert = async (dataSfC850) => {
