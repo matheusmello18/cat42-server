@@ -16,7 +16,7 @@ const Oracle = require('../Oracle');
  * const model = require('./model');
  * const Etapas = new model.Etapas();
  */
- var Etapas = function(){
+var Etapas = function(){
 	if(!(this instanceof Etapas))
 		return new Etapas();
 };

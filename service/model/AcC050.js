@@ -14,7 +14,7 @@ const Oracle = require('../Oracle');
  * @constructor
  * @example
  * const model = require('./model');
- * const acC050Saida = new model.AcC050.AcC050Saida();
+ * const acC050Saida = new model.NotaFiscal.Saida().Item().AcC050();
  */
  var AcC050Saida = function(){
   if(!(this instanceof AcC050Saida))
@@ -22,7 +22,7 @@ const Oracle = require('../Oracle');
 };
 
 /**
- * Função inserir os dados do AcC050
+ * Função inserir os dados do AcC050 Saida
  * 
  * @param {dataAcC050Saida} dataAcC050Saida 
  * @returns {Promise} Promise
@@ -60,7 +60,7 @@ const Oracle = require('../Oracle');
  * const rows = await acC050Saida.insert(dataAcC050Saida).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw new Error('Erro ao inserir o registro ACC050 Saida')
  * })
  */
 
@@ -78,7 +78,7 @@ AcC050Saida.prototype.insert = async (dataAcC050Saida) => {
 };
 
 /**
- * Função alterar os dados do AcC050
+ * Função alterar os dados do AcC050 Saida
  * 
  * @param {dataAcC050Saida} dataAcC050Saida 
  * @returns {Promise} Promise
@@ -116,7 +116,7 @@ AcC050Saida.prototype.insert = async (dataAcC050Saida) => {
  * const rows = await acC050Saida.update(dataAcC050Saida).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw new Error('Erro ao alterar o registro ACC050 Saida')
  * })
  */
  AcC050Saida.prototype.update = async (dataAcC050Saida) => {
@@ -130,14 +130,13 @@ AcC050Saida.prototype.insert = async (dataAcC050Saida) => {
 
 module.exports.AcC050Saida = AcC050Saida;
 
-
 /**
  * Classe de AcC050Entrada
  * 
  * @constructor
  * @example
  * const model = require('./model');
- * const acC050Entrada = new model.AcC050.AcC050Entrada();
+ * const acC050Entrada = new model.NotaFiscal.Entrada().Item().AcC050();
  */
  var AcC050Entrada = function(){
   if(!(this instanceof AcC050Entrada))
@@ -145,7 +144,7 @@ module.exports.AcC050Saida = AcC050Saida;
 };
 
 /**
- * Função inserir os dados do AcC050
+ * Função inserir os dados do AcC050 Entrada
  * 
  * @param {dataAcC050Entrada} dataAcC050Entrada 
  * @returns {Promise} Promise
@@ -183,7 +182,7 @@ module.exports.AcC050Saida = AcC050Saida;
  * const rows = await acC050Entrada.insert(dataAcC050Entrada).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw new Error('Erro ao inserir o registro ACC050 Entrada')
  * })
  */
 

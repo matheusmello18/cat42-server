@@ -23,7 +23,7 @@
  };
   
 /**
- * Função buscar os dados do SfC800 por código modelo documetno
+ * Função inserir os dados do SfC800
  * 
  * @param {dataSfC800} dataSfC800
  * @returns {Promise} Promise
@@ -90,14 +90,14 @@ module.exports.SfC800 = SfC800;
  * @property {String} nr_chave_cfe
  * @property {Number} id_modelo_documento
  * @property {String} id_ref_413
- * @property {Number} dt_documento
+ * @property {String} dt_documento
  * @property {String} nr_cnpj_cpf
  * @property {Number} nr_serie_sat
  * @property {Number} nr_cfe
  * @property {Number} nr_caixa
  * @property {String} nm_destinatario
  * @property {Number} vl_desconto
- * @property {String} vl_mercadoria
+ * @property {Number} vl_mercadoria
  * @property {Number} vl_outras_desp
  * @property {Number} vl_icms
  * @property {Number} vl_pis

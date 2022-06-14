@@ -13,8 +13,8 @@
   * 
   * @constructor
   * @example
-  * const SfC850 = require('./model/SfC850').SfC850;
-  * const SfC850 = new model.SfC850();
+  * const model = require('./model');
+  * const SfC850 = new model.SfC800.SfC850();
   */
  var SfC850 = function(){
    if(!(this instanceof SfC850))
@@ -91,8 +91,8 @@ module.exports.SfC850 = SfC850;
  * Campos da Tabela SfC850
  * 
  * @typedef {Object} dataSfC850
- * @property {String} nr_item
- * @property {Number} dt_documento
+ * @property {Number} nr_item
+ * @property {String} dt_documento
  * @property {Number} nr_cfe
  * @property {String} id_ref_413
  * @property {Number} nr_serie_sat
@@ -118,7 +118,6 @@ module.exports.SfC850 = SfC850;
  * @property {Number} vl_qtde_bc_cofins
  * @property {Number} qtde
  * @property {Number} vl_unitario
- * @property {Number} vl_cfe
  * @property {Number} vl_outras_desp
  * @property {Number} vl_desconto
  * @property {Number} id_empresa

@@ -90,7 +90,7 @@ Sf0190.prototype.selectDePara = async (ds_unidade_entrada, cnpj_principal, id_em
 }
 
  /**
-	* Função busca os dados do Sf0190 por código
+	* Função inserir os dados do Sf0190
 	* 
 	* @param {dataSf0190} dataSf0190 
 	* @returns {Promise} Promise

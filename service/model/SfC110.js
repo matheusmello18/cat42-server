@@ -3,7 +3,7 @@
  * 
  * @module model/SfC110
  * @example
- * const SfC110 = require('./model/SfC110');
+ * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');
@@ -14,8 +14,8 @@ const Oracle = require('../Oracle');
  * @class SfC110
  * @constructor
  * @example
- * const SfC110 = require('./model/SfC110');
- * const SfC110Saida = new SfC110.SfC110Saida();
+ * const model = require('./model');
+ * const SfC110Saida = new model.NotaFiscal.Saida().SfC110();
  */
 var SfC110Saida = function(){
   if (!(this instanceof SfC110Saida))
@@ -153,8 +153,8 @@ module.exports.SfC110Saida = SfC110Saida;
  * 
  * @constructor
  * @example
- * const SfC110 = require('./model/SfC110');
- * const SfC110Entrada = new SfC110.SfC110Entrada();
+ * const model = require('./model');
+ * const SfC110Entrada = new model.NotaFiscal.Entrada().SfC110();
  */
 var SfC110Entrada = function() {
   if(!(this instanceof SfC110Entrada))

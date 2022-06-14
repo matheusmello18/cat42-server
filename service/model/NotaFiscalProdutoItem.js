@@ -1,5 +1,5 @@
 /**
- * Modulo Nota Fiscal
+ * Modulo Item da Nota Fiscal
  * 
  * @module model/NotaFiscalItem
  */
@@ -11,14 +11,13 @@ const Oracle = require('../Oracle');
  */
 const AcC050 = require('./AcC050');
 
-
 /**
- * Classe de Saida.Produto.Item
+ * Classe de Item da Nota Fiscal de Saida Produto
  * 
  * @constructor
  * @example
  * const model = require('./model');
- * const nfeItemSaida = new model.NotaFiscalProdutoItem.Saida();
+ * const nfeItemSaida = new model.NotaFiscal.Saida().Item();
  */
 
  var NotaFiscalSaidaProdutoItem = function(){
@@ -27,7 +26,7 @@ const AcC050 = require('./AcC050');
 };
 
 /**
- * Função busca os dados do Município através do código do municipio
+ * Função inserir os dados na item da nota fiscal de saída 
  * 
  * @param {dataNotaFiscalSaidaItem} dataNotaFiscalSaidaItem 
  * @returns {Promise} Promise
@@ -133,7 +132,7 @@ module.exports.Saida = NotaFiscalSaidaProdutoItem;
  * @constructor
  * @example
  * const model = require('./model');
- * const nfeItemEntrada = new model.NotaFiscalProdutoItem.Entrada();
+ * const nfeItemEntrada = new model.NotaFiscal.Entrada().Item();
  */
 
  var NotaFiscalEntradaProdutoItem = function(){
@@ -142,7 +141,7 @@ module.exports.Saida = NotaFiscalSaidaProdutoItem;
 };
 
 /**
- * Função busca os dados do Município através do código do municipio
+ * Função inserir os dados na item da nota fiscal de entrada
  * 
  * @param {dataNotaFiscalEntradaItem} dataNotaFiscalEntradaItem 
  * @returns {Promise} Promise

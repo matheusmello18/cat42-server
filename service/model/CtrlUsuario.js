@@ -25,7 +25,7 @@ var CtrlUsuario = function(){
  * Função Busca os dados do CtrlUsuario por Email
  * 
  * @param {string} email
- * @param {string} senha
+ * @param {string|null} senha
  * @returns {Promise} Promise
  * @example
  * const rows = (await CtrlUsuario.select('matheus.mello@painelfiscal.com.br','123456')).rows;
@@ -65,7 +65,7 @@ CtrlUsuario.prototype.select = async (email, senha = '') => {
                 INNER JOIN CTRL_USUARIO C ON (C.ID_USUARIO = S.ID_USUARIO)
                 INNER JOIN IN_ORGAO O ON (O.ID_ORGAO = S.ID_ORGAO)
                 WHERE C.E_MAIL = :E_MAIL`;
-const sqlWhereSenha = ` AND C.SENHA_USUARIO_WEB = :SENHA_USUARIO_WEB`;
+  const sqlWhereSenha = ` AND C.SENHA_USUARIO_WEB = :SENHA_USUARIO_WEB`;
 
   try {
     let qry, params;

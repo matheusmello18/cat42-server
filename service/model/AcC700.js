@@ -14,7 +14,7 @@ const Oracle = require('../Oracle');
  * @constructor
  * @example
  * const model = require('./model');
- * const acC700Saida = new model.AcC700.AcC700Saida();
+ * const acC700Saida = new model.NotaFiscal.Saida().AcC700();
  */
 var AcC700Saida = function(){
 	if(!(this instanceof AcC700Saida))
@@ -22,7 +22,7 @@ var AcC700Saida = function(){
 };
  
  /**
-	* Função inserir os dados do AcC700Saida 
+	* Função inserir os dados do AcC700 Saida 
 	* 
 	* @param {dataAcC700Saida} dataAcC700Saida
 	* @returns {Promise} Promise
@@ -49,7 +49,7 @@ var AcC700Saida = function(){
 	* const data = await acC700Saida.insert(dataAcC700Saida).then((e) => {
 	*    return e;
 	* }).catch((err) => {
-	*    throw new Error('Erro ao inserir o registro.');
+	*    throw new Error('Erro ao inserir o registro AcC700 Saída');
 	* })
 	*/
  
@@ -74,7 +74,7 @@ module.exports.AcC700Saida = AcC700Saida;
  * @constructor
  * @example
  * const model = require('./model');
- * const acC700Entrada = new model.AcC700.AcC700Entrada();
+ * const acC700Entrada = new model.NotaFiscal.Entrada().AcC700();
 */
 	var AcC700Entrada = function(){
 		if(!(this instanceof AcC700Entrada))
@@ -82,7 +82,7 @@ module.exports.AcC700Saida = AcC700Saida;
 	};
 	
 	/**
-	 * Função inserir os dados do AcC700Entrada 
+	 * Função inserir os dados do AcC700 Entrada 
 	 * 
 	 * @param {dataAcC700Entrada} dataAcC700Entrada 
 	 * @returns {Promise} Promise

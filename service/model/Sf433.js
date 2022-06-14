@@ -22,7 +22,7 @@
  };
   
   /**
-   * Função buscar os dados do Sf433  por código modelo documetno
+   * Função buscar os dados do Sf433 por código 
    * 
    * @param {string} cd_codigo
    * @returns {Promise} Promise

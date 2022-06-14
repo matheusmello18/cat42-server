@@ -19,17 +19,17 @@ const Oracle = require('../Oracle');
 };
 
 /**
- * Função inserir os dados do AcC700Saida 
+ * Função inserir os dados do Produto Simulador 
  * 
  * @param {Number} id_produto
- * @param {String} cd_produto
- * @param {String} ds_produto
- * @param {String} ds_unidade_venda
- * @param {String} cd_produto_forn
- * @param {String} ds_unidade_forn
- * @param {Number} vl_fator_conversao
- * @param {Number} aliq_icms
- * @param {Number} vl_saldo_estoque_inicial
+ * @param {Number|String|any} cd_produto
+ * @param {Number|String|any} ds_produto
+ * @param {Number|String|any} ds_unidade_venda
+ * @param {Number|String|any} cd_produto_forn
+ * @param {Number|String|any} ds_unidade_forn
+ * @param {Number|String|any} vl_fator_conversao
+ * @param {Number|String|any} aliq_icms
+ * @param {Number|String|any} vl_saldo_estoque_inicial
  * @param {Number} id_empresa
  * @param {Number} id_usuario
  * @returns {Promise} Promise
@@ -69,7 +69,7 @@ ProdutoSimulador.prototype.Insert = async (id_produto, cd_produto, ds_produto, d
 }
 
 /**
- * Função inserir os dados do AcC700Saida 
+ * Função deletar os dados do Produto Simulador
  * 
  * @param {Number} id_empresa
  * @param {Number} id_usuario

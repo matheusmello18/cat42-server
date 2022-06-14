@@ -14,7 +14,7 @@ const Oracle = require('../Oracle');
  * @constructor
  * @example
  * const model = require('./model');
- * const ac331 = new model.Ac331();
+ * const municipio = new model.Ac331.Municipio();
  */
 var Municipio = function(){
   if(!(this instanceof Municipio))
@@ -27,11 +27,11 @@ var Municipio = function(){
  * @param {string} cd_municipio Código do Municipio
  * @returns {Promise} Promise
  * @example
- * const rows = (await ac331.Municipio.select('3534302')).rows;
+ * const rows = (await municipio.select('3534302')).rows;
  * 
  * ou
  *
- * const rows = await ac331.Municipio.select('3534302').then((e) => {
+ * const rows = await municipio.select('3534302').then((e) => {
  *    return e.rows;
  * }).catch((err) => {
  *    throw new Error(err.message)
@@ -61,7 +61,7 @@ module.exports.Municipio = Municipio;
  * @constructor
  * @example
  * const model = require('./model');
- * const ac331 = new model.Pais();
+ * const pais = new model.Ac331.Pais();
  */
  var Pais = function(){
   if (!(this instanceof Pais))
@@ -75,11 +75,11 @@ module.exports.Municipio = Municipio;
  * @return {Promise} Promise
  * 
  * @example
- * const rows = (await ac331.Pais.select('01058')).rows;
+ * const rows = (await pais.select('01058')).rows;
  * 
  * ou
  *
- * const rows = await ac331.Pais.select('01058').then((e) => {
+ * const rows = await pais.select('01058').then((e) => {
  *    return e.rows;
  * }).catch((err) => {
  *    throw new Error(err.message)

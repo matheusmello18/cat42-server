@@ -19,10 +19,10 @@ const utils = require('../utils');
 module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo) => {
 
 
-  const Empresa = (await model.CtrlEmpresa.select(id_empresa)).rows[0];
+  const Empresa = (await new model.CtrlEmpresa().select(id_empresa)).rows[0];
 
   if(Empresa.CNPJ_EMPRESA !== xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CNPJ[0]) { //então entrada
-    await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, 'Nota fiscal informada não é uma nota fiscal de entrada.');
+    await new model.EtapaStatus().insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, 'Nota fiscal informada não é uma nota fiscal de entrada.');
     throw new Error('Nota fiscal informada não é uma nota fiscal de entrada.');
   }
 

@@ -1,4 +1,3 @@
-const Oracle = require('./Oracle');
 const model = require('./model');
 const impXmlSaida = require('./ImportacaoXMLSaida');
 const impXmlEntrada = require('./ImportacaoXMLEntrada');
@@ -25,25 +24,25 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
   fs.readFile(path, "utf8", async (err, xml) => {
     if (err) {
-      await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
+      await new model.EtapaStatus().insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
       throw new Error(err.message);
     }
     parseString(xml, async function (err, xmlObj) {
       if (err) {
-        await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
+        await new model.EtapaStatus().insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
         throw new Error(err.message);
       }
 
       if (xmlObj.nfeProc !== undefined){
         await impXmlSaida.Nfe(xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo).catch(async (err) => {
-          await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
+          await new model.EtapaStatus().insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
         });
-			} else if (xmlObj.CFe !== undefined) {
+			} else if (xmlObj.CFe !== undefined) { //c800
         await impXmlSaida.Cfe(xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo).catch(async (err) => {
-          await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
+          await new model.EtapaStatus().insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
         });
       } else {
-        await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, 'XML fora do padrão da importação.');
+        await new model.EtapaStatus().insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, 'XML fora do padrão da importação.');
       }
     })
   });
@@ -51,7 +50,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
   //Oracle.execProcedure(nm_procedure1, id_empresa, id_usuario);
   //Oracle.execProcedure(nm_procedure2, id_empresa, id_usuario);
   
-  await model.EtapaStatus.insert(dt_periodo, 1, id_simul_etapa, id_empresa, id_usuario, 'Dados importado com sucesso.');
+  await new model.EtapaStatus().insert(dt_periodo, 1, id_simul_etapa, id_empresa, id_usuario, 'Dados importado com sucesso.');
 }
 
 
@@ -59,12 +58,12 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
 
   fs.readFile(path, "utf8", async (err, xml) => {
     if (err) {
-      await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
+      await new model.EtapaStatus().insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
       throw new Error(err.message);
     }
     parseString(xml, async function (err, xmlObj) {
       if (err) {
-        await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
+        await new model.EtapaStatus().insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, err.message);
         throw new Error(err.message);
       }
 
@@ -73,7 +72,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
 			} else if (xmlObj.CFe !== undefined) {
         await impXmlEntrada.Cfe(xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo);
       } else {
-        await model.EtapaStatus.insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, 'XML fora do padrão da importação.');
+        await new model.EtapaStatus().insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, 'XML fora do padrão da importação.');
       }
     })
   });
@@ -81,5 +80,5 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
   //Oracle.execProcedure(nm_procedure1, id_empresa, id_usuario);
   //Oracle.execProcedure(nm_procedure2, id_empresa, id_usuario);
   
-  await model.EtapaStatus.insert(dt_periodo, 1, id_simul_etapa, id_empresa, id_usuario, 'Dados importado com sucesso.');
+  await new model.EtapaStatus().insert(dt_periodo, 1, id_simul_etapa, id_empresa, id_usuario, 'Dados importado com sucesso.');
 }

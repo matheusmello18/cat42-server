@@ -19,7 +19,7 @@ const { parseString } = require('xml2js');
 module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo) => {
 
   //#region Empresa
-  const Empresa = await model.CtrlEmpresa.select(id_empresa)
+  const Empresa = await new model.CtrlEmpresa().select(id_empresa)
   .then((data) => {
     return data.rows[0]
   })
@@ -54,7 +54,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   const cpfOrCnpj = utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CNPJ, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CPF)[0];
 
   //#region Pais
-  const Pais = await model.Ac331.pais.select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.enderDest[0]?.cPais[0])
+  const Pais = await new model.Ac331.Pais().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.enderDest[0]?.cPais[0])
   .then((data) => {
     return data.rows[0]
   })
@@ -64,7 +64,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   //#endregion Pais
 
   //#region Municipio
-  const Municipio = await model.Ac331.municipio.select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.enderDest[0]?.cMun[0])
+  const Municipio = await new model.Ac331.Municipio().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.enderDest[0]?.cMun[0])
   .then((data) => {
     return data.rows[0]
   })
@@ -79,7 +79,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
   if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.enderDest[0]?.UF[0] == 'EX') {
 
-    PessoaMestre = await model.Pessoa.Mestre.selectByRazaoSocial(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.xNome[0], id_empresa)
+    PessoaMestre = await new model.Pessoa().Mestre.selectByRazaoSocial(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.xNome[0], id_empresa)
     .then((data) => {
       return data.rows[0]
     })
@@ -94,7 +94,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     }
   } else {   
 
-    PessoaMestre = await model.Pessoa.Mestre.selectByCpfOrCpnj(cpfOrCnpj,dhEmi,id_empresa)
+    PessoaMestre = await new model.Pessoa().Mestre.selectByCpfOrCpnj(cpfOrCnpj,dhEmi,id_empresa)
     .then((data) => {
       return data.rows[0]
     })
@@ -111,7 +111,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
   if (PessoaMestre === undefined) {
     //0150
-    await model.Pessoa.insert({
+    await new model.Pessoa().insert({
       dt_inicial: utils.FormatarData.RetornarMenorDataEmOracle(dhEmi, dt_periodo),
       cd_pessoa: cd_pessoa,
       nm_razao_social: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.xNome, 0),
@@ -140,7 +140,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   }
 
 
-  await model.Pessoa.sp_gera_pessoa_mestre_item()
+  await new model.Pessoa().sp_gera_pessoa_mestre_item()
   .catch(async (err) => {
     throw new Error('Falha na geração Mestre Item da Pessoa. Erro: ' + err.message);
   });
@@ -149,7 +149,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   let dm_entrada_saida = utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.tpNF, 0, "") == "1" ? "S" : "E"
   
   //#region Pessoa Destinatario
-  const PessoaDestinatario = await model.Pessoa.Mestre.selectByCdPessoa(cd_pessoa, id_empresa)
+  const PessoaDestinatario = await new model.Pessoa().Mestre.selectByCdPessoa(cd_pessoa, id_empresa)
   .then((data) => {
     return data.rows[0]
   })
@@ -159,7 +159,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   //#endregion Pessoa Destinatario
 
   //#region ModeloDocumento
-  const ModeloDocumento = await model.ModeloDocumento.selectByCdModeloDocumento(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.mod, 0, ""))
+  const ModeloDocumento = await new model.ModeloDocumento().selectByCdModeloDocumento(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.mod, 0, ""))
   .then((data) => {
     return data.rows[0]
   })
@@ -169,7 +169,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   //#endregion ModeloDocumento
 
   //#region Ac413
-  const Ac413 = await model.Ac413.selectByCodigo('00')
+  const Ac413 = await new model.Ac413().selectByCodigo('00')
   .then((data) => {
     return data.rows[0]
   })
@@ -181,7 +181,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   let vl_outras_despesas = parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det[0].ICMSTot[0]?.vOutro, 0, "0").replace('.',','))
   
   //#region CFOP
-  const Cfop = await model.Cfop.selectByCdCfop(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0])
+  const Cfop = await new model.Cfop().selectByCdCfop(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0])
   .then((data) => {
     return data.rows[0]
   })
@@ -232,25 +232,25 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   };
 
   
-  await model.NotaFiscal.Saida.Produto.SfC110.delete({
+  await new model.NotaFiscal.Saida().SfC110.delete({
     ...chaveC100,
   });
-  /*await model.NotaFiscal.Saida.Produto.Item.delete({
+  /*await new model.NotaFiscal.Saida.Produto.Item.delete({
     ...chaveC100,
   })
-  await model.NotaFiscal.Saida.Produto.Item.AcC050.delete({
+  await new model.NotaFiscal.Saida.Produto.Item.AcC050.delete({
     ...chaveC100,
   })
-  await model.NotaFiscal.Saida.Produto.SfC195.delete({
+  await new model.NotaFiscal.Saida.Produto.SfC195.delete({
     ...chaveC100,
   })
 
-  await model.NotaFiscal.Saida.Produto.delete({
+  await new model.NotaFiscal.Saida.Produto.delete({
     ...chaveC100,
   })*/
 
   //C100
-  await model.NotaFiscal.Saida.Produto.insert({
+  await new model.NotaFiscal.Saida().insert({
     ...chaveC100,
     id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
     dt_entrada_saida: dSaiEnt,
@@ -271,14 +271,14 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     dm_gare: 'N',
     dm_gnre: 'N',
     nr_chave_nf_eletronica: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.$.Id.toUpperCase().replace('NFE'),
-    id_pessoa_remetente_cte: '', //VAZIO
+    id_pessoa_remetente_cte: NaN, //VAZIO
     vl_icms_fcp: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vFCPUFDest, 0, "0").replace('.',','),
     vl_icms_uf_dest: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vICMSUFDest, 0, "0").replace('.',','),
     vl_icms_uf_remet: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vICMSUFRemet, 0, "0").replace('.',','),
     nr_chave_nf_eletron_ref_cat83: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.NFref === undefined ? "" : utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.NFref[0].refNFe, 0, "0").replace('.',','),
     vl_fcp_st: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vFCPST, 0, "0").replace('.',','),
-    id_ref_331_munic_orig: '',
-    id_ref_331_munic_dest: '',
+    id_ref_331_munic_orig: NaN,
+    id_ref_331_munic_dest: NaN,
     dm_tipo_cte: '',
     dm_finalidade: '',
     id_usuario: id_usuario
@@ -295,7 +295,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic !== undefined) {
 
     if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl !== undefined) {
-      let ac0450 = await model.Ac0450.select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl[0], id_empresa, dhEmi)
+      let ac0450 = await new model.Ac0450().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl[0], id_empresa, dhEmi)
       .then((data) => {
         return data.rows[0]
       })
@@ -305,7 +305,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       var id_ref_0450
       if (ac0450 == undefined) {
-        id_ref_0450 = await model.Ac0450.insert(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl[0], id_empresa, dhEmi)
+        id_ref_0450 = await new model.Ac0450().insert(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl[0], id_empresa, dhEmi)
         .then((data) => {
           return data;
         })
@@ -319,7 +319,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       //C110
       const SfC110Saida = {
         chaveC100Saida: chaveC100,
-        CamposC110Saida: {
+        camposC110Saida: {
           id_modelo_documento: parseInt(ModeloDocumento.ID_MODELO_DOCUMENTO),
           nr_item_imp: "1",
           id_ref_0450: parseInt(id_ref_0450),
@@ -327,7 +327,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
           id_usuario: id_usuario
         }
       }
-      await model.NotaFiscal.Saida.Produto.SfC110.insert(SfC110Saida).then((data) => {
+      await new model.NotaFiscal.Saida().SfC110.insert(SfC110Saida).then((data) => {
         return data;
       })
       .catch((err) => {
@@ -336,7 +336,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     }
 
     if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco !== undefined) {
-      var ac0450 = await model.Ac0450.select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco[0], id_empresa, dhEmi)
+      var ac0450 = await new model.Ac0450().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco[0], id_empresa, dhEmi)
       .then((data) => {
         return data.rows[0]
       })
@@ -346,7 +346,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       let id_ref_0450
       if (ac0450 == undefined) {
-        id_ref_0450 = await model.Ac0450.insert(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco[0], id_empresa, dhEmi)
+        id_ref_0450 = await new model.Ac0450().insert(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco[0], id_empresa, dhEmi)
         .then((data) => {
           return data;
         })
@@ -358,13 +358,15 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         id_ref_0450 = ac0450.ID_REF_0450
       }
       //C110
-      await model.NotaFiscal.Saida.Produto.SfC110.insert({
-        ...chaveC100,
-        id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
-        nr_item_imp: "1",
-        id_ref_0450: id_ref_0450,
-        ds_complementar: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco[0],
-        id_usuario: id_usuario
+      await new model.NotaFiscal.Saida().SfC110.insert({
+        chaveC100Saida: chaveC100,
+        camposC110Saida : {
+          id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
+          nr_item_imp: "1",
+          id_ref_0450: id_ref_0450,
+          ds_complementar: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco[0],
+          id_usuario: id_usuario
+        }
       }).then((data) => {
         return data;
       })
@@ -389,7 +391,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     //#region 0190
     let ds_unidade = utils.Validar.getValueArray(det.prod[0]?.uCom, 0, "XX");
 
-    let Unidade = await model.Sf0190.selectByDsUnidade(ds_unidade, id_empresa, dhEmi)
+    let Unidade = await new model.Sf0190().selectByDsUnidade(ds_unidade, id_empresa, dhEmi)
     .then((data) => {
       return data.rows[0]
     })
@@ -399,7 +401,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     if (Unidade === undefined) {
       //0190
-      await model.Sf0190.insert({
+      await new model.Sf0190().insert({
         ds_unidade: ds_unidade,
         ds_descricao: ds_unidade,
         dt_inicial: dhEmi,
@@ -414,7 +416,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     //#region 0200
     let cd_produto_servico = utils.FormatarString.removeCaracteresEspeciais(det.prod[0]?.cProd[0])
-    let produto = await model.Produto.Item.selectByCodigo(cd_produto_servico, id_empresa, dhEmi)
+    let produto = await new model.Produto().Mestre.Item.selectByCodigo(cd_produto_servico, id_empresa, dhEmi)
     .then((data) => {
       return data.rows[0]
     })
@@ -422,7 +424,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       throw new Error('Falha na busca pelo o produto cadastrada. Erro: ' + err.message);
     });
     
-    await model.Produto.insert({
+    await new model.Produto().insert({
       cd_produto_servico: cd_produto_servico,
       cd_barra: det.prod[0]?.cEANTrib[0],
       ds_produto_servico: det.prod[0]?.xProd[0],
@@ -444,12 +446,12 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       throw new Error('Falha ao inserir o produto no cadastrado. Erro: ' + err.message);
     });
 
-    await model.Produto.sp_gera_produto_mestre_item()
+    await new model.Produto().sp_gera_produto_mestre_item()
     .catch(async (err) => {
       throw new Error('Falha na geração Mestre Item do Produto. Erro: ' + err.message);
     });
 
-    const prod = await model.Produto.Item.selectByCodigo(cd_produto_servico, id_empresa, dhEmi)
+    const prod = await new model.Produto().Mestre.Item.selectByCodigo(cd_produto_servico, id_empresa, dhEmi)
     .then((data) => {
       return data.rows[0]
     })
@@ -492,9 +494,9 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
        */
       nr_fci: utils.Validar.getValueArray(det.prod[0]?.nFCI, 0, ""),
       /**
-       * @param {string} sCST_ICMS
+       * @param {number} sCST_ICMS
        */
-      id_ref_431:'', //sCST_ICMS
+      id_ref_431: NaN, //sCST_ICMS
       /**
        * @param {number} sVl_Bc_ICMS
        */
@@ -544,9 +546,9 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
        */
       dm_tributacao_icms: '5', //esta fixo no fonte
       /**
-       * @param {string} sCST_IPI
+       * @param {number} sCST_IPI
        */
-      id_ref_432:'', //sCST_IPI
+      id_ref_432: NaN, //sCST_IPI
       /**
        * @param {number} sVl_Bc_IPI
        */
@@ -644,9 +646,9 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
        */
       vl_icms_uf_remet: 0, //nVlICMS_UF_Remet
       /**
-       * @param {string} sEnquadra
+       * @param {number} sEnquadra
        */
-      id_ref_453: '', //sEnquadra
+      id_ref_453: NaN, //sEnquadra
       /**
        * @param {number} sBC_FCP_OP
        */
@@ -1100,7 +1102,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       impostoICMS.codAc431 = '';
     }
 
-    const ac431 = await model.Ac431.selectByCodigo(impostoICMS.codAc431)
+    const ac431 = await new model.Ac431().selectByCodigo(impostoICMS.codAc431)
     .then(async (data) => {
        return data.rows[0];
     }).catch(async (err) => {
@@ -1119,7 +1121,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     //#endregion ICMS
       
     //#region IPI
-    const Sf453 = await model.Sf453.selectByCodigo(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.cEnq, 0, ""))
+    const Sf453 = await new model.Sf453().selectByCodigo(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.cEnq, 0, ""))
     .then((data) => {
       return data.rows[0]
     })
@@ -1139,7 +1141,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
           paramC170.vl_ipi === NaN &&
           det.imposto[0]?.IPI[0]?.IPITrib[0]?.qUnid !== undefined &&
           det.imposto[0]?.IPI[0]?.IPITrib[0]?.vUnid !== undefined) {
-        paramC170.id_ref_432 = "99";
+        paramC170.id_ref_432 = 99;
       }
     } else if (det.imposto[0]?.IPI[0]?.IPINT !== undefined) {
       paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.CST, 0, "");
@@ -1209,7 +1211,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       }
     }
 
-    const Sf433 = await model.Sf433.selectByCodigo(paramC050.id_ref_433)
+    const Sf433 = await new model.Sf433().selectByCodigo(paramC050.id_ref_433.toString())
     .then((data) => {
       return data.rows[0]
     })
@@ -1269,7 +1271,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       }
     }
 
-    const Sf434 = await model.Sf434.selectByCodigo(paramC050.id_ref_434)
+    const Sf434 = await new model.Sf434().selectByCodigo(paramC050.id_ref_434.toString())
     .then((data) => {
       return data.rows[0]
     })
@@ -1324,7 +1326,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     //#endregion Calculo BC
     
     //#region C170
-    await model.NotaFiscal.Saida.Produto.Item.insert({
+    await new model.NotaFiscal.Saida().Item.insert({
       ...chaveC170,
       ...paramC170,
       id_usuario: id_usuario
@@ -1344,7 +1346,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       id_usuario: id_usuario
     }
 
-    await model.NotaFiscal.Saida.Produto.Item.AcC050.insert(AcC050Saida)
+    await new model.NotaFiscal.Saida().Item.AcC050.insert(AcC050Saida)
     .then((data) => {
       return data;
     })
@@ -1360,7 +1362,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         ds0460 = ds0460.slice(0,4000);
       }
       
-      let Sf0460 = await model.Sf0460.selectByCodigo(ds0460, id_empresa)
+      let Sf0460 = await new model.Sf0460().selectByCodigo(ds0460, id_empresa)
       .then((data) => {
         return data.rows[0]
       })
@@ -1369,12 +1371,13 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       });
 
       if (Sf0460 === undefined){
-        Sf0460 = await model.Sf0460.insert({
-          id_empresa: id_empresa, 
+        Sf0460 = await new model.Sf0460().insert({
+          cd_obs: null,
           dt_inicial: dhEmi, 
           dt_movimento: dhEmi, 
-          id_usuario: id_usuario, 
-          ds_obs: ds0460
+          ds_obs: ds0460,
+          id_empresa: id_empresa, 
+          id_usuario: id_usuario
         })
         .then((data) => {
           return data;
@@ -1384,11 +1387,11 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         });
       }
 
-      await model.NotaFiscal.Saida.Produto.SfC195.insert({
+      await new model.NotaFiscal.Saida().SfC195.insert({
         ...chaveC170,
         id_0460: Sf0460.ID_0460,
         ds_complementar: Sf0460.DS_OBS,
-        id_nota_fiscal_saida: '',
+        id_nota_fiscal_saida: NaN,
         id_usuario: id_usuario
       })
       .then((data) => {
@@ -1414,7 +1417,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo) => {
 
   //#region Empresa
-  const Empresa = await model.CtrlEmpresa.select(id_empresa)
+  const Empresa = await new model.CtrlEmpresa().select(id_empresa)
   .then((data) => {
     return data.rows[0]
   })
@@ -1429,7 +1432,7 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   //#endregion Empresa
 
   //#region ModeloDocumento
-  const ModeloDocumento = await model.ModeloDocumento.selectByCdModeloDocumento(xmlObj.CFe?.infCFe[0]?.ide[0]?.mod[0])
+  const ModeloDocumento = await new model.ModeloDocumento().selectByCdModeloDocumento(xmlObj.CFe?.infCFe[0]?.ide[0]?.mod[0])
   .then((data) => {
     return data.rows[0]
   })
@@ -1439,7 +1442,7 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   //#endregion ModeloDocumento
 
   //#region Ac413
-  const Ac413 = await model.Ac413.selectByCodigo('00')
+  const Ac413 = await new model.Ac413().selectByCodigo('00')
   .then((data) => {
     return data.rows[0]
   })
@@ -1536,7 +1539,7 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     id_usuario: id_usuario
   }
 
-  await model.SfC800.insert(SfC800)
+  await new model.SfC800().insert(SfC800)
   .then((data) => {
     return data
   })
@@ -1551,7 +1554,7 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     //#region 0190
     let ds_unidade = utils.Validar.getValueArray(det.prod[0]?.uCom, 0, "XX");
 
-    let Unidade = await model.Sf0190.selectByDsUnidade(ds_unidade, id_empresa, SfC800Chave.dt_documento)
+    let Unidade = await new model.Sf0190().selectByDsUnidade(ds_unidade, id_empresa, SfC800Chave.dt_documento)
     .then((data) => {
       return data.rows[0]
     })
@@ -1560,7 +1563,7 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     });
 
     if (Unidade === undefined) {
-      await model.Unidade.insert({
+      await new model.Sf0190().insert({
         ds_unidade: ds_unidade,
         ds_descricao: ds_unidade,
         dt_inicial: SfC800Chave.dt_documento,
@@ -1575,7 +1578,7 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     //#region 0200
     let cd_produto_servico = utils.FormatarString.removeCaracteresEspeciais(det.prod[0]?.cProd[0])
-    let produto = await model.Produto.Item.selectByCodigo(cd_produto_servico, id_empresa, SfC800Chave.dt_documento)
+    let produto = await new model.Produto().Mestre.Item.selectByCodigo(cd_produto_servico, id_empresa, SfC800Chave.dt_documento)
     .then((data) => {
       return data.rows[0]
     })
@@ -1583,12 +1586,12 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       throw new Error('Falha na busca pelo o produto cadastrada. Erro: ' + err.message);
     });
     
-    await model.Produto.insert({
+    await new model.Produto().insert({
       cd_produto_servico: cd_produto_servico,
       cd_barra: det.prod[0]?.cEAN[0],
       ds_produto_servico: det.prod[0]?.xProd[0],
-      id_ref_331_ncm: '',
-      id_ref_331_ex_ipi: '',
+      id_ref_331_ncm: NaN,
+      id_ref_331_ex_ipi: NaN,
       dm_tipo_item: produto === undefined ? '99' : produto.DM_TIPO_ITEM,
       unidade: ds_unidade,
       id_0190: ds_unidade,
@@ -1605,12 +1608,12 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       throw new Error('Falha ao inserir o produto no cadastrado. Erro: ' + err.message);
     });
 
-    await model.Produto.sp_gera_produto_mestre_item()
+    await new model.Produto().sp_gera_produto_mestre_item()
     .catch(async (err) => {
       throw new Error('Falha na geração Mestre Item do Produto. Erro: ' + err.message);
     });
 
-    const prod = await model.Produto.Item.selectByCodigo(cd_produto_servico, id_empresa, SfC800Chave.dt_documento)
+    const prod = await new model.Produto().Mestre.Item.selectByCodigo(cd_produto_servico, id_empresa, SfC800Chave.dt_documento)
     .then((data) => {
       return data.rows[0]
     })
@@ -1627,7 +1630,7 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         ds0460 = ds0460.slice(0,4000);
       }
       
-      Sf0460 = await model.Sf0460.selectByCodigo(ds0460, id_empresa)
+      Sf0460 = await new model.Sf0460().selectByCodigo(ds0460, id_empresa)
       .then((data) => {
         return data.rows[0]
       })
@@ -1636,12 +1639,13 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       });
 
       if (Sf0460 === undefined){
-        Sf0460 = await model.Sf0460.insert({
-          id_empresa: id_empresa, 
+        Sf0460 = await new model.Sf0460().insert({
+          cd_obs: '',
           dt_inicial: SfC800Chave.dt_documento, 
           dt_movimento: SfC800Chave.dt_documento, 
-          id_usuario: id_usuario, 
-          ds_obs: ds0460
+          ds_obs: ds0460,
+          id_empresa: id_empresa, 
+          id_usuario: id_usuario
         })
         .then((data) => {
           return data;
@@ -1806,7 +1810,7 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       impostoICMS.codAc431 = '';
     }
 
-    const ac431 = await model.Ac431.selectByCodigo(impostoICMS.codAc431)
+    const ac431 = await new model.Ac431().selectByCodigo(impostoICMS.codAc431)
     .then(async (data) => {
     return data.rows[0];
     }).catch(async (err) => {
@@ -1855,7 +1859,7 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     }
    
-    const Sf433 = await model.Sf433.selectByCodigo(SfC850.id_ref_433)
+    const Sf433 = await new model.Sf433().selectByCodigo(SfC850.id_ref_433)
     .then((data) => {
       return data.rows[0]
     })
@@ -1904,7 +1908,7 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     }
 
-    const Sf434 = await model.Sf434.selectByCodigo(SfC850.id_ref_434)
+    const Sf434 = await new model.Sf434().selectByCodigo(SfC850.id_ref_434)
     .then((data) => {
       return data.rows[0]
     })
@@ -1917,7 +1921,7 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     //#endregion COFINS
 
     //#region SFC850
-    await model.SfC800.SfC850.insert(SfC850)
+    await new model.SfC800().SfC850.insert(SfC850)
     .then((data) => {
       return data
     })

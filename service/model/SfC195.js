@@ -13,8 +13,8 @@
 	* 
 	* @constructor
 	* @example
-  * const SfC195 = require('./model/SfC195');
-  * const SfC195Saida = new SfC195.SfC195Saida();
+  * const model = require('./model');
+	* const SfC195Saida = new model.NotaFiscal.Saida().SfC195();
 	*/
  var SfC195Saida = function(){
 	 if(!(this instanceof SfC195Saida))
@@ -22,7 +22,7 @@
  };
 	
 /**
- * Função inserir os dados do SfC195Saida 
+ * Função inserir os dados do SfC195 Saida 
  * 
  * @param {dataSfC195Saida} dataSfC195Saida
  * @returns {Promise} Promise
@@ -69,12 +69,12 @@ module.exports.SfC195Saida = SfC195Saida;
 
 
  /**
-	* Classe de SfC195Entrada
+	* Classe de SfC195 Entrada
 	* 
 	* @constructor
 	* @example
-  * const SfC195 = require('./model/SfC195');
-  * const SfC195Entrada = new SfC195.SfC195Entrada();
+  * const model = require('./model');
+	* const SfC195Entrada = new model.NotaFiscal.Entrada().SfC195();
 	*/
 var SfC195Entrada = function(){
 	if(!(this instanceof SfC195Entrada))
@@ -82,7 +82,7 @@ var SfC195Entrada = function(){
 };
 
 /**
- * Função inserir os dados do SfC195Entrada
+ * Função inserir os dados do SfC195 Entrada
  * 
  * @param {dataSfC195Entrada} dataSfC195Entrada
  * @returns {Promise} Promise

@@ -23,7 +23,7 @@ var EtapaStatus = function(){
 
 
 /**
- * Função para selecionar
+ * Função para selecionar etapas da empresa
  * 
  * @param {number} id_empresa Código da Empresa
  * @param {number} id_usuario Código do Usuário

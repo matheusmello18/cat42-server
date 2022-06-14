@@ -22,7 +22,7 @@ var CtrlEmpresa = function(){
 };
 
 /**
- * Função buscar os dados da CtrlEmpresa 
+ * Função buscar os dados da CtrlEmpresa por identificador
  * 
  * @param {number} id_empresa
  * @returns {Promise} Promise

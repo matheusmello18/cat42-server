@@ -22,7 +22,7 @@ var Produto = function(){
 };
 
  /**
-	* Função inserir os dados do dataProdutoServico 
+	* Função inserir os dados do Produto/Serviço
 	* 
 	* @param {dataProdutoServico} dataProdutoServico
 	* @returns {Promise} Promise
@@ -92,7 +92,7 @@ Produto.prototype.sp_gera_produto_mestre_item = async () => {
 };
 
 /**
- * Função busca os dados do País através do código do país
+ * Função busca os dados do Produto por Código e Empresa
  * 
  * @param {string} cd_produto_servico
  * @param {Number} id_empresa
@@ -138,7 +138,7 @@ Produto.prototype.Mestre = new ProdutoMestre()
 };
 
 /**
- * Função busca os dados do País através do código do país
+ * Função busca os dados do Produto por código e empresa
  * 
  * @param {string} cd_produto_servico
  * @param {Number} id_empresa
@@ -184,7 +184,8 @@ module.exports.Produto = Produto;
  * @typedef {Object} dataProdutoServico
  * @property {String} cd_produto_servico
  * @property {String} cd_barra
- * @property {String} ds_produto_servid_ref_331_ncmico
+ * @property {String} ds_produto_servico
+ * @property {Number} id_ref_331_ncm
  * @property {Number} id_ref_331_ex_ipi
  * @property {String} dm_tipo_item
  * @property {String} unidade

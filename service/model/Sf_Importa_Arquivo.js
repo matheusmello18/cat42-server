@@ -18,14 +18,14 @@ var SFImportaArquivo = function(){
 };
 
 /**
- * Função inserir os dados do AcC700Saida 
+ * Função inserir os dados na Importa Arquivo 
  * 
  * @param {String} nr_referencia
  * @param {String} ds_conteudo
  * @param {Number} id_empresa
  * @param {Number} id_usuario
- * @param {String} dt_inicial
- * @param {String} dt_final
+ * @param {String|Date} dt_inicial
+ * @param {String|Date} dt_final
  * @param {Number} nr_linha
  * @param {Number} id_projeto
  * @param {Number} id_modulo
@@ -67,12 +67,12 @@ SFImportaArquivo.prototype.Insert = async ( nr_referencia, ds_conteudo, id_empre
 }
 
 /**
- * Função inserir os dados do AcC700Saida 
+ * Função deletar os dados na importa arquivo
  * 
  * @param {Number} id_projeto
  * @param {Number} id_modulo
- * @param {String} dt_inicial
- * @param {String} dt_final
+ * @param {String|Date} dt_inicial
+ * @param {String|Date} dt_final
  * @param {Number} id_empresa
  * @param {Number} id_usuario
  * @returns {Promise} Promise

@@ -22,7 +22,7 @@ const Oracle = require('../Oracle');
 };
 
 /**
- * Função inserir os dados do AcC700Saida 
+ * Função inserir os dados da Pessoa
  * 
  * @param {dataPessoa} dataPessoa
  * @returns {Promise} Promise
@@ -98,7 +98,7 @@ var PessoaMestre = function(){
 };
 
 /**
- * Função inserir os dados do dataPessoaMestre 
+ * Função inserir os dados na Pessoa Mestre
  * 
  * @param {dataPessoaMestre} dataPessoaMestre
  * @returns {Promise} Promise
@@ -130,7 +130,7 @@ PessoaMestre.prototype.insert = async (dataPessoaMestre) => {
 };
 
 /**
- * Função busca os dados do País através do código do país
+ * Função busca os dados da Pessoa por Código e Empresa
  * 
  * @param {string} cd_pessoa
  * @param {Number} id_empresa
@@ -160,7 +160,7 @@ PessoaMestre.prototype.selectByCdPessoa = async (cd_pessoa, id_empresa) => {
 };
 
 /**
- * Função busca os dados do País através do código do país
+ * Função busca os dados da Pessoa por Razão Social e Empresa
  * 
  * @param {string} nm_razao_social
  * @param {Number} id_empresa
@@ -192,7 +192,7 @@ PessoaMestre.prototype.selectByRazaoSocial = async (nm_razao_social, id_empresa)
 };
 
 /**
- * Função busca os dados do País através do código do país
+ * Função busca os dados da Pessoa por CNPJ ou CPF e Empresa
  * 
  * @param {string} nr_cnpj_cpf
  * @param {Number} id_empresa

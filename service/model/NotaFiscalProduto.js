@@ -15,6 +15,12 @@ const Oracle = require('../Oracle');
 const AcC060 = require('./AcC060');
 
 /**
+ * Incluindo AcC700
+ * @requires AcC700
+ */
+const AcC700 = require('./AcC700');
+
+/**
  * Incluindo SfC110
  * @requires SfC110
  */
@@ -33,7 +39,7 @@ const SfC195 = require('./SfC195');
 const NotaFiscalProdutoItem = require('./NotaFiscalProdutoItem');
 
 /**
- * Classe de Saida.Produto
+ * Classe de Nota Fiscal de Saida Produto
  * 
  * @constructor
  * @example
@@ -47,7 +53,7 @@ var NotaFiscalSaidaProduto = function(){
 };
 
 /**
- * Função inserir os dados do AcC700Entrada 
+ * Função inserir os dados da Nota Fiscal de Saida Produto 
  * 
  * @param {dataNotaFiscalSaidaProduto} dataNotaFiscalSaidaProduto 
  * @returns {Promise} Promise
@@ -115,6 +121,7 @@ NotaFiscalSaidaProduto.prototype.insert = async (dataNotaFiscalSaidaProduto) => 
 
 
 /**
+ * Função para Deletar nota fiscal de Saida
  * 
  * @param {chaveC100Saida} chaveC100Saida
  * @returns {Promise} Promise
@@ -133,7 +140,7 @@ NotaFiscalSaidaProduto.prototype.insert = async (dataNotaFiscalSaidaProduto) => 
  * const rows = await nfeSaida.insert(chaveC100Saida).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw new Error('Erro ao deletar a nota fiscal de saída')
  * })
  */
 NotaFiscalSaidaProduto.prototype.delete = async (chaveC100Saida) => {
@@ -159,13 +166,14 @@ NotaFiscalSaidaProduto.prototype.Item = new NotaFiscalProdutoItem.Saida(),
 /**
  * @property {SfC110Saida} SfC110Saida
  */
+NotaFiscalSaidaProduto.prototype.AcC700 = new AcC700.AcC700Saida(),
 NotaFiscalSaidaProduto.prototype.SfC110 = new SfC110.SfC110Saida(),
 NotaFiscalSaidaProduto.prototype.SfC195 = new SfC195.SfC195Saida()
 
 module.exports.Saida = NotaFiscalSaidaProduto;
 
 /**
- * Classe de Entrada.Produto
+ * Classe de Nota Fiscal de Entrada Produto
  * 
  * @constructor
  * @example
@@ -174,12 +182,12 @@ module.exports.Saida = NotaFiscalSaidaProduto;
  */
 
  var NotaFiscalEntradaProduto = function(){
-  if(!(this instanceof NotaFiscalSaidaProduto))
-    return new NotaFiscalSaidaProduto();
+  if(!(this instanceof NotaFiscalEntradaProduto))
+    return new NotaFiscalEntradaProduto();
 };
 
 /**
- * Função inserir os dados do AcC700Entrada 
+ * Função inserir os dados da nota fiscal de entrada
  * 
  * @param {dataNotaFiscalEntradaProduto} dataNotaFiscalEntradaProduto 
  * @returns {Promise} Promise
@@ -223,10 +231,10 @@ module.exports.Saida = NotaFiscalSaidaProduto;
  * const rows = await nfeEntrada.insert(dataNotaFiscalEntradaProduto).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw new Error('Erro ao inserir a nota fiscal de entrada')
  * })
  */
-NotaFiscalSaidaProduto.prototype.insert = async (dataNotaFiscalEntradaProduto) => {
+ NotaFiscalEntradaProduto.prototype.insert = async (dataNotaFiscalEntradaProduto) => {
   let sql = `insert into in_nota_fiscal_entrada 
             ( id_pessoa_remetente, id_modelo_documento, serie_subserie_documento, nr_documento, dm_tipo_fatura, dt_emissao_documento, dt_entrada, vl_total_nota_fiscal, vl_desconto, vl_icms_substituicao, vl_outras_despesas, vl_total_mercadoria, vl_frete, vl_seguro, vl_ipi, dm_modalidade_frete, id_ref_413, vl_icms_desonerado, nr_chave_nf_eletronica, vl_icms_fcp, vl_icms_uf_dest, vl_icms_uf_remet, nr_chave_nf_eletron_ref_cat83, vl_fcp_st, id_ref_331_munic_orig, id_ref_331_munic_dest, dm_tipo_cte, dm_finalidade, id_empresa, id_usuario) 
             values 
@@ -239,10 +247,11 @@ NotaFiscalSaidaProduto.prototype.insert = async (dataNotaFiscalEntradaProduto) =
   }
 }
 
-NotaFiscalSaidaProduto.prototype.Item = new NotaFiscalProdutoItem.Entrada(),
-NotaFiscalSaidaProduto.prototype.SfC110 = new SfC110.SfC110Entrada(),
-NotaFiscalSaidaProduto.prototype.AcC060 = new AcC060.AcC060Entrada(),
-NotaFiscalSaidaProduto.prototype.SfC195 = new SfC195.SfC195Entrada()
+NotaFiscalEntradaProduto.prototype.Item = new NotaFiscalProdutoItem.Entrada();
+NotaFiscalEntradaProduto.prototype.AcC060 = new AcC060.AcC060Entrada();
+NotaFiscalEntradaProduto.prototype.AcC700 = new AcC700.AcC700Entrada();
+NotaFiscalEntradaProduto.prototype.SfC110 = new SfC110.SfC110Entrada();
+NotaFiscalEntradaProduto.prototype.SfC195 = new SfC195.SfC195Entrada();
 
 module.exports.Entrada = NotaFiscalEntradaProduto;
 
@@ -281,7 +290,6 @@ module.exports.Entrada = NotaFiscalEntradaProduto;
  * @property {String} dm_modalidade_frete
  * @property {Number} id_ref_413
  * @property {Number} vl_icms_desonerado
- * @property {Number} dm_cancelamento
  * @property {String} dm_cancelamento
  * @property {String} dm_gare
  * @property {String} dm_gnre

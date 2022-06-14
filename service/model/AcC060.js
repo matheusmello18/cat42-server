@@ -14,7 +14,7 @@ const Oracle = require('../Oracle');
 	* @constructor
 	* @example
 	* const model = require('./model');
-	* const acC060Entrada = new model.AcC060.AcC060Entrada();
+	* const acC060Entrada = new model.NotaFiscal.Entrada().AcC060();
 	*/
 var AcC060Entrada = function(){
   if(!(this instanceof AcC060Entrada))
@@ -22,7 +22,7 @@ var AcC060Entrada = function(){
 };
  
  /**
-	* Função inserir os dados do AcC060Entrada 
+	* Função inserir os dados do AcC060 Entrada 
 	* 
 	* @param {dataAcC060Entrada} dataAcC060Entrada 
 	* @returns {Promise} Promise
@@ -52,7 +52,7 @@ var AcC060Entrada = function(){
 	* const rows = await acC060Entrada.insert(dataAcC060Entrada).then((e) => {
 	*    return e.rows;
 	* }).catch((err) => {
-	*    throw new Error(err.message)
+	*    throw new Error('Erro ao inserir o registro ACC060 Entrada')
 	* })
 	*/
  

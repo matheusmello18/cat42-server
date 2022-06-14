@@ -8,7 +8,7 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
   var dt_inicial = new Date(dateParts[2], dateParts[1]-1, 1);
   var dt_final = new Date(dateParts[2], dateParts[1], 0);
   
-  await model.Sf_Importa_Arquivo.Delete(
+  await new model.Sf_Importa_Arquivo().Delete(
     id_projeto, 
     id_modulo, 
     dt_inicial, 
@@ -28,7 +28,7 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
     arrLinha = linha.split("|");
 
     try {
-      await model.Sf_Importa_Arquivo.Insert(
+      await new model.Sf_Importa_Arquivo().Insert(
         arrLinha[1],
         linha,
         id_empresa,
@@ -62,11 +62,11 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
     );    
   } catch (err) {
     /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-    await model.EtapaStatus.insert(dt_periodo, 3, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message.split(/\sORA-[0-9]*:/)[1].trim());
+    await new model.EtapaStatus().insert(dt_periodo, 3, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message.split(/\sORA-[0-9]*:/)[1].trim());
     throw new Error(err.message);
   }
 
-  await model.EtapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
+  await new model.EtapaStatus().insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
   //Oracle.execProcedure(nm_procedure2, id_empresa, id_usuario);
 
 }

@@ -1,12 +1,14 @@
 const Oracle = require('./Oracle');
 const model = require('./model');
 const ExcelJS = require('exceljs'); // documentação: https://www.npmjs.com/package/exceljs
+const { parseString } = require('xml2js');
+const { parseNumbers } = require('xml2js/lib/processors');
 
 module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2) => {
   try {
     let existeErrorCampoNulo = false;
     // realizar os deletes da tabela produto
-    model.ProdutoSimulador.Delete(id_empresa, id_usuario);
+    await new model.ProdutoSimulador().Delete(id_empresa, id_usuario);
 
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(path);
@@ -40,12 +42,12 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
           camposNulo = camposNulo.concat(`. Número da linha: ${rowNumber.toString()}`)
           
           /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
-          await model.EtapaStatus.insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), camposNulo);
+          await new model.EtapaStatus().insert(dt_periodo, 2, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), camposNulo);
 
         } else {
           const nProx_Codigo = await Oracle.proxCod("SIMUL_PRODUTO");
-          await model.ProdutoSimulador.Insert(
-            nProx_Codigo,
+          await new model.ProdutoSimulador().Insert(
+            parseFloat(nProx_Codigo),
             row.getCell(1).value, //cd_produto
             row.getCell(2).value, //ds_produto
             row.getCell(3).value, //ds_unidade_venda
@@ -65,7 +67,7 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
       //executar a procedure configurada
       
       await Oracle.execProcedure(nm_procedure1, {id_empresa: id_empresa, id_usuario: id_usuario, abc: `teste`, xyz: `xxxx`});
-      await model.EtapaStatus.insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
+      await new model.EtapaStatus().insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
     }
   } catch (err) {
     throw new Error(err);

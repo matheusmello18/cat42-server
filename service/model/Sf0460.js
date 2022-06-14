@@ -22,7 +22,7 @@
  };
   
 /**
- * Função buscar os dados do Sf0460 por código modelo documetno
+ * Função buscar os dados do Sf0460 por observação
  * 
  * @param {string} ds_obs
  * @param {number} id_empresa
@@ -59,7 +59,6 @@ Sf0460.prototype.selectByCodigo = async (ds_obs, id_empresa) => {
  * @returns {Promise} Promise
  * @example
  * var dataSf0460 = {
- *   cd_obs: '',
  *   id_empresa: 1,
  *   dt_inicial: '',
  *   dt_movimento: '',
@@ -102,7 +101,7 @@ module.exports.Sf0460 = Sf0460;
  * Campos Chave Sf0460
  * 
  * @typedef {Object} dataSf0460
- * @property {String} cd_obs Pessoa Remetente
+ * @property {String|null} cd_obs Pessoa Remetente
  * @property {String} dt_inicial Número do Documento
  * @property {String} dt_movimento Série e Subserie
  * @property {String} ds_obs Série e Subserie
