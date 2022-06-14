@@ -3,7 +3,6 @@ const model = require('./model');
 const utils = require('../utils');
 
 
-
 //deletar se existe o registro e importar novamnete;
 //tomar atenção para este procedimento em outras importação se isso será necessário
 //importar o cupom fiscal c800 e c850
@@ -18,37 +17,349 @@ const utils = require('../utils');
  */
 module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo) => {
 
+  //#region Configurações iniciais
+  const dhEmi = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dhEmi, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dEmi)[0]);
+  const dSaiEnt = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dhSaiEnt, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dSaiEnt)[0]);
+  const cpfOrCnpj = utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.CNPJ, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.CPF)[0];
+  //#endregion
 
-  const Empresa = (await new model.CtrlEmpresa().select(id_empresa)).rows[0];
-
-  if(Empresa.CNPJ_EMPRESA !== xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CNPJ[0]) { //então entrada
-    await new model.EtapaStatus().insert(dt_periodo, 2, id_simul_etapa, id_empresa, id_usuario, 'Nota fiscal informada não é uma nota fiscal de entrada.');
-    throw new Error('Nota fiscal informada não é uma nota fiscal de entrada.');
-  }
-
-  /*
-  await model.Pessoa.insert({
-    dt_inicial:'',
-    cd_pessoa:'',
-    nm_razao_social:'',
-    ds_endereco:'',
-    ds_bairro:'',
-    id_ref_331_municipio:'',
-    uf:'',
-    id_ref_331_pais:'',
-    nr_cep:'',
-    nr_cnpj_cpf:'',
-    nr_inscricao_estadual:'',
-    dt_movimento:'',
-    nr_numero:'',
-    ds_complemento:'',
-    nr_fone:'',
-    dm_contribuinte:'',
-    nr_id_estrangeiro:'',
-    id_empresa: id_empresa,
-    id_usuario: id_usuario
+  //#region Empresa
+  const Empresa = await new model.CtrlEmpresa().select(id_empresa)
+  .then((data) => {
+    return data.rows[0]
+  })
+  .catch((err) => {
+    throw new Error('Falha na busca pela empresa cadastrada. Erro: ' + err.message);
   });
 
+  if(Empresa.CNPJ_EMPRESA !== xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.CNPJ[0]) { //então entrada
+    throw new Error('Nota fiscal informada não é uma nota fiscal de entrada.');
+  } else if(Empresa.CNPJ_EMPRESA !== cpfOrCnpj) {
+    throw new Error('Nota fiscal informada não pertence a empresa cadastrada.');
+  }
+
+  var inParametro = await Oracle.select(
+    `SELECT DM_IMPORTAXML_DEPARA, /*para nfe entrada*/
+            NVL(DM_APURACAO_DTEMISSAO, 'N') DM_APURACAO_DTEMISSAO, 
+            NVL(DM_IMPXML_CNPJ_PROD, 'N') DM_IMPXML_CNPJ_PROD, 
+            NVL(DM_PESQ_AC_0450, 'S') DM_PESQ_AC_0450
+      FROM IN_PARAMETRO_EMPRESA 
+      WHERE ID_EMPRESA = :ID_EMPRESA`, 
+    {ID_EMPRESA: id_empresa}
+  )
+  .then((data) => {
+    return data.rows[0]
+  })
+  .catch((err) => {
+    throw new Error('Falha na busca pelo o parametro empresa cadastrada. Erro: ' + err.message);
+  });
+  //#endregion Empresa  
+
+  //#region Pais
+  const Pais = await new model.Ac331.Pais().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.cPais[0])
+  .then((data) => {
+    return data.rows[0]
+  })
+  .catch((err) => {
+    throw new Error('Falha na busca pelo o país cadastrado. Erro: ' + err.message);
+  });
+  //#endregion Pais
+
+  //#region Municipio
+  const Municipio = await new model.Ac331.Municipio().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.cMun[0])
+  .then((data) => {
+    return data.rows[0]
+  })
+  .catch((err) => {
+    throw new Error('Falha na busca pelo o municipio cadastrado. Erro: ' + err.message);
+  });
+  //#endregion Municipio
+
+  //#region Pessoa
+  let cd_pessoa = '';
+  let PessoaMestre
+
+  PessoaMestre = await new model.Pessoa().Mestre.selectByCpfOrCpnj(cpfOrCnpj,dhEmi,id_empresa)
+  .then((data) => {
+    return data.rows[0]
+  })
+  .catch((err) => {
+    throw new Error('Falha na busca pela a pessoa cadastrada pelo CNPJ ou CPF. Erro: ' + err.message);
+  });
+
+  if (PessoaMestre !== undefined) {
+    cd_pessoa = PessoaMestre.CD_PESSOA;
+  } else {
+    cd_pessoa = cpfOrCnpj;
+  }
+  
+  if (PessoaMestre === undefined) {
+    //0150
+    await new model.Pessoa().insert({
+      dt_inicial: utils.FormatarData.RetornarMenorDataEmOracle(dhEmi, dt_periodo),
+      cd_pessoa: cd_pessoa,
+      nm_razao_social: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.xNome, 0),
+      ds_endereco: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.xLgr, 0),
+      ds_bairro: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.xBairro, 0),
+      id_ref_331_municipio: Municipio.ID_REF_331_MUNICIPIO,
+      uf: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.UF, 0),
+      id_ref_331_pais: Pais.ID_REF_331_PAIS,
+      nr_cep: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.CEP, 0),
+      nr_cnpj_cpf: cpfOrCnpj,
+      nr_inscricao_estadual: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.IE, 0),
+      dt_movimento: dhEmi,
+      nr_numero: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.nro, 0),
+      ds_complemento: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.xCpl, 0),
+      nr_fone: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.Fone, 0),
+      dm_contribuinte: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.indIEDest, 0, "1"),
+      nr_id_estrangeiro: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.IdEstrangeiro, 0, ""),
+      id_empresa: id_empresa,
+      id_usuario: id_usuario
+    }).then((data) => {
+      return data;
+    })
+    .catch((err) => {
+      throw new Error('Falha ao inserir a pessoa no cadastrado. Erro: ' + err.message);
+    });
+  }
+
+  await new model.Pessoa().sp_gera_pessoa_mestre_item()
+  .catch(async (err) => {
+    throw new Error('Falha na geração Mestre Item da Pessoa. Erro: ' + err.message);
+  });
+  //#endregion Pessoa
+
+  //#region Pessoa Emitente
+  const PessoaEmitente = await new model.Pessoa().Mestre.selectByCdPessoa(cd_pessoa, id_empresa)
+  .then((data) => {
+    return data.rows[0]
+  })
+  .catch((err) => {
+    throw new Error('Falha na busca pela a pessoa cadastrada pelo código. Erro: ' + err.message);
+  });
+  //#endregion Pessoa Emitente
+
+  //#region ModeloDocumento
+  const ModeloDocumento = await new model.ModeloDocumento().selectByCdModeloDocumento(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.mod, 0, ""))
+  .then((data) => {
+    return data.rows[0]
+  })
+  .catch((err) => {
+    throw new Error('Falha na busca pelo o model documento cadastrado. Erro: ' + err.message);
+  });
+  //#endregion ModeloDocumento
+
+  //#region Ac413
+  const Ac413 = await new model.Ac413().selectByCodigo('00')
+  .then((data) => {
+    return data.rows[0]
+  })
+  .catch((err) => {
+    throw new Error('Falha na busca pelo o Ac433 cadastrado. Erro: ' + err.message);
+  });
+  //#endregion Ac413
+
+  //#region CFOP
+  const Cfop = await new model.Cfop().selectByCdCfop(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det[0]?.prod[0]?.CFOP[0])
+  .then((data) => {
+    return data.rows[0]
+  })
+  .catch((err) => {
+    throw new Error('Falha na busca pelo o CFOP cadastrado. Erro: ' + err.message);
+  });
+  //#endregion CFOP
+  
+  let vl_outras_despesas = parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0].ICMSTot[0]?.vOutro, 0, "0").replace('.',','))
+
+  if (['3', '7'].includes(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det[0]?.prod[0]?.CFOP[0][0])) {
+    if (Cfop.DM_ICMS_VL_CONTABIL === 'S') {
+      vl_outras_despesas = vl_outras_despesas + 
+        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vICMS, 0).replace('.',','));
+    }
+    if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S') {
+      vl_outras_despesas = vl_outras_despesas + 
+        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vPIS, 0).replace('.',',')) +
+        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vCOFINS, 0).vCOFINS('.',','));
+    }
+    if (Cfop.DM_VLCONTABIL_II === 'S') {
+      vl_outras_despesas = vl_outras_despesas + 
+        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vII, 0).vCOFINS('.',','));
+    }
+  }
+
+  if (utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0, "X") !== "X"){
+    vl_outras_despesas = vl_outras_despesas + 
+    parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0).vCOFINS('.',','));
+  }
+
+  //#region C100
+  const chaveC100 = {
+    /**
+     * @param {Number} id_pessoa_remetente
+     */
+    id_pessoa_remetente: PessoaEmitente.ID_PESSOA,
+    /**
+     * @param {String} nr_documento
+     */
+    nr_documento: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.nNF, 0, ""),
+    /**
+     * @param {String} serie_subserie_documento
+     */
+    serie_subserie_documento: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.serie, 0, ""),
+    /**
+     * @param {String} dt_emissao_documento
+     */
+    dt_emissao_documento: dhEmi,
+    /**
+     * @param {Number} id_empresa
+     */
+    id_empresa: id_empresa
+  };
+
+  await new model.NotaFiscal.Entrada().SfC110.delete({
+    ...chaveC100,
+  });
+  /*await new model.NotaFiscal.Saida().Item.delete({
+    ...chaveC100,
+  })
+  await new model.NotaFiscal.Saida().Item.AcC050.delete({
+    ...chaveC100,
+  })
+  await new model.NotaFiscal.Saida().SfC195.delete({
+    ...chaveC100,
+  })
+  await new model.NotaFiscal.Saida().delete({
+    ...chaveC100,
+  })
+  tem um outro registro tbm verificar nas classes nf e nfi
+  */
+
+  //C100
+  await new model.NotaFiscal.Entrada().insert({
+    ...chaveC100,
+    id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
+    dm_tipo_fatura: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.indPag, 0, "0"),
+    dt_emissao_documento: dhEmi,
+    dt_entrada: dSaiEnt,
+    vl_total_nota_fiscal: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vNF, 0).replace('.',','),
+    vl_desconto: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vDesc, 0, "0").replace('.',','),
+    vl_icms_substituicao: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vST, 0, "0").replace('.',','),
+    vl_outras_despesas: vl_outras_despesas,
+    vl_total_mercadoria: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vProd, 0, "0").replace('.',','),
+    vl_frete: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vFrete, 0, "0").replace('.',','),
+    vl_ipi: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPI, 0, "0").replace('.',','),
+    vl_seguro: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vSeg, 0, "0").replace('.',','),
+    dm_modalidade_frete: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.transp[0].modFrete, 0, "0").replace('.',','),
+    id_ref_413: Ac413.ID_REF_413,
+    vl_icms_desonerado: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vICMSDeson, 0, "0").replace('.',','),
+    nr_chave_nf_eletronica: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.$.Id.toUpperCase().replace('NFE'),
+    vl_icms_fcp: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vFCPUFDest, 0, "0").replace('.',','),
+    vl_icms_uf_dest: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vICMSUFDest, 0, "0").replace('.',','),
+    vl_icms_uf_remet: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vICMSUFRemet, 0, "0").replace('.',','),
+    nr_chave_nf_eletron_ref_cat83: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.NFref === undefined ? "" : utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.NFref[0].refNFe, 0, "0").replace('.',','),
+    vl_fcp_st: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vFCPST, 0, "0").replace('.',','),
+    id_ref_331_munic_orig: NaN,
+    id_ref_331_munic_dest: NaN,
+    dm_tipo_cte: '',
+    dm_finalidade: '',
+    id_usuario: id_usuario
+  })
+  .then((data) => {
+    return data;
+  })
+  .catch((err) => {
+    throw new Error('Falha ao inserir a nota fiscal de saida no cadastrado. Erro: ' + err.message);
+  });
+  //#endregion C100
+
+  //#region C110
+  if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic !== undefined) {
+
+    if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl !== undefined) {
+      let ac0450 = await new model.Ac0450().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl[0], id_empresa, dhEmi)
+      .then((data) => {
+        return data.rows[0]
+      })
+      .catch((err) => {
+        throw new Error('Falha na busca pelo o Ac0450 cadastrado. Erro: ' + err.message);
+      });
+
+      var id_ref_0450
+      if (ac0450 == undefined) {
+        id_ref_0450 = await new model.Ac0450().insert(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl[0], id_empresa, dhEmi)
+        .then((data) => {
+          return data;
+        })
+        .catch((err) => {
+          throw new Error('Falha ao inserir o Ac0450 no cadastrado. Erro: ' + err.message);
+        });
+
+      } else {
+        id_ref_0450 = ac0450.ID_REF_0450
+      }
+      //C110
+      const SfC110Saida = {
+        chaveC100Saida: chaveC100,
+        camposC110Saida: {
+          id_modelo_documento: parseInt(ModeloDocumento.ID_MODELO_DOCUMENTO),
+          nr_item_imp: "1",
+          id_ref_0450: parseInt(id_ref_0450),
+          ds_complementar: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infCpl[0].substring(1,3980),
+          id_usuario: id_usuario
+        }
+      }
+      await new model.NotaFiscal.Saida().SfC110.insert(SfC110Saida).then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw new Error('Falha ao inserir o C110 no cadastrado. Erro: ' + err.message);
+      });
+    }
+
+    if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco !== undefined) {
+      var ac0450 = await new model.Ac0450().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco[0], id_empresa, dhEmi)
+      .then((data) => {
+        return data.rows[0]
+      })
+      .catch((err) => {
+        throw new Error('Falha na busca pelo Ac0450 cadastrado. Erro: ' + err.message);
+      });
+
+      let id_ref_0450
+      if (ac0450 == undefined) {
+        id_ref_0450 = await new model.Ac0450().insert(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco[0], id_empresa, dhEmi)
+        .then((data) => {
+          return data;
+        })
+        .catch((err) => {
+          throw new Error('Falha ao inserir o Ac0450 no cadastrado. Erro: ' + err.message);
+        });
+        
+      } else {
+        id_ref_0450 = ac0450.ID_REF_0450
+      }
+      //C110
+      await new model.NotaFiscal.Saida().SfC110.insert({
+        chaveC100Saida: chaveC100,
+        camposC110Saida : {
+          id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
+          nr_item_imp: "1",
+          id_ref_0450: id_ref_0450,
+          ds_complementar: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.infAdic[0]?.infAdFisco[0],
+          id_usuario: id_usuario
+        }
+      }).then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw new Error('Falha ao inserir o C110 no cadastrado. Erro: ' + err.message);
+      });
+    }
+  }
+  //#endregion C110
+
+
+  /*
   await model.Unidade.insert({
     ds_unidade:'',
     ds_descricao:'',
@@ -77,38 +388,6 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   // não será insert e sim update, pois a nota veio da importação texto
   // entrada
 
-  await model.NotaFiscal.Entrada.Produto.insert({
-    id_pessoa_remetente:'',
-    id_modelo_documento:'',
-    serie_subserie_documento:'',
-    nr_documento:'',
-    dm_tipo_fatura:'',
-    dt_emissao_documento:'',
-    dt_entrada:'',
-    vl_total_nota_fiscal:'',
-    vl_desconto:'',
-    vl_icms_substituicao:'',
-    vl_outras_despesas:'',
-    vl_total_mercadoria:'',
-    vl_frete:'',
-    vl_seguro:'',
-    vl_ipi:'',
-    dm_modalidade_frete:'',
-    id_ref_413:'',
-    vl_icms_desonerado:'',
-    nr_chave_nf_eletronica:'',
-    vl_icms_fcp:'',
-    vl_icms_uf_dest:'',
-    vl_icms_uf_remet:'',
-    nr_chave_nf_eletron_ref_cat83:'',
-    vl_fcp_st:'',
-    id_ref_331_munic_orig:'',
-    id_ref_331_munic_dest:'',
-    dm_tipo_cte:'',
-    dm_finalidade:'',
-    id_empresa: id_empresa,
-    id_usuario: id_usuario
-  })
 
   await model.NotaFiscal.Entrada.Produto.SfC110.insert({
     serie_subserie_documento:'',
@@ -261,6 +540,5 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
  * @param {number} id_usuario 
  * @param {String} dt_periodo 
  */
- module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo) => {
-
+module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo) => {
 }

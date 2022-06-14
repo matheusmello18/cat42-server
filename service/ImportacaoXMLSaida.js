@@ -1,7 +1,6 @@
 const Oracle = require('./Oracle');
 const model = require('./model');
 const utils = require('../utils');
-const { parseString } = require('xml2js');
 
 //deletar se existe o registro e importar novamnete;
 //tomar atenção para este procedimento em outras importação se isso será necessário
@@ -18,6 +17,12 @@ const { parseString } = require('xml2js');
  */
 module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo) => {
 
+  //#region Configurações iniciais
+  const dhEmi = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dhEmi, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dEmi)[0]);
+  const cpfOrCnpj = utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CNPJ, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CPF)[0];
+  const dm_entrada_saida = utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.tpNF, 0, "") == "1" ? "S" : "E"
+  //#endregion
+
   //#region Empresa
   const Empresa = await new model.CtrlEmpresa().select(id_empresa)
   .then((data) => {
@@ -27,9 +32,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     throw new Error('Falha na busca pela empresa cadastrada. Erro: ' + err.message);
   });
   
-
   if(Empresa.CNPJ_EMPRESA !== xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0].CNPJ[0]) { //senão saida
     throw new Error('Nota fiscal informada não é uma nota fiscal de saída.');
+  } else if(Empresa.CNPJ_EMPRESA !== cpfOrCnpj) {
+    throw new Error('Nota fiscal informada não pertence a empresa cadastrada.');
   }
   
   var inParametro = await Oracle.select(
@@ -47,11 +53,9 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   .catch((err) => {
     throw new Error('Falha na busca pelo o parametro empresa cadastrada. Erro: ' + err.message);
   });
-  //#endregion SF0460
+  //#endregion Empresa
   
-  const dhEmi = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dhEmi, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dEmi)[0]);
   const dSaiEnt = inParametro.DM_APURACAO_DTEMISSAO === 'N' ? utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dhSaiEnt, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dSaiEnt)[0]) : dhEmi;
-  const cpfOrCnpj = utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CNPJ, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CPF)[0];
 
   //#region Pais
   const Pais = await new model.Ac331.Pais().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.enderDest[0]?.cPais[0])
@@ -127,8 +131,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       nr_numero: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.enderDest[0]?.nro, 0),
       ds_complemento: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.enderDest[0]?.xCpl, 0),
       nr_fone: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.enderDest[0]?.Fone, 0),
-      dm_contribuinte: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.indIEDest, 0),
-      nr_id_estrangeiro: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.IdEstrangeiro, 0),
+      dm_contribuinte: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.indIEDest, 0, "1"),
+      nr_id_estrangeiro: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.IdEstrangeiro, 0, ""),
       id_empresa: id_empresa,
       id_usuario: id_usuario
     }).then((data) => {
@@ -145,8 +149,6 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     throw new Error('Falha na geração Mestre Item da Pessoa. Erro: ' + err.message);
   });
   //#endregion Pessoa
-
-  let dm_entrada_saida = utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.tpNF, 0, "") == "1" ? "S" : "E"
   
   //#region Pessoa Destinatario
   const PessoaDestinatario = await new model.Pessoa().Mestre.selectByCdPessoa(cd_pessoa, id_empresa)
@@ -178,10 +180,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   });
   //#endregion Ac413
   
-  let vl_outras_despesas = parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det[0].ICMSTot[0]?.vOutro, 0, "0").replace('.',','))
-  
   //#region CFOP
-  const Cfop = await new model.Cfop().selectByCdCfop(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0])
+  const Cfop = await new model.Cfop().selectByCdCfop(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det[0]?.prod[0]?.CFOP[0])
   .then((data) => {
     return data.rows[0]
   })
@@ -189,12 +189,13 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     throw new Error('Falha na busca pelo o CFOP cadastrado. Erro: ' + err.message);
   });
   //#endregion CFOP
+  
+  let vl_outras_despesas = parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0].ICMSTot[0]?.vOutro, 0, "0").replace('.',','))
 
-
-  if (['3', '7'].includes(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.prod[0]?.CFOP[0][0])) {
+  if (['3', '7'].includes(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det[0]?.prod[0]?.CFOP[0][0])) {
     if (Cfop.DM_ICMS_VL_CONTABIL === 'S') {
       vl_outras_despesas = vl_outras_despesas + 
-        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vOutro, 0).replace('.',','));
+        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vICMS, 0).replace('.',','));
     }
     if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S') {
       vl_outras_despesas = vl_outras_despesas + 
@@ -205,6 +206,11 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       vl_outras_despesas = vl_outras_despesas + 
         parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vII, 0).vCOFINS('.',','));
     }
+  }
+
+  if (utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0, "X") !== "X"){
+    vl_outras_despesas = vl_outras_despesas + 
+    parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0).vCOFINS('.',','));
   }
 
   //#region C100
@@ -230,22 +236,20 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
      */
     id_empresa: id_empresa
   };
-
   
   await new model.NotaFiscal.Saida().SfC110.delete({
     ...chaveC100,
   });
-  /*await new model.NotaFiscal.Saida.Produto.Item.delete({
+  /*await new model.NotaFiscal.Saida().Item.delete({
     ...chaveC100,
   })
-  await new model.NotaFiscal.Saida.Produto.Item.AcC050.delete({
+  await new model.NotaFiscal.Saida().Item.AcC050.delete({
     ...chaveC100,
   })
-  await new model.NotaFiscal.Saida.Produto.SfC195.delete({
+  await new model.NotaFiscal.Saida().SfC195.delete({
     ...chaveC100,
   })
-
-  await new model.NotaFiscal.Saida.Produto.delete({
+  await new model.NotaFiscal.Saida().delete({
     ...chaveC100,
   })*/
 
