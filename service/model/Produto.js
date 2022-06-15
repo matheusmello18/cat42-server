@@ -66,6 +66,88 @@ Produto.prototype.insert = async (dataProdutoServico) => {
 }
 
 /**
+	* Função inserir os dados do De Para Produto
+	* 
+	* @param {dataDeParaProduto} dataDeParaProduto
+	* @returns {Promise} Promise
+	* @example
+	* var dataDeParaProduto = {
+	*   cd_produto_saida: 'IMPORTAXML', 
+	*   cd_produto_entrada: '',
+  *		cnpj_principal: '', 
+	*		ds_produto_entrada: '', 
+	*		cd_ncm: '', 
+	*		dt_inicial: '', 
+	*		id_empresa: 1
+	* }
+	* await Produto.insertDePara(dataDeParaProduto);
+	* 
+	* ou
+	*
+	* const data = await Produto.insertDePara(dataDeParaProduto).then((e) => {
+	*    return e;
+	* }).catch((err) => {
+	*    throw new Error('Erro ao inserir o registro.');
+	* })
+	*/
+Produto.prototype.insertDePara = async (dataDeParaProduto) => {
+	let sql = `insert into comp_produtoe_produtos 
+						( cd_produto_saida, cd_produto_entrada, cnpj_principal, ds_produto_entrada, cd_ncm,  dt_inicial, id_empresa) 
+						values 
+						( :cd_produto_saida, :cd_produto_entrada, :cnpj_principal, :ds_produto_entrada, :cd_ncm, :dt_inicial, :id_empresa)
+						`;
+	try {
+		await Oracle.insert(sql, dataDeParaProduto)
+	} catch (err) {
+		throw new Error(err);
+	}
+}
+
+/**
+ * Função busca os dados do Produto por Código e Empresa
+ * 
+ * @param {string} cd_produto_entrada
+ * @param {string} cnpj_principal
+ * @param {string} dt_inicial
+ * @param {string} dt_final
+ * @param {Number} id_empresa
+ * @return {Promise} Promrise
+ * 
+ * @example
+ * const rows = (await Produto.selectDePara('562718', '12.302.200/00001-10', '01/08/2019', '30/08/2019', 1)).rows;
+ * 
+ * ou
+ *
+ * const rows = await Produto.selectDePara('562718', '12.302.200/00001-10', '01/08/2019', '30/08/2019', 1).then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
+ */
+ Produto.prototype.selectDePara = async (cd_produto_entrada, cnpj_principal, dt_inicial, dt_final, id_empresa) => {
+	let sql = `select cd_produto_entrada,
+	                  cd_produto_saida,
+										ds_produto_entrada
+ 							 from comp_produtoe_produtos
+							where cd_produto_entrada = :cd_produto_entrada
+							  and cnpj_principal     = :cnpj_principal
+								and dt_inicial         = :dt_inicial
+								and (dt_final          = :dt_final or dt_final is null)
+								and id_empresa         = :id_empresa`;
+	try {
+		return await Oracle.select(sql, {
+			cd_produto_entrada: cd_produto_entrada,
+			cnpj_principal: cnpj_principal,
+			dt_inicial: dt_inicial,
+			dt_final: dt_final,
+			id_empresa: id_empresa
+		})
+	} catch (err) {
+		throw new Error(err);
+	}
+}
+
+/**
  * Gerar Produto Mestre Item
  * @returns {Promise} Promise
  */
@@ -195,5 +277,19 @@ module.exports.Produto = Produto;
  * @property {Number} id_cest
  * @property {Number} id_empresa
  * @property {Number} id_usuario
+ * @global
+ */
+
+/**
+ * Campos da Tabela De Para Produto
+ * 
+ * @typedef {Object} dataDeParaProduto
+ * @property {String} cd_produto_saida
+ * @property {String} cd_produto_entrada
+ * @property {String} cnpj_principal
+ * @property {String} ds_produto_entrada
+ * @property {String} cd_ncm
+ * @property {String} dt_inicial
+ * @property {Number} id_empresa
  * @global
  */

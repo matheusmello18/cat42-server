@@ -23,7 +23,7 @@ module.exports.DateOracleToDateNode = (DateOracle) => {
 
 module.exports.DateOracleToPrimeiroDia = (DateOracle) => {
   var dateParts = DateOracle.split("/");
-  return ''.concat(1,'/',dateParts[1],'/',dateParts[2]);
+  return ''.concat('1','/',dateParts[1],'/',dateParts[2]);
 }
 
 module.exports.DateOracleToUltimoDia = (DateOracle) => {

@@ -428,32 +428,64 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       throw new Error('Falha na busca pelo o produto cadastrada. Erro: ' + err.message);
     });
     
-    await new model.Produto().insert({
-      cd_produto_servico: cd_produto_servico,
-      cd_barra: det.prod[0]?.cEANTrib[0],
-      ds_produto_servico: det.prod[0]?.xProd[0],
-      id_ref_331_ncm: det.prod[0]?.NCM[0],
-      id_ref_331_ex_ipi: det.prod[0]?.EXTIPI[0],
-      dm_tipo_item: produto === undefined ? '99' : produto.DM_TIPO_ITEM,
-      unidade: ds_unidade,
-      id_0190: ds_unidade,
-      dt_inicial: dhEmi,
-      dt_movimento: dhEmi,
-      id_cest: utils.Validar.getValueArray(det.prod[0]?.CEST, 0, ""),
-      id_empresa: id_empresa,
-      id_usuario: id_usuario
-    })
-    .then((data) => {
-      return data;
-    })
-    .catch((err) => {
-      throw new Error('Falha ao inserir o produto no cadastrado. Erro: ' + err.message);
-    });
+    if(produto == undefined){
+      var NCM = await new model.Ac331.Ncm().select(
+        det.prod[0]?.NCM[0],
+        dhEmi
+      ).then((data) => {
+        return data.rows[0]
+      }).catch((err) => {
+        throw new Error("Falha na busca pelo NCM. Erro: " + err.message);
+      })
 
-    await new model.Produto().sp_gera_produto_mestre_item()
-    .catch(async (err) => {
-      throw new Error('Falha na geração Mestre Item do Produto. Erro: ' + err.message);
-    });
+      var ExIpi
+      if (NCM !== undefined) {
+        ExIpi = await new model.Ac331.ExIPI().select(
+          det.prod[0]?.EXTIPI[0],
+          NCM.ID_REF_331_NCM
+        ).then((data) => {
+          return data.rows[0]
+        }).catch((err) => {
+          throw new Error("Falha na busca pelo ExIpi. Erro: " + err.message);
+        })
+      }
+
+      var CEST = await new model.SfCest().selectByCodigo(
+        utils.Validar.getValueArray(det.prod[0]?.CEST, 0, ""),
+        dhEmi
+      ).then((data) => {
+        return data.rows[0];
+      }).catch((err) => {
+        throw new Error('Falha na busca pelo Cest. Erro: ' + err.message);
+      })
+
+      await new model.Produto().insert({
+        cd_produto_servico: cd_produto_servico,
+        cd_barra: det.prod[0]?.cEANTrib[0],
+        ds_produto_servico: det.prod[0]?.xProd[0],
+        id_ref_331_ncm: NCM === undefined ? NaN : NCM.ID_REF_331_NCM,
+        id_ref_331_ex_ipi: ExIpi === undefined ? NaN : ExIpi.ID_REF_331_EX_IPI,
+        dm_tipo_item: produto === undefined ? '99' : produto.DM_TIPO_ITEM,
+        unidade: ds_unidade,
+        id_0190: ds_unidade,
+        dt_inicial: dhEmi,
+        dt_movimento: dhEmi,
+        id_cest: CEST === undefined ? NaN : CEST.ID_CEST,
+        id_empresa: id_empresa,
+        id_usuario: id_usuario
+      })
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw new Error('Falha ao inserir o produto no cadastrado. Erro: ' + err.message);
+      });
+
+      await new model.Produto().sp_gera_produto_mestre_item()
+      .catch(async (err) => {
+        throw new Error('Falha na geração Mestre Item do Produto. Erro: ' + err.message);
+      });
+    }
 
     const prod = await new model.Produto().Mestre.Item.selectByCodigo(cd_produto_servico, id_empresa, dhEmi)
     .then((data) => {

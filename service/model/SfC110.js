@@ -210,7 +210,7 @@ var SfC110Entrada = function() {
  * Deletar C110 Entrada atraves da chave do C100 Entada
  *
  * @param {chaveC100Entrada} chaveC100Entrada 
- * @return {Promise} Promrise<Result<T>>
+ * @return {Promise} Promise
  */
 
  SfC110Entrada.prototype.delete = async (chaveC100Entrada) => {

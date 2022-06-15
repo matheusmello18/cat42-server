@@ -77,8 +77,8 @@ module.exports.AcC060Entrada = AcC060Entrada;
  * @typedef {Object} dataAcC060Entrada
  * @property {String} dm_importacao
  * @property {String} nr_di
- * @property {Number} dt_registro
- * @property {Number} dt_desembaraco
+ * @property {String} dt_registro
+ * @property {String} dt_desembaraco
  * @property {Number} vl_pis
  * @property {Number} vl_cofins
  * @property {Number} id_nota_fiscal_entrada
@@ -91,5 +91,17 @@ module.exports.AcC060Entrada = AcC060Entrada;
  * @property {Number} id_empresa
  * @property {Number} id_usuario
  * @property {Number} id_modelo_documento
+ * @global
+ */
+
+/**
+ * Campos Chave SFC110 Entrada
+ * 
+ * @typedef {Object} chaveC100Entrada
+ * @property {Number} id_pessoa_remetente Pessoa Remetente
+ * @property {String} nr_documento Número do Documento
+ * @property {String} serie_subserie_documento Série e Subserie
+ * @property {String} dt_emissao_documento Data da emissão do documento
+ * @property {Number} id_empresa Identificação da Empresa
  * @global
  */

@@ -100,3 +100,102 @@ Pais.prototype.select = async (cd_pais) => {
   }
 }
 module.exports.Pais = Pais;
+
+
+/**
+ * Classe de Ncm
+ * 
+ * @constructor
+ * @example
+ * const model = require('./model');
+ * const ncm = new model.Ac331.Ncm();
+ */
+ var Ncm = function(){
+  if (!(this instanceof Ncm))
+    return new Ncm();
+};
+
+/**
+ * Função busca os dados do NCM através do código
+ * 
+ * @param {string} cd_ncm Código do NCM
+ * @param {string} dt_movimento
+ * @return {Promise} Promise
+ * 
+ * @example
+ * const rows = (await ncm.select('01058')).rows;
+ * 
+ * ou
+ *
+ * const rows = await ncm.select('01058').then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
+ */
+
+Ncm.prototype.select = async (cd_ncm, dt_movimento) => {
+  try {
+    return await Oracle.select(
+      `select id_ref_331_ncm, cd_ncm, ds_ncm 
+         from ac_331_ncm
+        where dt_inicial = (select max(ac.dt_inicial)
+                             from ac_331_ncm ac
+                            where ac.dt_inicial <= :dt_movimento
+                              and ac.cd_ncm      = ac_331_ncm.cd_ncm)
+          and cd_ncm = :cd_ncm
+      `,
+      {cd_ncm: cd_ncm, dt_movimento: dt_movimento});
+  } catch (err) {
+    throw new Error(err);
+  }
+}
+
+module.exports.Ncm = Ncm;
+
+/**
+ * Classe de ExIPI
+ * 
+ * @constructor
+ * @example
+ * const model = require('./model');
+ * const exipi = new model.Ac331.ExIPI();
+ */
+ var ExIPI = function(){
+  if (!(this instanceof ExIPI))
+    return new ExIPI();
+};
+
+/**
+ * Função busca os dados do Ex Ipi através do código
+ * 
+ * @param {string} cd_exipi Código do ExIpi
+ * @param {number} id_ref_331_ncm 
+ * @return {Promise} Promise
+ * 
+ * @example
+ * const rows = (await exipi.select('01058', 15)).rows;
+ * 
+ * ou
+ *
+ * const rows = await exipi.select('01058', 15).then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error(err.message)
+ * })
+ */
+
+ExIPI.prototype.select = async (cd_exipi, id_ref_331_ncm) => {
+  try {
+    return await Oracle.select(
+      `select id_ref_331_ex_ipi, nr_ex_ipi, ds_ex_ipi
+        from ac_331_ex_ipi
+       where id_ref_331_ncm = :id_ref_331_ncm
+         and nr_ex_ipi = :nr_ex_ipi`,
+      {nr_ex_ipi: cd_exipi, id_ref_331_ncm: id_ref_331_ncm});
+  } catch (err) {
+    throw new Error(err);
+  }
+}
+
+module.exports.ExIPI = ExIPI;

@@ -219,16 +219,16 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   await new model.NotaFiscal.Entrada().SfC110.delete({
     ...chaveC100,
   });
-  /*await new model.NotaFiscal.Saida().Item.delete({
+  /*await new model.NotaFiscal.Entrada().Item.delete({
     ...chaveC100,
   })
-  await new model.NotaFiscal.Saida().Item.AcC050.delete({
+  await new model.NotaFiscal.Entrada().Item.AcC050.delete({
     ...chaveC100,
   })
-  await new model.NotaFiscal.Saida().SfC195.delete({
+  await new model.NotaFiscal.Entrada().SfC195.delete({
     ...chaveC100,
   })
-  await new model.NotaFiscal.Saida().delete({
+  await new model.NotaFiscal.Entrada().delete({
     ...chaveC100,
   })
   tem um outro registro tbm verificar nas classes nf e nfi
@@ -268,7 +268,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao inserir a nota fiscal de saida no cadastrado. Erro: ' + err.message);
+    throw new Error('Falha ao inserir a nota fiscal de entrada no cadastrado. Erro: ' + err.message);
   });
   //#endregion C100
 
@@ -298,9 +298,9 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         id_ref_0450 = ac0450.ID_REF_0450
       }
       //C110
-      const SfC110Saida = {
-        chaveC100Saida: chaveC100,
-        camposC110Saida: {
+      const paramSfC110Entrada = {
+        chaveC100Entrada: chaveC100,
+        camposC110Entrada: {
           id_modelo_documento: parseInt(ModeloDocumento.ID_MODELO_DOCUMENTO),
           nr_item_imp: "1",
           id_ref_0450: parseInt(id_ref_0450),
@@ -308,7 +308,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
           id_usuario: id_usuario
         }
       }
-      await new model.NotaFiscal.Saida().SfC110.insert(SfC110Saida).then((data) => {
+      await new model.NotaFiscal.Entrada().SfC110.insert(paramSfC110Entrada).then((data) => {
         return data;
       })
       .catch((err) => {
@@ -339,9 +339,9 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         id_ref_0450 = ac0450.ID_REF_0450
       }
       //C110
-      await new model.NotaFiscal.Saida().SfC110.insert({
-        chaveC100Saida: chaveC100,
-        camposC110Saida : {
+      await new model.NotaFiscal.Entrada().SfC110.insert({
+        chaveC100Entrada: chaveC100,
+        camposC110Entrada : {
           id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
           nr_item_imp: "1",
           id_ref_0450: id_ref_0450,
@@ -359,48 +359,219 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   //#endregion C110
 
 
-  /*
-  await model.Unidade.insert({
-    ds_unidade:'',
-    ds_descricao:'',
-    dt_inicial:'',
-    dt_movimento:'',
-    id_empresa: id_empresa,
-    id_usuario: id_usuario
-  })
+  for (let i = 0; i < xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det.length; i++) {
+    const det = xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det[i];
 
-  await model.Produto.insert({
-    cd_produto_servico:'',
-    cd_barra:'',
-    ds_produto_servico:'',
-    id_ref_331_ncm:'',
-    id_ref_331_ex_ipi:'',
-    dm_tipo_item:'',
-    unidade:'',
-    id_0190:'',
-    dt_inicial:'',
-    dt_movimento:'',
-    id_cest:'',
-    id_empresa: id_empresa,
-    id_usuario: id_usuario
-  })
+    const chaveC170 = {
+      ...chaveC100,
+      id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
+      nr_sequencia: det.$.nItem, //sItem_Seq
+      nr_item: det.$.nItem,
+    };
+
+    //#region 0190
+    let ds_unidade
+
+    if (inParametro.DM_IMPORTAXML_DEPARA == 'S'){
+
+      let deParaUnidade = await new model.Sf0190().selectDePara(
+        det.prod[0]?.uCom,
+        cpfOrCnpj,
+        id_empresa
+      ).then((data) => {
+        return data.rows[0];
+      }).catch((err) => {
+        throw new Error('Falha ao buscar pelo De Para Unidade Medida. Erro: ' + err.message);
+      })
+
+      if (deParaUnidade !== undefined){
+        ds_unidade = deParaUnidade.DS_UNIDADE_SAIDA;
+      } else {
+        await new model.Sf0190().insertDePara(
+          id_empresa,
+          cpfOrCnpj,
+          det.prod[0]?.uCom
+        ).then((e) => {
+          return e;
+        }).catch((err) => {
+          throw new Error('Falha ao buscar pelo De Para Unidade Medida. Erro: ' + err.message);
+        })
+      }
+    }
+
+    ds_unidade = utils.Validar.getValueArray(det.prod[0]?.uCom, 0, "XX");
+
+    let Unidade = await new model.Sf0190().selectByDsUnidade(ds_unidade, id_empresa, dhEmi)
+    .then((data) => {
+      return data.rows[0]
+    })
+    .catch((err) => {
+      throw new Error('Falha na busca pela a unidade cadastrada. Erro: ' + err.message);
+    });
+
+    if (Unidade === undefined) {
+      //0190
+      await new model.Sf0190().insert({
+        ds_unidade: ds_unidade,
+        ds_descricao: ds_unidade,
+        dt_inicial: dhEmi,
+        dt_movimento: dhEmi,
+        id_empresa: id_empresa,
+        id_usuario: id_usuario
+      });
+    } else {
+      ds_unidade = Unidade.DS_UNIDADE;
+    }
+    //#endregion 0190
+
+    //#region 0200
+    let cd_produto_servico
+    if (inParametro.DM_IMPXML_CNPJ_PROD == 'S'){
+      cd_produto_servico = cpfOrCnpj + '-' + utils.FormatarString.removeCaracteresEspeciais(det.prod[0]?.cProd[0])
+    } else {
+      cd_produto_servico = utils.FormatarString.removeCaracteresEspeciais(det.prod[0]?.cProd[0])
+    }
+
+    let produto = await new model.Produto().Mestre.Item.selectByCodigo(cd_produto_servico, id_empresa, dhEmi)
+    .then((data) => {
+      return data.rows[0]
+    })
+    .catch((err) => {
+      throw new Error('Falha na busca pelo o produto cadastrada. Erro: ' + err.message);
+    });
+    
+    if (inParametro.DM_IMPORTAXML_DEPARA == 'S'){
+      var ProdutoDePara = await new model.Produto().selectDePara(
+        cd_produto_servico,
+        cpfOrCnpj,
+        dhEmi,
+        utils.FormatarData.DateOracleToUltimoDia(dhEmi),
+        id_empresa
+      )
+      .then((data) => {
+        return data.rows[0]
+      })
+      .catch((err) => {
+        throw new Error("Falha na busca pelo o produto de para. Erro: " + err.message);
+      })
+
+      if (ProdutoDePara !== null){
+        cd_produto_servico = ProdutoDePara.CD_PRODUTO_SAIDA
+      } else {
+        await new model.Produto().insertDePara({
+          cd_produto_saida: 'IMPORTAXML', 
+          cd_produto_entrada: cd_produto_servico,
+          cnpj_principal: cpfOrCnpj, 
+          ds_produto_entrada: det.prod[0]?.xProd[0], 
+          cd_ncm: det.prod[0]?.NCM[0], 
+          dt_inicial: dhEmi, 
+          id_empresa: id_empresa
+        })
+        .then((data) => {
+          return data;
+        })
+        .catch((err) => {
+          throw new Error('Falha ao inserir o produto de para. Erro: ' + err.message);
+        });
+      }
+      
+    }
+
+    if (produto == undefined){
+      var NCM = await new model.Ac331.Ncm().select(
+        det.prod[0]?.NCM[0],
+        dhEmi
+      ).then((data) => {
+        return data.rows[0]
+      }).catch((err) => {
+        throw new Error("Falha na busca pelo NCM. Erro: " + err.message);
+      })
+
+      var ExIpi
+      if (NCM !== undefined){
+        ExIpi = await new model.Ac331.ExIPI().select(
+          det.prod[0]?.EXTIPI[0],
+          NCM.ID_REF_331_NCM
+        ).then((data) => {
+          return data.rows[0]
+        }).catch((err) => {
+          throw new Error("Falha na busca pelo ExIpi. Erro: " + err.message);
+        })
+      }
+
+      var CEST = await new model.SfCest().selectByCodigo(
+        utils.Validar.getValueArray(det.prod[0]?.CEST, 0, ""),
+        dhEmi
+      ).then((data) => {
+        return data.rows[0];
+      }).catch((err) => {
+        throw new Error('Falha na busca pelo Cest. Erro: ' + err.message);
+      })
+
+      await new model.Produto().insert({
+        cd_produto_servico: cd_produto_servico,
+        cd_barra: det.prod[0]?.cEANTrib[0],
+        ds_produto_servico: det.prod[0]?.xProd[0],
+        id_ref_331_ncm: NCM === undefined ? NaN : NCM.ID_REF_331_NCM,
+        id_ref_331_ex_ipi: ExIpi === undefined ? NaN : ExIpi.ID_REF_331_EX_IPI,
+        dm_tipo_item: produto === undefined ? '99' : produto.DM_TIPO_ITEM,
+        unidade: ds_unidade,
+        id_0190: ds_unidade,
+        dt_inicial: dhEmi,
+        dt_movimento: dhEmi,
+        id_cest: CEST === undefined ? NaN : CEST.ID_CEST,
+        id_empresa: id_empresa,
+        id_usuario: id_usuario
+      })
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw new Error('Falha ao inserir o produto no cadastrado. Erro: ' + err.message);
+      });
+  
+      await new model.Produto().sp_gera_produto_mestre_item()
+      .catch(async (err) => {
+        throw new Error('Falha na geração Mestre Item do Produto. Erro: ' + err.message);
+      });
+    }
+
+    const prod = await new model.Produto().Mestre.Item.selectByCodigo(cd_produto_servico, id_empresa, dhEmi)
+    .then((data) => {
+      return data.rows[0]
+    })
+    .catch((err) => {
+      throw new Error('Falha na busca pelo o produto cadastrada. Erro: ' + err.message);
+    });
+    //#endregion 0200
+
+    //#region C120 => C060
+    if (det.prod[0]?.DI[0] !== undefined){
+      await new model.NotaFiscal.Entrada().AcC060.insert({
+        ...chaveC100,
+        ...{
+          dm_importacao: '0',
+          nr_di: det.prod[0]?.DI[0].NDI[0],
+          dt_registro: utils.FormatarData.DateXmlToDateOracleString(det.prod[0]?.DI[0].DDI[0]),
+          dt_desembaraco: utils.FormatarData.DateXmlToDateOracleString(det.prod[0]?.DI[0].DDesemb[0]),
+          vl_pis: 0,
+          vl_cofins: 0,
+          id_nota_fiscal_entrada: NaN,
+          nr_item: 1,
+          nr_sequencia: 1,
+          id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
+          id_usuario: id_usuario
+        }
+      })
+    }
+    //#endregion C120 => C060
+  }
+  
+  
+  /*
 
   // não será insert e sim update, pois a nota veio da importação texto
   // entrada
-
-
-  await model.NotaFiscal.Entrada.Produto.SfC110.insert({
-    serie_subserie_documento:'',
-    nr_documento:'',
-    dt_emissao_documento:'',
-    id_pessoa_remetente:'',
-    nr_item_imp:'',
-    id_ref_0450:'',
-    ds_complementar:'',
-    id_empresa: id_empresa,
-    id_usuario: id_usuario,
-    id_modelo_documento:''
-  })
   
   await model.NotaFiscal.Entrada.Produto.AcC060.insert({
     dm_importacao:'',
@@ -532,13 +703,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
 }
 
-/**
- * 
- * @param {any} xmlObj
- * @param {number} id_simul_etapa 
- * @param {number} id_empresa 
- * @param {number} id_usuario 
- * @param {String} dt_periodo 
- */
-module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo) => {
-}
+
+/*
+Não tem para entrada
+module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo) => {}
+*/

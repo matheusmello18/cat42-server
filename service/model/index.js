@@ -21,6 +21,7 @@ const NotaFiscal = require('./NotaFiscalProduto');
 const Sf433 = require('./Sf433').Sf433;
 const Sf434 = require('./Sf434').Sf434;
 const Sf453 = require('./Sf453').Sf453;
+const SfCest = require('./SfCest').SfCest;
 const Sf0460 = require('./Sf0460').Sf0460;
 const SfC800 = require('./SfC800').SfC800;
 
@@ -28,7 +29,7 @@ const ProdutoSimulador = require('./ProdutoSimulador').ProdutoSimulador;
 const Sf_Importa_Arquivo = require('./Sf_Importa_Arquivo').SFImportaArquivo;
 
 module.exports = {
-  Ac331, Ac0450, Ac413, Ac431,
+  Ac331, Ac0450, Ac413, Ac431, SfCest,
   ProdutoSimulador, Sf_Importa_Arquivo, 
   CtrlEmpresa, CtrlUsuario, Etapas, 
   EtapaStatus, ModeloDocumento, Cfop,

@@ -129,6 +129,43 @@ Sf0190.prototype.insert = async (dataSf0190) => {
   }
 }
 
+ /**
+	* Função inserir os dados do Sf0190
+	* 
+  * @param {number} id_empresa
+  * @param {string} cnpj_principal
+  * @param {string} ds_unidade_entrada
+	* @returns {Promise} Promise
+  * @example
+  * 
+  * await Sf0190.insertDePara('PC', '04665945000183', 1);
+  * 
+  * ou
+  *
+  * const data = await Sf0190.insertDePara('PC', '04665945000183', 1).then((e) => {
+  *    return e;
+  * }).catch((err) => {
+  *    throw new Error('Erro ao inserir o registro Unidade Medida De Para.')
+  * })
+	*/
+Sf0190.prototype.insertDePara = async (id_empresa, cnpj_principal, ds_unidade_entrada) => {
+  let sql = `insert into comp_unidadee_unidades 
+            ( id_empresa, cnpj_principal, ds_unidade_entrada) 
+            values 
+            ( :id_empresa, :cnpj_principal, :ds_unidade_entrada)
+            `;
+  try {
+    return await Oracle.insert(sql, {
+      id_empresa: id_empresa,
+      cnpj_principal: cnpj_principal,
+      ds_unidade_entrada: ds_unidade_entrada
+    })
+  } catch (err) {
+    // fazer tratamento se houver retorno do banco 20211, se houver este código ignorar
+    throw new Error(err);
+  }
+}
+
 module.exports.Sf0190 = Sf0190;
 
 /**
