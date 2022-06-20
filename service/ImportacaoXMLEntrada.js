@@ -19,7 +19,11 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
   //#region Configurações iniciais
   const dhEmi = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dhEmi, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dEmi)[0]);
-  const dSaiEnt = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dhSaiEnt, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dSaiEnt)[0]);
+  let dSaiEnt;
+  if (utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dhSaiEnt, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dSaiEnt) !== "")
+    dSaiEnt = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dhSaiEnt, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dSaiEnt)[0]);
+  else
+    dSaiEnt = dhEmi;
   const cpfOrCnpj = utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.CNPJ, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.CPF)[0];
   //#endregion
 
@@ -32,9 +36,9 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     throw new Error('Falha na busca pela empresa cadastrada. Erro: ' + err.message);
   });
 
-  if(Empresa.CNPJ_EMPRESA !== xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.CNPJ[0]) { //então entrada
+  if(Empresa.CNPJ_EMPRESA === xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.CNPJ[0]) { //então entrada
     throw new Error('Nota fiscal informada não é uma nota fiscal de entrada.');
-  } else if(Empresa.CNPJ_EMPRESA !== cpfOrCnpj) {
+  } else if(Empresa.CNPJ_EMPRESA !== xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CNPJ[0]) { 
     throw new Error('Nota fiscal informada não pertence a empresa cadastrada.');
   }
 
@@ -179,19 +183,19 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S') {
       vl_outras_despesas = vl_outras_despesas + 
         parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vPIS, 0).replace('.',',')) +
-        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vCOFINS, 0).vCOFINS('.',','));
+        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vCOFINS, 0).replace('.',','));
     }
     if (Cfop.DM_VLCONTABIL_II === 'S') {
       vl_outras_despesas = vl_outras_despesas + 
-        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vII, 0).vCOFINS('.',','));
+        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vII, 0).replace('.',','));
     }
   }
 
   if (utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0, "X") !== "X"){
     vl_outras_despesas = vl_outras_despesas + 
-    parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0).vCOFINS('.',','));
+    parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0).replace('.',','));
   }
-
+  
   //#region C100
   const chaveC100 = {
     /**
@@ -215,10 +219,11 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
      */
     id_empresa: id_empresa
   };
-
+  console.log('chegou');
   await new model.NotaFiscal.Entrada().SfC110.delete({
     ...chaveC100,
   });
+  console.log('chegou1');
   /*await new model.NotaFiscal.Entrada().Item.delete({
     ...chaveC100,
   })
@@ -258,8 +263,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     vl_icms_uf_remet: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vICMSUFRemet, 0, "0").replace('.',','),
     nr_chave_nf_eletron_ref_cat83: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.NFref === undefined ? "" : utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.NFref[0].refNFe, 0, "0").replace('.',','),
     vl_fcp_st: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vFCPST, 0, "0").replace('.',','),
-    id_ref_331_munic_orig: NaN,
-    id_ref_331_munic_dest: NaN,
+    id_ref_331_munic_orig: null,
+    id_ref_331_munic_dest: null,
     dm_tipo_cte: '',
     dm_finalidade: '',
     id_usuario: id_usuario
@@ -270,6 +275,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   .catch((err) => {
     throw new Error('Falha ao inserir a nota fiscal de entrada no cadastrado. Erro: ' + err.message);
   });
+  console.log('chegou3');
   //#endregion C100
 
   //#region C110
@@ -512,14 +518,14 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         cd_produto_servico: cd_produto_servico,
         cd_barra: det.prod[0]?.cEANTrib[0],
         ds_produto_servico: det.prod[0]?.xProd[0],
-        id_ref_331_ncm: NCM === undefined ? NaN : NCM.ID_REF_331_NCM,
-        id_ref_331_ex_ipi: ExIpi === undefined ? NaN : ExIpi.ID_REF_331_EX_IPI,
+        id_ref_331_ncm: NCM === undefined ? null : NCM.ID_REF_331_NCM,
+        id_ref_331_ex_ipi: ExIpi === undefined ? null : ExIpi.ID_REF_331_EX_IPI,
         dm_tipo_item: produto === undefined ? '99' : produto.DM_TIPO_ITEM,
         unidade: ds_unidade,
         id_0190: ds_unidade,
         dt_inicial: dhEmi,
         dt_movimento: dhEmi,
-        id_cest: CEST === undefined ? NaN : CEST.ID_CEST,
+        id_cest: CEST === undefined ? null : CEST.ID_CEST,
         id_empresa: id_empresa,
         id_usuario: id_usuario
       })
@@ -556,7 +562,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
           dt_desembaraco: utils.FormatarData.DateXmlToDateOracleString(det.prod[0]?.DI[0].DDesemb[0]),
           vl_pis: 0,
           vl_cofins: 0,
-          id_nota_fiscal_entrada: NaN,
+          id_nota_fiscal_entrada: null,
           nr_item: 1,
           nr_sequencia: 1,
           id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
@@ -606,7 +612,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       /**
        * @param {number} sCST_ICMS
        */
-      id_ref_431: NaN, //sCST_ICMS
+      id_ref_431: null, //sCST_ICMS
       /**
        * @param {number} sVl_Bc_ICMS
        */
@@ -658,7 +664,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       /**
        * @param {number} sCST_IPI
        */
-      id_ref_432: NaN, //sCST_IPI
+      id_ref_432: null, //sCST_IPI
       /**
        * @param {number} sVl_Bc_IPI
        */
@@ -758,7 +764,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       /**
        * @param {number} sEnquadra
        */
-      id_ref_453: NaN, //sEnquadra
+      id_ref_453: null, //sEnquadra
       /**
        * @param {number} sBC_FCP_OP
        */
@@ -1204,8 +1210,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC170.vl_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vIPI, 0, "").replace('.',','));
       paramC170.aliq_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.pIPI, 0, "0").replace('.',','));
       
-      if (paramC170.vl_base_calculo_ipi === NaN && 
-          paramC170.vl_ipi === NaN &&
+      if (paramC170.vl_base_calculo_ipi === null && 
+          paramC170.vl_ipi === null &&
           det.imposto[0]?.IPI[0]?.IPITrib[0]?.qUnid !== undefined &&
           det.imposto[0]?.IPI[0]?.IPITrib[0]?.vUnid !== undefined) {
         paramC170.id_ref_432 = 49;

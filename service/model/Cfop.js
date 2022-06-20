@@ -44,7 +44,7 @@ CFOP.prototype.selectByCdCfop = async (cd_cfop) => {
                  or  (cd_cfop_demais_uf = :cd_cfop) 
                  or  (cd_cfop_pais      = :cd_cfop))`;
   try {
-    return await Oracle.select(sql, cd_cfop)
+    return await Oracle.select(sql, {cd_cfop: cd_cfop})
   } catch (err) {
     throw new Error(err);
   }

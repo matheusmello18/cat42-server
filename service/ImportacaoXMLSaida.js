@@ -200,17 +200,17 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S') {
       vl_outras_despesas = vl_outras_despesas + 
         parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vPIS, 0).replace('.',',')) +
-        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vCOFINS, 0).vCOFINS('.',','));
+        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vCOFINS, 0).replace('.',','));
     }
     if (Cfop.DM_VLCONTABIL_II === 'S') {
       vl_outras_despesas = vl_outras_despesas + 
-        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vII, 0).vCOFINS('.',','));
+        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vII, 0).replace('.',','));
     }
   }
 
   if (utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0, "X") !== "X"){
     vl_outras_despesas = vl_outras_despesas + 
-    parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0).vCOFINS('.',','));
+    parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0).replace('.',','));
   }
 
   //#region C100
@@ -275,14 +275,14 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     dm_gare: 'N',
     dm_gnre: 'N',
     nr_chave_nf_eletronica: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.$.Id.toUpperCase().replace('NFE'),
-    id_pessoa_remetente_cte: NaN, //VAZIO
+    id_pessoa_remetente_cte: null, //VAZIO
     vl_icms_fcp: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vFCPUFDest, 0, "0").replace('.',','),
     vl_icms_uf_dest: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vICMSUFDest, 0, "0").replace('.',','),
     vl_icms_uf_remet: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vICMSUFRemet, 0, "0").replace('.',','),
     nr_chave_nf_eletron_ref_cat83: xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.NFref === undefined ? "" : utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.NFref[0].refNFe, 0, "0").replace('.',','),
     vl_fcp_st: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vFCPST, 0, "0").replace('.',','),
-    id_ref_331_munic_orig: NaN,
-    id_ref_331_munic_dest: NaN,
+    id_ref_331_munic_orig: null,
+    id_ref_331_munic_dest: null,
     dm_tipo_cte: '',
     dm_finalidade: '',
     id_usuario: id_usuario
@@ -463,14 +463,14 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         cd_produto_servico: cd_produto_servico,
         cd_barra: det.prod[0]?.cEANTrib[0],
         ds_produto_servico: det.prod[0]?.xProd[0],
-        id_ref_331_ncm: NCM === undefined ? NaN : NCM.ID_REF_331_NCM,
-        id_ref_331_ex_ipi: ExIpi === undefined ? NaN : ExIpi.ID_REF_331_EX_IPI,
+        id_ref_331_ncm: NCM === undefined ? null : NCM.ID_REF_331_NCM,
+        id_ref_331_ex_ipi: ExIpi === undefined ? null : ExIpi.ID_REF_331_EX_IPI,
         dm_tipo_item: produto === undefined ? '99' : produto.DM_TIPO_ITEM,
         unidade: ds_unidade,
         id_0190: ds_unidade,
         dt_inicial: dhEmi,
         dt_movimento: dhEmi,
-        id_cest: CEST === undefined ? NaN : CEST.ID_CEST,
+        id_cest: CEST === undefined ? null : CEST.ID_CEST,
         id_empresa: id_empresa,
         id_usuario: id_usuario
       })
@@ -542,7 +542,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       /**
        * @param {number} sCST_ICMS
        */
-      id_ref_431: NaN, //sCST_ICMS
+      id_ref_431: null, //sCST_ICMS
       /**
        * @param {number} sVl_Bc_ICMS
        */
@@ -594,7 +594,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       /**
        * @param {number} sCST_IPI
        */
-      id_ref_432: NaN, //sCST_IPI
+      id_ref_432: null, //sCST_IPI
       /**
        * @param {number} sVl_Bc_IPI
        */
@@ -694,7 +694,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       /**
        * @param {number} sEnquadra
        */
-      id_ref_453: NaN, //sEnquadra
+      id_ref_453: null, //sEnquadra
       /**
        * @param {number} sBC_FCP_OP
        */
@@ -1183,8 +1183,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC170.vl_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vIPI, 0, "").replace('.',','));
       paramC170.aliq_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.pIPI, 0, "0").replace('.',','));
       
-      if (paramC170.vl_base_calculo_ipi === NaN && 
-          paramC170.vl_ipi === NaN &&
+      if (paramC170.vl_base_calculo_ipi === null && 
+          paramC170.vl_ipi === null &&
           det.imposto[0]?.IPI[0]?.IPITrib[0]?.qUnid !== undefined &&
           det.imposto[0]?.IPI[0]?.IPITrib[0]?.vUnid !== undefined) {
         paramC170.id_ref_432 = 99;
@@ -1437,7 +1437,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         ...chaveC170,
         id_0460: Sf0460.ID_0460,
         ds_complementar: Sf0460.DS_OBS,
-        id_nota_fiscal_saida: NaN,
+        id_nota_fiscal_saida: null,
         id_usuario: id_usuario
       })
       .then((data) => {
@@ -1636,8 +1636,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       cd_produto_servico: cd_produto_servico,
       cd_barra: det.prod[0]?.cEAN[0],
       ds_produto_servico: det.prod[0]?.xProd[0],
-      id_ref_331_ncm: NaN,
-      id_ref_331_ex_ipi: NaN,
+      id_ref_331_ncm: null,
+      id_ref_331_ex_ipi: null,
       dm_tipo_item: produto === undefined ? '99' : produto.DM_TIPO_ITEM,
       unidade: ds_unidade,
       id_0190: ds_unidade,

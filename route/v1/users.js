@@ -7,7 +7,7 @@ const Usuario = require("../../service/model/CtrlUsuario")
 
 router.post("/login", async (req, res) => {
   try {
-    const usuario = await Usuario.select(req.body.email, req.body.senha);
+    const usuario = await new Usuario.CtrlUsuario().select(req.body.email, req.body.senha);
   
     if (usuario.rows[0] !== undefined)
       return res.status(200).json({success:"true", user: usuario.rows[0]});
@@ -20,12 +20,12 @@ router.post("/login", async (req, res) => {
 
 router.post("/forget", async (req, res) => {
   try {
-    const usuario = await Usuario.select(req.body.email);
+    const usuario = await new Usuario.CtrlUsuario().select(req.body.email);
   
     if (usuario.rows[0] !== undefined)
     {
       var hash = CryptoJS.MD5(usuario.rows[0].E_MAIL + Date.now()).toString();
-      await Usuario.updateHash(usuario.rows[0].ID_USUARIO, hash);
+      await new Usuario.CtrlUsuario().updateHash(usuario.rows[0].ID_USUARIO, hash);
       sendEmail.recuperarSenha(usuario.rows[0], hash).catch(console.error);
       return res.status(200).json({success:"true", user: usuario.rows[0]});
     }
@@ -40,7 +40,7 @@ router.post("/forget", async (req, res) => {
 router.post("/account", async (req, res) => {
   try {
     
-    const usuario = await Usuario.select(req.body.email);
+    const usuario = await new Usuario.CtrlUsuario().select(req.body.email);
   
     if (usuario.rows[0] !== undefined)
       return res.status(200).json({success:"true", user: usuario.rows[0]});
@@ -54,7 +54,7 @@ router.post("/account", async (req, res) => {
 
 router.post("/hash", async (req, res) => {
   try {
-    const usuario = await Usuario.selectByHash(req.body.hash);
+    const usuario = await new Usuario.CtrlUsuario().selectByHash(req.body.hash);
   
     if (usuario.rows[0] !== undefined)
       return res.status(200).json({success:"true", user: usuario.rows[0]});
@@ -67,8 +67,8 @@ router.post("/hash", async (req, res) => {
 
 router.post("/recovery", async (req, res) => {
   try {
-    const usuario = await Usuario.select(req.body.email);
-    await Usuario.updateSenha(req.body.id, req.body.senhaWeb, req.body.senha)
+    const usuario = await new Usuario.CtrlUsuario().select(req.body.email);
+    await new Usuario.CtrlUsuario().updateSenha(req.body.id, req.body.senhaWeb, req.body.senha)
   
     if (usuario.rows[0] !== undefined)
       return res.status(200).json({success:"true", user: usuario.rows[0]});

@@ -10,12 +10,13 @@ const Importacoes = require('../../service/Importacoes');
 
 router.post("/show", async (req, res) => {
   try {
-    var retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
+    var retorno = await new etapas.Etapas().select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
+    
   
     for (let index = 0; index < retorno.rows.length; index++) {
       const etapa = retorno.rows[index];
       if (etapa.ID_SIMUL_STATUS !== null){
-        var retStatus = await etapaStatus.select(req.body.id_empresa, req.body.id_usuario, etapa.ID_SIMUL_ETAPA);
+        var retStatus = await new etapaStatus.EtapaStatus().select(req.body.id_empresa, req.body.id_usuario, etapa.ID_SIMUL_ETAPA);
         retorno.rows[index].STATUS = retStatus.rows;
       } else {
         retorno.rows[index].STATUS = [];
@@ -29,12 +30,14 @@ router.post("/show", async (req, res) => {
 })
 
 var storage = multer.diskStorage({
+  // @ts-ignore
   destination: function (req, file, cb) {
       // Uploads is the Upload_folder_name
       if (!fs.existsSync(`uploads/${req.body.nr_cnpj}`))
         fs.mkdirSync(`uploads/${req.body.nr_cnpj}`, { recursive: true })
       cb(null, `uploads/${req.body.nr_cnpj}`)
   },
+  // @ts-ignore
   filename: function (req, file, cb) {
     cb(null, Date.now() + "-" + file.originalname)
   }
@@ -68,10 +71,13 @@ var upload = multer({
       }
     
       if (req.body.nm_method === 'ImportarArqExcel'){
+        // @ts-ignore
         cb("O upload do arquivo não é compativel com o esperado. Permitdo arquivo Excel");
       } else if (req.body.nm_method === 'ImportarArqTexto') {
+        // @ts-ignore
         cb("O upload do arquivo não é compativel com o esperado. Permitdo arquivo Texto");
       } else if (req.body.nm_method === 'ImportarArqXML') {
+        // @ts-ignore
         cb("O upload do arquivo não é compativel com o esperado. Permitdo arquivo XML");
       }
     } 
@@ -89,27 +95,27 @@ router.post("/upload", async (req, res) => {
     } else {
       // SUCCESS, image successfully uploaded
       try {
+        
         if (req.body.nm_method === 'ImportarArqExcel') {
           await Importacoes.Excel(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nm_procedure1, req.body.nm_procedure2);
         } else if (req.body.nm_method === 'ImportarArqTexto') {
-       
             await Importacoes.Text(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nm_procedure1, req.body.nm_procedure2, req.body.id_modulo, req.body.id_projeto);  
-
-          
-        } else if (req.body.nm_method === 'ImportarArqXML') {
+        } else if (req.body.nm_method === 'ImportarArqXMLSaida') {
           await Importacoes.XmlSaida(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
+        } else if (req.body.nm_method === 'ImportarArqXMLEntrada') {
+          await Importacoes.XmlEntrada(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
         }
 
-        retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
-        var retStatus = await etapaStatus.select(req.body.id_empresa, req.body.id_usuario, req.body.id_simul_etapa);
+        let retorno = await new etapas.Etapas().select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
+        var retStatus = await new etapaStatus.EtapaStatus().select(req.body.id_empresa, req.body.id_usuario, req.body.id_simul_etapa);
         retorno.rows[0].STATUS = retStatus.rows;
         
         return res.status(200).json({success:"true", message: 'Importação finalizada.', row: retorno.rows[0]});
 
       } catch (error) {
         
-        retorno = await etapas.select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
-        var retStatus = await etapaStatus.select(req.body.id_empresa, req.body.id_usuario, req.body.id_simul_etapa);
+        let retorno = await new etapas.Etapas().select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
+        var retStatus = await new etapaStatus.EtapaStatus().select(req.body.id_empresa, req.body.id_usuario, req.body.id_simul_etapa);
         retorno.rows[0].STATUS = retStatus.rows;
 
         return res.status(200).json({success:"false", message: 'Importação não finalizada.', row: retorno.rows[0]});  

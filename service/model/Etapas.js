@@ -40,8 +40,8 @@ var Etapas = function(){
  * })
  */
 
-Etapas.prototype.select = async (id_empresa, id_usuario, dt_periodo, id_simul_etapa = NaN) => {
-  const sql = `
+Etapas.prototype.select = async (id_empresa, id_usuario, dt_periodo, id_simul_etapa = null) => {
+  let sql = `
   select es.id_simul_status,
          to_char(es.dt_periodo, 'dd/mm/yyyy') dt_periodo,
          es.id_simul_tp_status,
@@ -98,7 +98,7 @@ Etapas.prototype.select = async (id_empresa, id_usuario, dt_periodo, id_simul_et
   try {
     let params;
 
-    if (id_simul_etapa !== NaN){
+    if (id_simul_etapa !== null){
       let sqlNova = sql + ' and es.id_simul_etapa = :id_simul_etapa'
       params = {
         id_empresa: id_empresa,

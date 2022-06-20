@@ -217,7 +217,7 @@ var SfC110Entrada = function() {
   `;
 
   try {
-    return await Oracle.delete(sql, chaveC100Entrada);
+    return //await Oracle.delete(sql, chaveC100Entrada);
   } catch (err) {
     throw new Error(err);
   }
