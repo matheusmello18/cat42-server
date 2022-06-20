@@ -2,8 +2,6 @@
  * Modulo Produto
  * 
  * @module model/Produto
- * @example
- * const model = require('./model');
  */
 const Oracle = require('../Oracle');
 

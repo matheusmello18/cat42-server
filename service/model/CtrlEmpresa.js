@@ -2,8 +2,6 @@
  * Modulo CtrlEmpresa
  * 
  * @module model/CtrlEmpresa
- * @example
- * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');

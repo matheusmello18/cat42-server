@@ -2,8 +2,6 @@
  * Modulo CFOP
  * 
  * @module model/Cfop
- * @example
- * const model = require('./model');
  */
  const Oracle = require('../Oracle');
 

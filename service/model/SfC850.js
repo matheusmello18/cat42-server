@@ -2,8 +2,6 @@
  * Modulo SfC850
  * 
  * @module model/SfC850
- * @example
- * const model = require('./model');
  */
 
  const Oracle = require('../Oracle');

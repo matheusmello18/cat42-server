@@ -2,8 +2,6 @@
  * Modulo CtrlUsuario
  * 
  * @module model/CtrlUsuario
- * @example
- * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');

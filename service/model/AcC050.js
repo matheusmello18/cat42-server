@@ -2,8 +2,6 @@
  * Modulo AcC050
  * 
  * @module model/AcC050
- * @example
- * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');

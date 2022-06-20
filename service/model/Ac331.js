@@ -2,8 +2,6 @@
  * Modulo Ac331
  * 
  * @module model/Ac331
- * @example
- * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');

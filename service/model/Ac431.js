@@ -2,8 +2,6 @@
  * Modulo Ac431
  * 
  * @module model/Ac431
- * @example
- * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');

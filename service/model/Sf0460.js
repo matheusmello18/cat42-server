@@ -2,8 +2,6 @@
  * Modulo Sf0460
  * 
  * @module model/Sf0460
- * @example
- * const model = require('./model');
  */
 
  const Oracle = require('../Oracle');

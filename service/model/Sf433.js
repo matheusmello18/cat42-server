@@ -2,8 +2,6 @@
  * Modulo Sf433
  * 
  * @module model/Sf433
- * @example
- * const model = require('./model');
  */
 
  const Oracle = require('../Oracle');

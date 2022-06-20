@@ -2,8 +2,6 @@
  * Modulo Ac0450
  * 
  * @module model/Ac0450
- * @example
- * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');

@@ -2,8 +2,6 @@
  * Modulo Etapas
  * 
  * @module model/Etapas
- * @example
- * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');

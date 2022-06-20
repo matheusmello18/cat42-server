@@ -17,7 +17,7 @@ const AcC050 = require('./AcC050');
  * @constructor
  * @example
  * const model = require('./model');
- * const nfeItemSaida = new model.NotaFiscal.Saida().Item();
+ * const nfeItemSaida = new model.NotaFiscal.Saida().Item;
  */
 
  var NotaFiscalSaidaProdutoItem = function(){
@@ -132,7 +132,7 @@ module.exports.Saida = NotaFiscalSaidaProdutoItem;
  * @constructor
  * @example
  * const model = require('./model');
- * const nfeItemEntrada = new model.NotaFiscal.Entrada().Item();
+ * const nfeItemEntrada = new model.NotaFiscal.Entrada().Item;
  */
 
  var NotaFiscalEntradaProdutoItem = function(){

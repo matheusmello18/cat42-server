@@ -2,8 +2,6 @@
  * Modulo Nota Fiscal
  * 
  * @module model/NotaFiscal
- * @example
- * const model = require('./model');
  */
 
 const Oracle = require('../Oracle');

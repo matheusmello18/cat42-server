@@ -2,8 +2,6 @@
  * Modulo SfCest
  * 
  * @module model/SfCest
- * @example
- * const model = require('./model');
  */
 
  const Oracle = require('../Oracle');

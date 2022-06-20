@@ -2,8 +2,6 @@
  * Modulo Pessoa
  * 
  * @module model/Pessoa
- * @example
- * const model = require('./model');
  */
 const Oracle = require('../Oracle');
 
