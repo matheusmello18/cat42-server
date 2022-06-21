@@ -49,11 +49,12 @@ var SfC110Saida = function(){
  *    throw new Error('Erro ao inserir o registro.');
  * })
  */
- SfC110Saida.prototype.insert = async (paramSfC110Saida) => {
+
+SfC110Saida.prototype.insert = async (paramSfC110Saida) => {
   let sql = `insert into sf_c110_saida 
     ( id_modelo_documento, dm_entrada_saida, serie_subserie_documento, nr_documento, dt_emissao_documento, nr_item_imp, id_ref_0450, ds_complementar, id_empresa, id_usuario) 
     values 
-    ( :id_modelo_documento, :dm_entrada_saida, :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :nr_item_imp, :id_ref_0450, :ds_complementar, :id_empresa, :id_usuario)
+    ( :id_modelo_documento, :dm_entrada_saida, :serie_subserie_documento, :nr_documento, to_date(:dt_emissao_documento, 'dd/mm/yyyy'), :nr_item_imp, :id_ref_0450, :ds_complementar, :id_empresa, :id_usuario)
     `;
   try {
     return await Oracle.insert(sql, {
@@ -86,9 +87,10 @@ var SfC110Saida = function(){
  * const data = await SfC110Saida.delete(chaveC100Saida).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    throw new Error('Erro ao deletar o registro SFC195.');
  * })
  */
+
  SfC110Saida.prototype.delete = async (chaveC100Saida) => {
  let sql = `
    DELETE SF_C110_SAIDA
@@ -99,7 +101,7 @@ var SfC110Saida = function(){
               AND (NVL(TRIM(SERIE_SUBSERIE_DOCUMENTO),0) = NVL(TRIM(:serie_subserie_documento),0)
                OR F_STRZERO(NVL(SERIE_SUBSERIE_DOCUMENTO, '0'), 3) = F_STRZERO(NVL(:serie_subserie_documento, '0'), 3))
               AND NR_DOCUMENTO                          = :nr_documento
-              AND DT_EMISSAO_DOCUMENTO                  = :dt_emissao_documento
+              and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
               AND ID_EMPRESA                            = :id_empresa)
  `;
 
@@ -192,7 +194,7 @@ var SfC110Entrada = function() {
   let sql = `insert into sf_c110_entrada 
     ( serie_subserie_documento, nr_documento, dt_emissao_documento, id_pessoa_remetente, nr_item_imp, id_ref_0450, ds_complementar, id_empresa, id_usuario, id_modelo_documento) 
     values 
-    ( :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :id_pessoa_remetente, :nr_item_imp, :id_ref_0450, :ds_complementar, :id_empresa, :id_usuario, :id_modelo_documento)
+    ( :serie_subserie_documento, :nr_documento, to_date(:dt_emissao_documento, 'dd/mm/yyyy'), :id_pessoa_remetente, :nr_item_imp, :id_ref_0450, :ds_complementar, :id_empresa, :id_usuario, :id_modelo_documento)
     `;
   try {
     await Oracle.insert(sql, {
@@ -204,20 +206,44 @@ var SfC110Entrada = function() {
   }
 };
 
+
 /**
- * Deletar C110 Entrada atraves da chave do C100 Entada
+ * Deletar C110 Entrada atraves da chave do C100 Entrada
  *
  * @param {chaveC100Entrada} chaveC100Entrada 
  * @return {Promise} Promise
+ * @example
+ * var chaveC100Entrada = {
+ *   id_modelo_documento: 0,
+ *   serie_subserie_documento: '',
+ *   nr_documento: '',
+ *   dt_emissao_documento: '',
+ *   id_pessoa_remetente: 0
+ * }
+ * await SfC110Entrada.delete(chaveC100Entrada);
+ * 
+ * ou
+ *
+ * const data = await SfC110Entrada.delete(chaveC100Entrada).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao deletar registro no SFC110 Entrada');
+ * })
  */
 
- SfC110Entrada.prototype.delete = async (chaveC100Entrada) => {
+SfC110Entrada.prototype.delete = async (chaveC100Entrada) => {
   let sql = `
-
+  delete sf_c110_entrada
+  where nvl(trim(serie_subserie_documento),0) = nvl(trim(:serie_subserie_documento),0)
+    and id_pessoa_remetente  = :id_pessoa_remetente
+    and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
+    and nr_documento         = :nr_documento
+    and id_modelo_documento  = :id_modelo_documento
+    and id_empresa           = :id_empresa
   `;
 
   try {
-    return //await Oracle.delete(sql, chaveC100Entrada);
+    return await Oracle.delete(sql, chaveC100Entrada);
   } catch (err) {
     throw new Error(err);
   }
@@ -229,10 +255,11 @@ module.exports.SfC110Entrada = SfC110Entrada;
  * Campos Chave SFC110 Entrada
  * 
  * @typedef {Object} chaveC100Entrada
- * @property {Number} id_pessoa_remetente Pessoa Remetente
  * @property {String} nr_documento Número do Documento
- * @property {String} serie_subserie_documento Série e Subserie
+ * @property {String} serie_subserie_documento Numero de Série
  * @property {String} dt_emissao_documento Data da emissão do documento
+ * @property {Number} id_modelo_documento Identificação do Modelo Documento
+ * @property {Number} id_pessoa_remetente Identificação da Pessoa Remetente
  * @property {Number} id_empresa Identificação da Empresa
  * @global
  */

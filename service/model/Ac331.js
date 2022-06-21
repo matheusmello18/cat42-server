@@ -139,7 +139,7 @@ Ncm.prototype.select = async (cd_ncm, dt_movimento) => {
          from ac_331_ncm
         where dt_inicial = (select max(ac.dt_inicial)
                              from ac_331_ncm ac
-                            where ac.dt_inicial <= :dt_movimento
+                            where ac.dt_inicial <= to_date(:dt_movimento, 'dd/mm/yyyy')
                               and ac.cd_ncm      = ac_331_ncm.cd_ncm)
           and cd_ncm = :cd_ncm
       `,

@@ -85,8 +85,8 @@ Ac0450.prototype.insert = async (ds_observacao, id_empresa, dt_inicial) => {
                                  id_usuario, 
                                  ds_observacao) 
                           values(:cd_observacao, 
-                                 :dt_inicial, 
-                                 :dt_movimento, 
+                                 to_date(:dt_inicial, 'dd/mm/yyyy'),
+                                 to_date(:dt_movimento, 'dd/mm/yyyy'),
                                  :id_empresa, 
                                  :id_usuario, 
                                  :ds_observacao)`;

@@ -117,7 +117,7 @@ Sf0190.prototype.insert = async (dataSf0190) => {
   let sql = `insert into sf_0190 
             ( ds_unidade, ds_descricao, dt_inicial, dt_movimento, id_empresa, id_usuario) 
             values 
-            ( :ds_unidade, :ds_descricao, :dt_inicial, :dt_movimento, :id_empresa, :id_usuario)
+            ( :ds_unidade, :ds_descricao, to_date(:dt_inicial, 'dd/mm/yyyy'), to_date(:dt_movimento, 'dd/mm/yyyy'), :id_empresa, :id_usuario)
             `;
   try {
     return await Oracle.insert(sql, dataSf0190)

@@ -107,7 +107,7 @@ NotaFiscalSaidaProduto.prototype.insert = async (dataNotaFiscalSaidaProduto) => 
   let sql = `insert into in_nota_fiscal_saida 
               ( dm_entrada_saida, id_pessoa_destinatario, id_modelo_documento, serie_subserie_documento, nr_documento, dm_tipo_fatura, dt_emissao_documento, dt_entrada_saida, vl_total_nota_fiscal, vl_desconto, vl_icms_substituicao, vl_outras_despesas, vl_total_mercadoria, vl_frete, vl_ipi, vl_seguro, dm_modalidade_frete, id_ref_413, vl_icms_desonerado, dm_cancelamento, dm_gare, dm_gnre, nr_chave_nf_eletronica, id_pessoa_remetente_cte, vl_icms_fcp, vl_icms_uf_dest, vl_icms_uf_remet, nr_chave_nf_eletron_ref_cat83, vl_fcp_st, id_ref_331_munic_orig, id_ref_331_munic_dest, dm_tipo_cte, dm_finalidade, id_empresa, id_usuario) 
               values 
-              ( :dm_entrada_saida, :id_pessoa_destinatario, :id_modelo_documento, :serie_subserie_documento, :nr_documento, :dm_tipo_fatura, :dt_emissao_documento, :dt_entrada_saida, :vl_total_nota_fiscal, :vl_desconto, :vl_icms_substituicao, :vl_outras_despesas, :vl_total_mercadoria, :vl_frete, :vl_ipi, :vl_seguro, :dm_modalidade_frete, :id_ref_413, :vl_icms_desonerado, :dm_cancelamento, :dm_gare, :dm_gnre, :nr_chave_nf_eletronica, :id_pessoa_remetente_cte, :vl_icms_fcp, :vl_icms_uf_dest, :vl_icms_uf_remet, :nr_chave_nf_eletron_ref_cat83, :vl_fcp_st, :id_ref_331_munic_orig, :id_ref_331_munic_dest, :dm_tipo_cte, :dm_finalidade, :id_empresa, :id_usuario)
+              ( :dm_entrada_saida, :id_pessoa_destinatario, :id_modelo_documento, :serie_subserie_documento, :nr_documento, :dm_tipo_fatura, to_date(:dt_emissao_documento, 'dd/mm/yyyy'), to_date(:dt_entrada_saida, 'dd/mm/yyyy'), :vl_total_nota_fiscal, :vl_desconto, :vl_icms_substituicao, :vl_outras_despesas, :vl_total_mercadoria, :vl_frete, :vl_ipi, :vl_seguro, :dm_modalidade_frete, :id_ref_413, :vl_icms_desonerado, :dm_cancelamento, :dm_gare, :dm_gnre, :nr_chave_nf_eletronica, :id_pessoa_remetente_cte, :vl_icms_fcp, :vl_icms_uf_dest, :vl_icms_uf_remet, :nr_chave_nf_eletron_ref_cat83, :vl_fcp_st, :id_ref_331_munic_orig, :id_ref_331_munic_dest, :dm_tipo_cte, :dm_finalidade, :id_empresa, :id_usuario)
             `;
   try {
     await Oracle.insert(sql, dataNotaFiscalSaidaProduto)
@@ -119,7 +119,7 @@ NotaFiscalSaidaProduto.prototype.insert = async (dataNotaFiscalSaidaProduto) => 
 
 
 /**
- * Função para Deletar nota fiscal de Saida
+ * Deletar nota fiscal de Saida atraves da chave do C100 Saida
  * 
  * @param {chaveC100Saida} chaveC100Saida
  * @returns {Promise} Promise
@@ -131,11 +131,11 @@ NotaFiscalSaidaProduto.prototype.insert = async (dataNotaFiscalSaidaProduto) => 
  *   dt_emissao_documento: '',
  *   id_empresa: 1
  * }
- * const data = (await nfeSaida.insert(chaveC100Saida));
+ * const data = (await nfeSaida.delete(chaveC100Saida));
  * 
  * ou
  *
- * const rows = await nfeSaida.insert(chaveC100Saida).then((e) => {
+ * const rows = await nfeSaida.delete(chaveC100Saida).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
  *    throw new Error('Erro ao deletar a nota fiscal de saída')
@@ -148,7 +148,7 @@ NotaFiscalSaidaProduto.prototype.delete = async (chaveC100Saida) => {
       AND (NVL(TRIM(SERIE_SUBSERIE_DOCUMENTO),0) = NVL(TRIM(:serie_subserie_documento),0)
       OR F_STRZERO(NVL(SERIE_SUBSERIE_DOCUMENTO, '0'), 3) = F_STRZERO(NVL(:serie_subserie_documento, '0'), 3))
       AND NR_DOCUMENTO                          = :nr_documento
-      AND DT_EMISSAO_DOCUMENTO                  = :dt_emissao_documento
+      and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
       AND ID_EMPRESA                            = :id_empresa
   `;
 
@@ -237,7 +237,7 @@ module.exports.Saida = NotaFiscalSaidaProduto;
   let sql = `insert into in_nota_fiscal_entrada 
             ( id_pessoa_remetente, id_modelo_documento, serie_subserie_documento, nr_documento, dm_tipo_fatura, dt_emissao_documento, dt_entrada, vl_total_nota_fiscal, vl_desconto, vl_icms_substituicao, vl_outras_despesas, vl_total_mercadoria, vl_frete, vl_seguro, vl_ipi, dm_modalidade_frete, id_ref_413, vl_icms_desonerado, nr_chave_nf_eletronica, vl_icms_fcp, vl_icms_uf_dest, vl_icms_uf_remet, nr_chave_nf_eletron_ref_cat83, vl_fcp_st, id_ref_331_munic_orig, id_ref_331_munic_dest, dm_tipo_cte, dm_finalidade, id_empresa, id_usuario) 
             values 
-            ( :id_pessoa_remetente, :id_modelo_documento, :serie_subserie_documento, :nr_documento, :dm_tipo_fatura, :dt_emissao_documento, :dt_entrada, :vl_total_nota_fiscal, :vl_desconto, :vl_icms_substituicao, :vl_outras_despesas, :vl_total_mercadoria, :vl_frete, :vl_seguro, :vl_ipi, :dm_modalidade_frete, :id_ref_413, :vl_icms_desonerado, :nr_chave_nf_eletronica, :vl_icms_fcp, :vl_icms_uf_dest, :vl_icms_uf_remet, :nr_chave_nf_eletron_ref_cat83, :vl_fcp_st, :id_ref_331_munic_orig, :id_ref_331_munic_dest, :dm_tipo_cte, :dm_finalidade, :id_empresa, :id_usuario)
+            ( :id_pessoa_remetente, :id_modelo_documento, :serie_subserie_documento, :nr_documento, :dm_tipo_fatura, to_date(:dt_emissao_documento, 'dd/mm/yyyy'), to_date(:dt_entrada, 'dd/mm/yyyy'), :vl_total_nota_fiscal, :vl_desconto, :vl_icms_substituicao, :vl_outras_despesas, :vl_total_mercadoria, :vl_frete, :vl_seguro, :vl_ipi, :dm_modalidade_frete, :id_ref_413, :vl_icms_desonerado, :nr_chave_nf_eletronica, :vl_icms_fcp, :vl_icms_uf_dest, :vl_icms_uf_remet, :nr_chave_nf_eletron_ref_cat83, :vl_fcp_st, :id_ref_331_munic_orig, :id_ref_331_munic_dest, :dm_tipo_cte, :dm_finalidade, :id_empresa, :id_usuario)
             `;
   try {
     await Oracle.insert(sql, dataNotaFiscalEntradaProduto)
@@ -245,6 +245,47 @@ module.exports.Saida = NotaFiscalSaidaProduto;
     throw new Error(err);
   }
 }
+
+/**
+ * Deletar nota fiscal de Saida Entrada atraves da chave do C100 Entada
+ * 
+ * @param {chaveC100Entrada} chaveC100Entrada
+ * @returns {Promise} Promise
+ * @example 
+ * var chaveC100Entrada = {
+ *   dm_entrada_saida: '1',  
+ *   nr_documento: '', 
+ *   serie_subserie_documento: '',
+ *   dt_emissao_documento: '',
+ *   id_empresa: 1
+ * }
+ * const data = (await nfeEntrada.delete(chaveC100Entrada));
+ * 
+ * ou
+ *
+ * const rows = await nfeEntrada.delete(chaveC100Entrada).then((e) => {
+ *    return e.rows;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao deletar a nota fiscal de saída')
+ * })
+ */
+NotaFiscalEntradaProduto.prototype.delete = async (chaveC100Entrada) => {
+  let sql = `
+  delete in_nota_fiscal_entrada
+  where nvl(trim(serie_subserie_documento),0) = nvl(trim(:serie_subserie_documento),0)
+    and id_pessoa_remetente  = :id_pessoa_remetente
+    and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
+    and nr_documento         = :nr_documento
+    and id_modelo_documento  = :id_modelo_documento
+    and id_empresa           = :id_empresa
+  `;
+
+  try {
+    return await Oracle.delete(sql, chaveC100Entrada);
+  } catch (err) {
+    throw new Error(err);
+  }
+};
 
 NotaFiscalEntradaProduto.prototype.Item = new NotaFiscalProdutoItem.Entrada();
 NotaFiscalEntradaProduto.prototype.AcC060 = new AcC060.AcC060Entrada();
@@ -305,6 +346,19 @@ module.exports.Entrada = NotaFiscalEntradaProduto;
  * @property {String} dm_finalidade
  * @property {Number} id_empresa
  * @property {Number} id_usuario
+ * @global
+ */
+
+/**
+ * Campos da Chave da Tabela Nota Fiscal de Entrada
+ * 
+ * @typedef {Object} chaveC100Entrada
+ * @property {String} nr_documento Número do Documento
+ * @property {String} serie_subserie_documento Numero de Série
+ * @property {String} dt_emissao_documento Data da emissão do documento
+ * @property {Number} id_modelo_documento Identificação do Modelo Documento
+ * @property {Number} id_pessoa_remetente Identificação da Pessoa Remetente
+ * @property {Number} id_empresa Identificação da Empresa
  * @global
  */
 

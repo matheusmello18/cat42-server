@@ -14,7 +14,7 @@ const Oracle = require('../Oracle');
  * const model = require('./model');
  * const acC050Saida = new model.NotaFiscal.Saida().Item().AcC050();
  */
- var AcC050Saida = function(){
+var AcC050Saida = function(){
   if(!(this instanceof AcC050Saida))
     return new AcC050Saida();
 };
@@ -66,7 +66,7 @@ AcC050Saida.prototype.insert = async (dataAcC050Saida) => {
 	let sql = `insert into ac_c050_saida 
 						( dm_entrada_saida, id_modelo_documento, id_ref_433, aliq_pis, vl_bc_pis, vl_pis, vl_aliq_pis, vl_pis_st, qtde_bc_pis, id_ref_434, aliq_cofins, vl_bc_cofins, vl_cofins, vl_aliq_cofins, vl_cofins_st, qtde_bc_cofins, id_nota_fiscal_saida, dt_emissao_documento, nr_documento, nr_item, nr_sequencia, serie_subserie_documento, id_empresa, id_usuario) 
 						values 
-						( :dm_entrada_saida, :id_modelo_documento, :id_ref_433, :aliq_pis, :vl_bc_pis, :vl_pis, :vl_aliq_pis, :vl_pis_st, :qtde_bc_pis, :id_ref_434, :aliq_cofins, :vl_bc_cofins, :vl_cofins, :vl_aliq_cofins, :vl_cofins_st, :qtde_bc_cofins, :id_nota_fiscal_saida, :dt_emissao_documento, :nr_documento, :nr_item, :nr_sequencia, :serie_subserie_documento, :id_empresa, :id_usuario)
+						( :dm_entrada_saida, :id_modelo_documento, :id_ref_433, :aliq_pis, :vl_bc_pis, :vl_pis, :vl_aliq_pis, :vl_pis_st, :qtde_bc_pis, :id_ref_434, :aliq_cofins, :vl_bc_cofins, :vl_cofins, :vl_aliq_cofins, :vl_cofins_st, :qtde_bc_cofins, :id_nota_fiscal_saida, to_date(:dt_emissao_documento, 'dd/mm/yyyy'), :nr_documento, :nr_item, :nr_sequencia, :serie_subserie_documento, :id_empresa, :id_usuario)
 						`;
 	try {
 		return await Oracle.insert(sql, dataAcC050Saida)
@@ -124,6 +124,48 @@ AcC050Saida.prototype.insert = async (dataAcC050Saida) => {
 	} catch (err) {
 		throw new Error(err);
 	}
+}
+
+/**
+ * Deletar C050 Saida atraves da chave do C100 Saida
+ *
+ * @param {chaveC100Saida} chaveC100Saida 
+ * @return {Promise} Promise
+ * @example
+ * var chaveC100Entrada = {
+ *   dm_entrada_saida: 0,
+ *   serie_subserie_documento: '',
+ *   nr_documento: '',
+ *   dt_emissao_documento: '',
+ *   id_empresa: 1
+ * }
+ * await acC050Saida.delete(chaveC100Saida);
+ * 
+ * ou
+ *
+ * const data = await acC050Saida.delete(chaveC100Saida).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao deletar registro no AcC050 Saida');
+ * })
+ */
+
+ AcC050Saida.prototype.delete = async (chaveC100Saida) => {
+  let sql = `
+  delete ac_c050_saida
+  where nvl(trim(serie_subserie_documento),0) = nvl(trim(:serie_subserie_documento),0)
+    and id_pessoa_remetente  = :id_pessoa_remetente
+    and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
+    and nr_documento         = :nr_documento
+    and id_modelo_documento  = :id_modelo_documento
+    and id_empresa           = :id_empresa
+  `;
+
+  try {
+    return await Oracle.delete(sql, chaveC100Saida);
+  } catch (err) {
+    throw new Error(err);
+  }
 }
 
 module.exports.AcC050Saida = AcC050Saida;
@@ -190,7 +232,7 @@ AcC050Entrada.prototype.insert = async (dataAcC050Entrada) => {
 			vl_cofins, vl_aliq_cofins, vl_cofins_st, qtde_bc_cofins, id_nota_fiscal_entrada, dt_emissao_documento, id_pessoa_remetente, 
 			nr_documento, nr_item, nr_sequencia, serie_suserie_documento, id_empresa, id_usuario, id_modelo_documento) 
 		values 
-		( :id_ref_433, :aliq_pis, :vl_bc_pis, :vl_pis, :vl_aliq_pis, :vl_pis_st, :qtde_bc_pis, :id_ref_434, :aliq_cofins, :vl_bc_cofins, :vl_cofins, :vl_aliq_cofins, :vl_cofins_st, :qtde_bc_cofins, :id_nota_fiscal_entrada, :dt_emissao_documento, :id_pessoa_remetente, :nr_documento, :nr_item, :nr_sequencia, :serie_suserie_documento, :id_empresa, :id_usuario, :id_modelo_documento)
+		( :id_ref_433, :aliq_pis, :vl_bc_pis, :vl_pis, :vl_aliq_pis, :vl_pis_st, :qtde_bc_pis, :id_ref_434, :aliq_cofins, :vl_bc_cofins, :vl_cofins, :vl_aliq_cofins, :vl_cofins_st, :qtde_bc_cofins, :id_nota_fiscal_entrada, to_date(:dt_emissao_documento, 'dd/mm/yyyy'), :id_pessoa_remetente, :nr_documento, :nr_item, :nr_sequencia, :serie_suserie_documento, :id_empresa, :id_usuario, :id_modelo_documento)
 	`;
 	try {
 		return await Oracle.insert(sql, dataAcC050Entrada)
@@ -199,7 +241,58 @@ AcC050Entrada.prototype.insert = async (dataAcC050Entrada) => {
 	}
 }
 
+/**
+ * Deletar C050 Entrada atraves da chave do C100 Entada
+ * 
+ * @param {chaveC100Entrada} chaveC100Entrada 
+ * @returns {Promise} Promise
+ * @example
+ * var chaveC100Entrada = {
+ *   id_modelo_documento: 0,
+ *   serie_suserie_documento: '',
+ *   nr_documento: '',
+ *   dt_emissao_documento: '',
+ *   id_pessoa_remetente: 0
+ * }
+ * await acC050Entrada.delete(chaveC100Entrada);
+ * 
+ * ou
+ *
+ * const data = await acC050Entrada.delete(chaveC100Entrada).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao deletar registro no AcC050 Entrada');
+ * })
+ */
+ AcC050Entrada.prototype.delete = async (chaveC100Entrada) => {
+  let sql = `delete ac_c050_entrada
+              where nvl(trim(serie_suserie_documento),0) = nvl(trim(:serie_suserie_documento),0)
+                and id_pessoa_remetente  = :id_pessoa_remetente
+                and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
+                and nr_documento         = :nr_documento
+                and id_modelo_documento  = :id_modelo_documento
+                and id_empresa           = :id_empresa
+            `;
+  try {
+    await Oracle.insert(sql, chaveC100Entrada)
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 module.exports.AcC050Entrada = AcC050Entrada;
+
+/**
+ * Campos da Chave da Tabela Nota Fiscal de Saída
+ * 
+ * @typedef {Object} chaveC100Saida
+ * @property {String} dm_entrada_saida 1 - Entrada | 2 - Saída
+ * @property {String} nr_documento Número do Documento
+ * @property {String} serie_subserie_documento Numero de Série
+ * @property {String} dt_emissao_documento Data da emissão do documento
+ * @property {Number} id_empresa Identificação da Empresa
+ * @global
+ */
 
 /**
  * Campos da Tabela AcC050Saida
@@ -229,6 +322,19 @@ module.exports.AcC050Entrada = AcC050Entrada;
  * @property {String} serie_subserie_documento
  * @property {Number} id_empresa
  * @property {Number} id_usuario
+ * @global
+ */
+
+/**
+ * Campos da Chave da Tabela Nota Fiscal de Entrada
+ * 
+ * @typedef {Object} chaveC100Entrada
+ * @property {String} nr_documento Número do Documento
+ * @property {String} serie_suserie_documento Numero de Série
+ * @property {String} dt_emissao_documento Data da emissão do documento
+ * @property {Number} id_modelo_documento Identificação do Modelo Documento
+ * @property {Number} id_pessoa_remetente Identificação da Pessoa Remetente
+ * @property {Number} id_empresa Identificação da Empresa
  * @global
  */
 

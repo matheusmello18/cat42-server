@@ -91,8 +91,8 @@ SFImportaArquivo.prototype.Delete = async (id_projeto, id_modulo, dt_inicial, dt
   const sqlDelete = `
   delete from sf_importa_texto
    where id_empresa = :id_empresa
-     and dt_inicial between :dt_inicial 
-                        and :dt_final
+     and to_char(dt_inicial,'dd/mm/yyyy') between :dt_inicial 
+                                              and :dt_final
      and id_projeto = :id_projeto
      and id_modulo  = :id_modulo
      and id_usuario = :id_usuario

@@ -42,8 +42,8 @@ SfCest.prototype.selectByCodigo = async (cd_cest, dt_movimento) => {
                from sf_cest
               where dt_inicial = (select max(dt_inicial)
                        from sf_cest
-                      where dt_inicial <= :dt_movimento
-                        and (dt_final >= :dt_movimento or dt_final is null)
+                      where to_char(dt_inicial,'dd/mm/yyyy') <= :dt_movimento
+                        and (to_char(dt_final,'dd/mm/yyyy') >= :dt_movimento or dt_final is null)
                         and replace(cd_cest,'.','') = :cd_cest)
                 and replace(cd_cest,'.','') = :cd_cest`;
   try {

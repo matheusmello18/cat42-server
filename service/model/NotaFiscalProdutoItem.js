@@ -112,7 +112,7 @@ NotaFiscalSaidaProdutoItem.prototype.insert = async (dataNotaFiscalSaidaItem) =>
   let sql = `insert into in_nota_fiscal_saida_item 
             ( dm_entrada_saida, id_modelo_documento, serie_subserie_documento, nr_documento, dt_emissao_documento, nr_sequencia, id_produto_servico, id_0190, vl_unitario, vl_total_item, vl_desconto_item, dm_movimentacao_fisica, cd_fiscal_operacao, nr_fci, id_ref_431, vl_base_calculo_icms, vl_icms, vl_base_calculo_icms_subst, aliq_icms_subs, vl_icms_substituicao, aliq_icms, vl_reducao_bc_icms, vl_perc_red_icms, vl_perc_red_icms_st, dm_mod_bc_icms, dm_mod_bc_icms_st, dm_tributacao_icms, id_ref_432, vl_base_calculo_ipi, vl_ipi, aliq_ipi, qtde, unidade, dm_tributacao_ipi, vl_outras_despesas, vl_frete, vl_seguro, nr_item, ds_complementar, dm_mot_desc_icms, vl_icms_desonerado, vl_bc_ii, vl_desp_adu, vl_ii, vl_iof, vl_bc_icms_uf_dest, perc_icms_fcp, aliq_icms_uf_dest, aliq_icms_interestadual, perc_icms_partilha, vl_icms_fcp, vl_icms_uf_dest, vl_icms_uf_remet, id_ref_453, vl_bc_fcp_op, aliq_fcp_op, vl_fcp_op, vl_bc_fcp_st, aliq_fcp_st, vl_fcp_st, vl_bc_icms_st_obs, vl_icms_st_obs, qtde_tributada, id_empresa, id_usuario) 
             values 
-            ( :dm_entrada_saida, :id_modelo_documento, :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :nr_sequencia, :id_produto_servico, :id_0190, :vl_unitario, :vl_total_item, :vl_desconto_item, :dm_movimentacao_fisica, :cd_fiscal_operacao, :nr_fci, :id_ref_431, :vl_base_calculo_icms, :vl_icms, :vl_base_calculo_icms_subst, :aliq_icms_subs, :vl_icms_substituicao, :aliq_icms, :vl_reducao_bc_icms, :vl_perc_red_icms, :vl_perc_red_icms_st, :dm_mod_bc_icms, :dm_mod_bc_icms_st, :dm_tributacao_icms, :id_ref_432, :vl_base_calculo_ipi, :vl_ipi, :aliq_ipi, :qtde, :unidade, :dm_tributacao_ipi, :vl_outras_despesas, :vl_frete, :vl_seguro, :nr_item, :ds_complementar, :dm_mot_desc_icms, :vl_icms_desonerado, :vl_bc_ii, :vl_desp_adu, :vl_ii, :vl_iof, :vl_bc_icms_uf_dest, :perc_icms_fcp, :aliq_icms_uf_dest, :aliq_icms_interestadual, :perc_icms_partilha, :vl_icms_fcp, :vl_icms_uf_dest, :vl_icms_uf_remet, :id_ref_453, :vl_bc_fcp_op, :aliq_fcp_op, :vl_fcp_op, :vl_bc_fcp_st, :aliq_fcp_st, :vl_fcp_st, :vl_bc_icms_st_obs, :vl_icms_st_obs, :qtde_tributada, :id_empresa, :id_usuario)
+            ( :dm_entrada_saida, :id_modelo_documento, :serie_subserie_documento, :nr_documento, to_date(:dt_emissao_documento, 'dd/mm/yyyy'), :nr_sequencia, :id_produto_servico, :id_0190, :vl_unitario, :vl_total_item, :vl_desconto_item, :dm_movimentacao_fisica, :cd_fiscal_operacao, :nr_fci, :id_ref_431, :vl_base_calculo_icms, :vl_icms, :vl_base_calculo_icms_subst, :aliq_icms_subs, :vl_icms_substituicao, :aliq_icms, :vl_reducao_bc_icms, :vl_perc_red_icms, :vl_perc_red_icms_st, :dm_mod_bc_icms, :dm_mod_bc_icms_st, :dm_tributacao_icms, :id_ref_432, :vl_base_calculo_ipi, :vl_ipi, :aliq_ipi, :qtde, :unidade, :dm_tributacao_ipi, :vl_outras_despesas, :vl_frete, :vl_seguro, :nr_item, :ds_complementar, :dm_mot_desc_icms, :vl_icms_desonerado, :vl_bc_ii, :vl_desp_adu, :vl_ii, :vl_iof, :vl_bc_icms_uf_dest, :perc_icms_fcp, :aliq_icms_uf_dest, :aliq_icms_interestadual, :perc_icms_partilha, :vl_icms_fcp, :vl_icms_uf_dest, :vl_icms_uf_remet, :id_ref_453, :vl_bc_fcp_op, :aliq_fcp_op, :vl_fcp_op, :vl_bc_fcp_st, :aliq_fcp_st, :vl_fcp_st, :vl_bc_icms_st_obs, :vl_icms_st_obs, :qtde_tributada, :id_empresa, :id_usuario)
             `;
   try {
     await Oracle.insert(sql, dataNotaFiscalSaidaItem)
@@ -120,6 +120,48 @@ NotaFiscalSaidaProdutoItem.prototype.insert = async (dataNotaFiscalSaidaItem) =>
     throw new Error(err);
   }
 };
+
+/**
+ * Deletar Item da nota fiscal de Saida atraves da chave do C100 Saida
+ *
+ * @param {chaveC100Saida} chaveC100Saida 
+ * @return {Promise} Promise
+ * @example
+ * var chaveC100Entrada = {
+ *   dm_entrada_saida: 0,
+ *   serie_subserie_documento: '',
+ *   nr_documento: '',
+ *   dt_emissao_documento: '',
+ *   id_empresa: 1
+ * }
+ * await nfeItemEntrada.delete(chaveC100Saida);
+ * 
+ * ou
+ *
+ * const data = await nfeItemEntrada.delete(chaveC100Saida).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao deletar registro no item da nota fiscal saida');
+ * })
+ */
+
+ NotaFiscalSaidaProdutoItem.prototype.delete = async (chaveC100Saida) => {
+  let sql = `
+  delete in_nota_fiscal_saida_item
+  where nvl(trim(serie_subserie_documento),0) = nvl(trim(:serie_subserie_documento),0)
+    and id_pessoa_remetente  = :id_pessoa_remetente
+    and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
+    and nr_documento         = :nr_documento
+    and id_modelo_documento  = :id_modelo_documento
+    and id_empresa           = :id_empresa
+  `;
+
+  try {
+    return await Oracle.delete(sql, chaveC100Saida);
+  } catch (err) {
+    throw new Error(err);
+  }
+}
 
 NotaFiscalSaidaProdutoItem.prototype.AcC050 = new AcC050.AcC050Saida();
 
@@ -223,10 +265,50 @@ NotaFiscalEntradaProdutoItem.prototype.insert = async (dataNotaFiscalEntradaItem
   let sql = `insert into in_nota_fiscal_entrada_item 
             ( id_modelo_documento, serie_subserie_documento, nr_documento, dt_emissao_documento, id_pessoa_remetente, nr_sequencia, id_produto_servico, id_0190, vl_unitario, vl_total_item, vl_desconto_item, dm_movimentacao_fisica, cd_fiscal_operacao, nr_fci, id_ref_431, vl_base_calculo_icms, vl_icms, vl_base_calculo_icms_subst, aliq_icms_subst, vl_icms_substituicao, aliq_icms, vl_reducao_bc_icms, dm_tributacao_icms, id_ref_432, vl_base_calculo_ipi, vl_ipi, aliq_ipi, qtde, unidade, dm_tributacao_ipi, vl_outras_despesas, vl_frete, vl_seguro, nr_item, ds_complementar, dm_mot_desc_icms, vl_icms_desonerado, vl_bc_ii, vl_desp_adu, vl_ii, vl_iof, vl_bc_icms_uf_dest, perc_icms_fcp, aliq_icms_uf_dest, aliq_icms_interestadual, perc_icms_partilha, vl_icms_fcp, vl_icms_uf_dest, vl_icms_uf_remet, id_ref_453, vl_bc_fcp_op, aliq_fcp_op, vl_fcp_op, vl_bc_fcp_st, aliq_fcp_st, vl_fcp_st, vl_bc_icms_st_obs, vl_icms_st_obs, cd_classificacao_fiscal_merc, id_empresa, id_usuario) 
             values 
-            ( :id_modelo_documento, :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :id_pessoa_remetente, :nr_sequencia, :id_produto_servico, :id_0190, :vl_unitario, :vl_total_item, :vl_desconto_item, :dm_movimentacao_fisica, :cd_fiscal_operacao, :nr_fci, :id_ref_431, :vl_base_calculo_icms, :vl_icms, :vl_base_calculo_icms_subst, :aliq_icms_subst, :vl_icms_substituicao, :aliq_icms, :vl_reducao_bc_icms, :dm_tributacao_icms, :id_ref_432, :vl_base_calculo_ipi, :vl_ipi, :aliq_ipi, :qtde, :unidade, :dm_tributacao_ipi, :vl_outras_despesas, :vl_frete, :vl_seguro, :nr_item, :ds_complementar, :dm_mot_desc_icms, :vl_icms_desonerado, :vl_bc_ii, :vl_desp_adu, :vl_ii, :vl_iof, :vl_bc_icms_uf_dest, :perc_icms_fcp, :aliq_icms_uf_dest, :aliq_icms_interestadual, :perc_icms_partilha, :vl_icms_fcp, :vl_icms_uf_dest, :vl_icms_uf_remet, :id_ref_453, :vl_bc_fcp_op, :aliq_fcp_op, :vl_fcp_op, :vl_bc_fcp_st, :aliq_fcp_st, :vl_fcp_st, :vl_bc_icms_st_obs, :vl_icms_st_obs, :cd_classificacao_fiscal_merc, :id_empresa, :id_usuario)
+            ( :id_modelo_documento, :serie_subserie_documento, :nr_documento, to_date(:dt_emissao_documento, 'dd/mm/yyyy'), :id_pessoa_remetente, :nr_sequencia, :id_produto_servico, :id_0190, :vl_unitario, :vl_total_item, :vl_desconto_item, :dm_movimentacao_fisica, :cd_fiscal_operacao, :nr_fci, :id_ref_431, :vl_base_calculo_icms, :vl_icms, :vl_base_calculo_icms_subst, :aliq_icms_subst, :vl_icms_substituicao, :aliq_icms, :vl_reducao_bc_icms, :dm_tributacao_icms, :id_ref_432, :vl_base_calculo_ipi, :vl_ipi, :aliq_ipi, :qtde, :unidade, :dm_tributacao_ipi, :vl_outras_despesas, :vl_frete, :vl_seguro, :nr_item, :ds_complementar, :dm_mot_desc_icms, :vl_icms_desonerado, :vl_bc_ii, :vl_desp_adu, :vl_ii, :vl_iof, :vl_bc_icms_uf_dest, :perc_icms_fcp, :aliq_icms_uf_dest, :aliq_icms_interestadual, :perc_icms_partilha, :vl_icms_fcp, :vl_icms_uf_dest, :vl_icms_uf_remet, :id_ref_453, :vl_bc_fcp_op, :aliq_fcp_op, :vl_fcp_op, :vl_bc_fcp_st, :aliq_fcp_st, :vl_fcp_st, :vl_bc_icms_st_obs, :vl_icms_st_obs, :cd_classificacao_fiscal_merc, :id_empresa, :id_usuario)
             `;
   try {
     await Oracle.insert(sql, dataNotaFiscalEntradaItem)
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+/**
+ * Deletar Item da nota fiscal Entrada atraves da chave do C100 Entada
+ * 
+ * @param {chaveC100Entrada} chaveC100Entrada 
+ * @returns {Promise} Promise
+ * @example
+ * var chaveC100Entrada = {
+ *   id_modelo_documento: 0,
+ *   serie_subserie_documento: '',
+ *   nr_documento: '',
+ *   dt_emissao_documento: '',
+ *   id_pessoa_remetente: 0
+ * }
+ * await nfeItemEntrada.delete(chaveC100Entrada);
+ * 
+ * ou
+ *
+ * const data = await nfeItemEntrada.delete(chaveC100Entrada).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao deletar registro no item da nota fiscal entrada');
+ * })
+ */
+ NotaFiscalEntradaProdutoItem.prototype.delete = async (chaveC100Entrada) => {
+  console.log(chaveC100Entrada);
+  let sql = `delete in_nota_fiscal_entrada_item
+              where nvl(trim(serie_subserie_documento),0) = nvl(trim(:serie_subserie_documento),0)
+                and id_pessoa_remetente  = :id_pessoa_remetente
+                and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
+                and nr_documento         = :nr_documento
+                and id_modelo_documento  = :id_modelo_documento
+                and id_empresa           = :id_empresa
+            `;
+  try {
+    await Oracle.insert(sql, chaveC100Entrada)
   } catch (err) {
     throw new Error(err);
   }
@@ -236,6 +318,18 @@ NotaFiscalEntradaProdutoItem.prototype.AcC050 = new AcC050.AcC050Entrada();
 
 module.exports.Entrada = NotaFiscalEntradaProdutoItem;
 
+
+/**
+ * Campos da Chave da Tabela Nota Fiscal de Saída
+ * 
+ * @typedef {Object} chaveC100Saida
+ * @property {String} dm_entrada_saida 1 - Entrada | 2 - Saída
+ * @property {String} nr_documento Número do Documento
+ * @property {String} serie_subserie_documento Numero de Série
+ * @property {String} dt_emissao_documento Data da emissão do documento
+ * @property {Number} id_empresa Identificação da Empresa
+ * @global
+ */
 
 /**
  * Campos da Tabela dataNotaFiscalSaidaItem
@@ -306,6 +400,19 @@ module.exports.Entrada = NotaFiscalEntradaProdutoItem;
  * @property {Number} qtde_tributada
  * @property {Number} id_empresa
  * @property {Number} id_usuario
+ * @global
+ */
+
+/**
+ * Campos da Chave da Tabela Nota Fiscal de Entrada
+ * 
+ * @typedef {Object} chaveC100Entrada
+ * @property {String} nr_documento Número do Documento
+ * @property {String} serie_subserie_documento Numero de Série
+ * @property {String} dt_emissao_documento Data da emissão do documento
+ * @property {Number} id_modelo_documento Identificação do Modelo Documento
+ * @property {Number} id_pessoa_remetente Identificação da Pessoa Remetente
+ * @property {Number} id_empresa Identificação da Empresa
  * @global
  */
 

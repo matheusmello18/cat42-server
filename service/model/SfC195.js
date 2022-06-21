@@ -54,7 +54,7 @@ SfC195Saida.prototype.insert = async (dataSfC195Saida) => {
 	let sql = `insert into sf_c195_saida 
 						( dm_entrada_saida, id_0460, ds_complementar, id_nota_fiscal_saida, nr_item, id_modelo_documento, serie_subserie_documento, nr_documento, dt_emissao_documento, nr_sequencia, id_empresa, id_usuario) 
 						values 
-						( :dm_entrada_saida, :id_0460, :ds_complementar, :id_nota_fiscal_saida, :nr_item, :id_modelo_documento, :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :nr_sequencia, :id_empresa, :id_usuario)
+						( :dm_entrada_saida, :id_0460, :ds_complementar, :id_nota_fiscal_saida, :nr_item, :id_modelo_documento, :serie_subserie_documento, :nr_documento, to_date(:dt_emissao_documento, 'dd/mm/yyyy'), :nr_sequencia, :id_empresa, :id_usuario)
 						`;
 	try {
 		await Oracle.insert(sql, dataSfC195Saida)
@@ -62,7 +62,49 @@ SfC195Saida.prototype.insert = async (dataSfC195Saida) => {
 		throw new Error(err);
 	}
 }
-	
+
+/**
+ * Deletar C195 Saida atraves da chave do C100 Saida
+ *
+ * @param {chaveC100Saida} chaveC100Saida 
+ * @return {Promise} Promise
+ * @example
+ * var chaveC100Entrada = {
+ *   dm_entrada_saida: 0,
+ *   serie_subserie_documento: '',
+ *   nr_documento: '',
+ *   dt_emissao_documento: '',
+ *   id_empresa: 1
+ * }
+ * await SfC195Saida.delete(chaveC100Saida);
+ * 
+ * ou
+ *
+ * const data = await SfC195Saida.delete(chaveC100Saida).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao deletar registro no SFC195');
+ * })
+ */
+
+ SfC195Saida.prototype.delete = async (chaveC100Saida) => {
+  let sql = `
+  delete sf_c195_saida
+  where nvl(trim(serie_subserie_documento),0) = nvl(trim(:serie_subserie_documento),0)
+    and id_pessoa_remetente  = :id_pessoa_remetente
+    and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
+    and nr_documento         = :nr_documento
+    and id_modelo_documento  = :id_modelo_documento
+    and id_empresa           = :id_empresa
+  `;
+
+  try {
+    return await Oracle.delete(sql, chaveC100Saida);
+  } catch (err) {
+    throw new Error(err);
+  }
+}
+
 module.exports.SfC195Saida = SfC195Saida;
 
 
@@ -115,7 +157,7 @@ SfC195Entrada.prototype.insert = async (dataSfC195Entrada) => {
 	let sql = `insert into sf_c195_entrada 
 						( id_0460, ds_complementar, id_nota_fiscal_entrada, serie_subserie_documento, nr_documento, dt_emissao_documento, id_pessoa_remetente, nr_sequencia, nr_item, id_empresa, id_usuario, id_modelo_documento) 
 						values 
-						( :id_0460, :ds_complementar, :id_nota_fiscal_entrada, :serie_subserie_documento, :nr_documento, :dt_emissao_documento, :id_pessoa_remetente, :nr_sequencia, :nr_item, :id_empresa, :id_usuario, :id_modelo_documento)
+						( :id_0460, :ds_complementar, :id_nota_fiscal_entrada, :serie_subserie_documento, :nr_documento, to_date(:dt_emissao_documento, 'dd/mm/yyyy'), :id_pessoa_remetente, :nr_sequencia, :nr_item, :id_empresa, :id_usuario, :id_modelo_documento)
 						`;
 	try {
 		await Oracle.insert(sql, dataSfC195Entrada)
@@ -124,7 +166,62 @@ SfC195Entrada.prototype.insert = async (dataSfC195Entrada) => {
 	}
 }
 
+/**
+ * Deletar C195 Entrada atraves da chave do C100 Entada
+ *
+ * @param {chaveC100Entrada} chaveC100Entrada 
+ * @return {Promise} Promise
+ * @example
+ * var chaveC100Entrada = {
+ *   id_modelo_documento: 0,
+ *   serie_subserie_documento: '',
+ *   nr_documento: '',
+ *   dt_emissao_documento: '',
+ *   id_pessoa_remetente: 0,
+ *   id_empresa: 1
+ * }
+ * await SfC195Entrada.delete(chaveC100Entrada);
+ * 
+ * ou
+ *
+ * const data = await SfC195Entrada.delete(chaveC100Entrada).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao deletar registro no SFC195');
+ * })
+ */
+
+SfC195Entrada.prototype.delete = async (chaveC100Entrada) => {
+  let sql = `
+  delete sf_c195_entrada
+  where nvl(trim(serie_subserie_documento),0) = nvl(trim(:serie_subserie_documento),0)
+    and id_pessoa_remetente  = :id_pessoa_remetente
+    and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
+    and nr_documento         = :nr_documento
+    and id_modelo_documento  = :id_modelo_documento
+    and id_empresa           = :id_empresa
+  `;
+
+  try {
+    return await Oracle.delete(sql, chaveC100Entrada);
+  } catch (err) {
+    throw new Error(err);
+  }
+}
+
 module.exports.SfC195Entrada = SfC195Entrada;
+
+/**
+ * Campos da Chave da Tabela Nota Fiscal de Saída
+ * 
+ * @typedef {Object} chaveC100Saida
+ * @property {String} dm_entrada_saida 1 - Entrada | 2 - Saída
+ * @property {String} nr_documento Número do Documento
+ * @property {String} serie_subserie_documento Numero de Série
+ * @property {String} dt_emissao_documento Data da emissão do documento
+ * @property {Number} id_empresa Identificação da Empresa
+ * @global
+ */
 
 /**
  * Campos da Tabela dataSfC195Saida
@@ -141,6 +238,19 @@ module.exports.SfC195Entrada = SfC195Entrada;
  * @property {Number} id_empresa
  * @property {Number} id_usuario
  * @property {Number} id_modelo_documento
+ * @global
+ */
+
+/**
+ * Campos da Chave da Tabela Nota Fiscal de Entrada
+ * 
+ * @typedef {Object} chaveC100Entrada
+ * @property {String} nr_documento Número do Documento
+ * @property {String} serie_subserie_documento Numero de Série
+ * @property {String} dt_emissao_documento Data da emissão do documento
+ * @property {Number} id_modelo_documento Identificação do Modelo Documento
+ * @property {Number} id_pessoa_remetente Identificação da Pessoa Remetente
+ * @property {Number} id_empresa Identificação da Empresa
  * @global
  */
 

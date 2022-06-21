@@ -54,7 +54,7 @@ Produto.prototype.insert = async (dataProdutoServico) => {
 	let sql = `insert into in_produto_servico 
 						( cd_produto_servico, cd_barra, ds_produto_servico, id_ref_331_ncm, id_ref_331_ex_ipi, dm_tipo_item, unidade, id_0190, dt_inicial, dt_movimento, id_cest, id_empresa, id_usuario) 
 						values 
-						( :cd_produto_servico, :cd_barra, :ds_produto_servico, :id_ref_331_ncm, :id_ref_331_ex_ipi, :dm_tipo_item, :unidade, :id_0190, :dt_inicial, :dt_movimento, :id_cest, :id_empresa, :id_usuario)
+						( :cd_produto_servico, :cd_barra, :ds_produto_servico, :id_ref_331_ncm, :id_ref_331_ex_ipi, :dm_tipo_item, :unidade, :id_0190, to_date(:dt_inicial, 'dd/mm/yyyy'), to_date(:dt_movimento, 'dd/mm/yyyy'), :id_cest, :id_empresa, :id_usuario)
 						`;
 	try {
 		await Oracle.insert(sql, dataProdutoServico)
@@ -92,7 +92,7 @@ Produto.prototype.insertDePara = async (dataDeParaProduto) => {
 	let sql = `insert into comp_produtoe_produtos 
 						( cd_produto_saida, cd_produto_entrada, cnpj_principal, ds_produto_entrada, cd_ncm,  dt_inicial, id_empresa) 
 						values 
-						( :cd_produto_saida, :cd_produto_entrada, :cnpj_principal, :ds_produto_entrada, :cd_ncm, :dt_inicial, :id_empresa)
+						( :cd_produto_saida, :cd_produto_entrada, :cnpj_principal, :ds_produto_entrada, :cd_ncm, to_date(:dt_inicial, 'dd/mm/yyyy'), :id_empresa)
 						`;
 	try {
 		await Oracle.insert(sql, dataDeParaProduto)
@@ -129,8 +129,8 @@ Produto.prototype.insertDePara = async (dataDeParaProduto) => {
  							 from comp_produtoe_produtos
 							where cd_produto_entrada = :cd_produto_entrada
 							  and cnpj_principal     = :cnpj_principal
-								and dt_inicial         = :dt_inicial
-								and (dt_final          = :dt_final or dt_final is null)
+								and to_char(dt_inicial,'dd/mm/yyyy') = :dt_inicial
+								and (to_char(dt_final,'dd/mm/yyyy')  = :dt_final or dt_final is null)
 								and id_empresa         = :id_empresa`;
 	try {
 		return await Oracle.select(sql, {
