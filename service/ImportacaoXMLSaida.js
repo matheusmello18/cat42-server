@@ -220,7 +220,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
      */
     dm_entrada_saida: dm_entrada_saida,
     /**
-     * @param {String} nr_documento
+     * @param {Number} nr_documento
      */
     nr_documento: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.nNF, 0, ""),
     /**
@@ -320,6 +320,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       } else {
         id_ref_0450 = ac0450.ID_REF_0450
       }
+
       //C110
       const SfC110Saida = {
         chaveC100Saida: chaveC100,
@@ -388,13 +389,12 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     const chaveC170 = {
       ...chaveC100,
       id_modelo_documento: ModeloDocumento.ID_MODELO_DOCUMENTO,
-      nr_sequencia: det.$.nItem, //sItem_Seq
-      nr_item: det.$.nItem,
+      nr_sequencia: parseInt(det.$.nItem), //sItem_Seq
+      nr_item: parseInt(det.$.nItem),
     };
     
     //#region 0190
     let ds_unidade = utils.Validar.getValueArray(det.prod[0]?.uCom, 0, "XX");
-
     let Unidade = await new model.Sf0190().selectByDsUnidade(ds_unidade, id_empresa, dhEmi)
     .then((data) => {
       return data.rows[0]
@@ -413,6 +413,14 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         id_empresa: id_empresa,
         id_usuario: id_usuario
       });
+
+      Unidade = await new model.Sf0190().selectByDsUnidade(ds_unidade, id_empresa, dhEmi)
+      .then((data) => {
+        return data.rows[0]
+      })
+      .catch((err) => {
+        throw new Error('Falha na busca pela a unidade cadastrada. Erro: ' + err.message);
+      });
     } else {
       ds_unidade = Unidade.DS_UNIDADE;
     }
@@ -429,6 +437,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     });
     
     if(produto == undefined){
+
       var NCM = await new model.Ac331.Ncm().select(
         det.prod[0]?.NCM[0],
         dhEmi
@@ -440,14 +449,16 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       var ExIpi
       if (NCM !== undefined) {
-        ExIpi = await new model.Ac331.ExIPI().select(
-          det.prod[0]?.EXTIPI[0],
-          NCM.ID_REF_331_NCM
-        ).then((data) => {
-          return data.rows[0]
-        }).catch((err) => {
-          throw new Error("Falha na busca pelo ExIpi. Erro: " + err.message);
-        })
+        if (det.prod[0]?.EXTIPI !== undefined) {
+          ExIpi = await new model.Ac331.ExIPI().select(
+            det.prod[0]?.EXTIPI[0],
+            NCM.ID_REF_331_NCM
+          ).then((data) => {
+            return data.rows[0]
+          }).catch((err) => {
+            throw new Error("Falha na busca pelo ExIpi. Erro: " + err.message);
+          })
+        }
       }
 
       var CEST = await new model.SfCest().selectByCodigo(
@@ -467,7 +478,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         id_ref_331_ex_ipi: ExIpi === undefined ? null : ExIpi.ID_REF_331_EX_IPI,
         dm_tipo_item: produto === undefined ? '99' : produto.DM_TIPO_ITEM,
         unidade: ds_unidade,
-        id_0190: ds_unidade,
+        id_0190: Unidade.ID_0190,
         dt_inicial: dhEmi,
         dt_movimento: dhEmi,
         id_cest: CEST === undefined ? null : CEST.ID_CEST,
@@ -510,23 +521,23 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       /**
        * @param {integer} id_produto_servico
        */
-      id_produto_servico: prod.ID_PRODUTO_SERVCO,
+      id_produto_servico: prod.ID_PRODUTO_SERVICO,
       /**
        * @param {string} ds_unidade
        */
-      id_0190: ds_unidade,
+      id_0190: Unidade.ID_0190,
       /**
        * @param {number} nVl_Uni det.prod[0]?.vUnCom
        */
-      vl_unitario: utils.Validar.getValueArray(det.prod[0]?.vUnCom, 0, "0").replace(',','.'),
+      vl_unitario: parseFloat(utils.Validar.getValueArray(det.prod[0]?.vUnCom, 0, "0").replace(',','.')),
       /**
        * @param {number} vl_total_item det.prod[0]?.vProd
        */
-      vl_total_item: utils.Validar.getValueArray(det.prod[0]?.vProd, 0, "0").replace(',','.'),
+      vl_total_item: parseFloat(utils.Validar.getValueArray(det.prod[0]?.vProd, 0, "0").replace(',','.')),
       /**
        * @param {number} sVl_Desc det.prod[0]?.vDesc 
        */
-      vl_desconto_item: utils.Validar.getValueArray(det.prod[0]?.vDesc, 0, "0").replace(',','.'),
+      vl_desconto_item: parseFloat(utils.Validar.getValueArray(det.prod[0]?.vDesc, 0, "0").replace(',','.')),
       /**
        * @param {string} dm_movimentacao_fisica 'S'
        */
@@ -791,7 +802,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
        */
       qtde_bc_cofins: 0,
       /**
-       * @param {number} verificar como fazer
+       * @param {number} id_nota_fiscal_saida nulo
        */
       id_nota_fiscal_saida: null,
     }
@@ -1366,6 +1377,9 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       paramC170.vl_reducao_bc_icms = somatoria * (paramC170.vl_perc_red_icms / 100);
       
+    } else {
+      let nRedBC = (parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace(',','.')) / 100)
+      paramC170.vl_reducao_bc_icms = paramC170.vl_total_item * (nRedBC / 100);
     }
     
     paramC170.vl_outras_despesas = vl_outras_despesas;

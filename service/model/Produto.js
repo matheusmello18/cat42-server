@@ -237,7 +237,7 @@ Produto.prototype.Mestre = new ProdutoMestre()
  * })
  */
 ProdutoMestreItem.prototype.selectByCodigo = async (cd_produto_servico, id_empresa, dt_inicial) => {
-	let sql = `select psm.cd_produto_servico, psi.ds_produto_servico, psi.dm_tipo_item
+	let sql = `select psm.cd_produto_servico, psi.ds_produto_servico, psi.dm_tipo_item, psm.id_produto_servico
 								from in_produto_servico_mestre psm 
 								left join in_produto_servico_item psi on (psm.id_produto_servico = psi.id_produto_servico) 
 							where psm.id_empresa = :id_empresa
@@ -246,7 +246,7 @@ ProdutoMestreItem.prototype.selectByCodigo = async (cd_produto_servico, id_empre
 																					from in_produto_servico_item item 
 																				where item.id_produto_servico = psi.id_produto_servico 
 																					and item.dt_inicial <= to_date(:dt_inicial, 'DD/MM/YYYY')) 
-										or psi.dt_inicial is null) `;
+										or psi.dt_inicial is null)`;
 	try {
 		return await Oracle.select(sql, {id_empresa: id_empresa, cd_produto_servico: cd_produto_servico, dt_inicial: dt_inicial})
 	} catch (err) {

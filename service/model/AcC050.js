@@ -227,6 +227,7 @@ module.exports.AcC050Saida = AcC050Saida;
  */
 
 AcC050Entrada.prototype.insert = async (dataAcC050Entrada) => {
+  console.log(dataAcC050Entrada);
 	let sql = `insert into ac_c050_entrada 
 		( id_ref_433, aliq_pis, vl_bc_pis, vl_pis, vl_aliq_pis, vl_pis_st, qtde_bc_pis, id_ref_434, aliq_cofins, vl_bc_cofins, 
 			vl_cofins, vl_aliq_cofins, vl_cofins_st, qtde_bc_cofins, id_nota_fiscal_entrada, dt_emissao_documento, id_pessoa_remetente, 
@@ -287,7 +288,7 @@ module.exports.AcC050Entrada = AcC050Entrada;
  * 
  * @typedef {Object} chaveC100Saida
  * @property {String} dm_entrada_saida 1 - Entrada | 2 - Saída
- * @property {String} nr_documento Número do Documento
+ * @property {Number} nr_documento Número do Documento
  * @property {String} serie_subserie_documento Numero de Série
  * @property {String} dt_emissao_documento Data da emissão do documento
  * @property {Number} id_empresa Identificação da Empresa
@@ -316,7 +317,7 @@ module.exports.AcC050Entrada = AcC050Entrada;
  * @property {Number} qtde_bc_cofins
  * @property {Number} id_nota_fiscal_saida
  * @property {String} dt_emissao_documento
- * @property {Number|String} nr_documento
+ * @property {Number} nr_documento
  * @property {Number} nr_item
  * @property {Number} nr_sequencia
  * @property {String} serie_subserie_documento
@@ -329,7 +330,7 @@ module.exports.AcC050Entrada = AcC050Entrada;
  * Campos da Chave da Tabela Nota Fiscal de Entrada
  * 
  * @typedef {Object} chaveC100Entrada
- * @property {String} nr_documento Número do Documento
+ * @property {Number} nr_documento Número do Documento
  * @property {String} serie_suserie_documento Numero de Série
  * @property {String} dt_emissao_documento Data da emissão do documento
  * @property {Number} id_modelo_documento Identificação do Modelo Documento
@@ -362,7 +363,7 @@ module.exports.AcC050Entrada = AcC050Entrada;
  * @property {Number} nr_documento
  * @property {Number} nr_item
  * @property {Number} nr_sequencia
- * @property {String} serie_subserie_documento
+ * @property {String} serie_suserie_documento
  * @property {Number} id_empresa
  * @property {Number} id_usuario
  * @global

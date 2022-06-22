@@ -298,7 +298,6 @@ NotaFiscalEntradaProdutoItem.prototype.insert = async (dataNotaFiscalEntradaItem
  * })
  */
  NotaFiscalEntradaProdutoItem.prototype.delete = async (chaveC100Entrada) => {
-  console.log(chaveC100Entrada);
   let sql = `delete in_nota_fiscal_entrada_item
               where nvl(trim(serie_subserie_documento),0) = nvl(trim(:serie_subserie_documento),0)
                 and id_pessoa_remetente  = :id_pessoa_remetente
@@ -324,7 +323,7 @@ module.exports.Entrada = NotaFiscalEntradaProdutoItem;
  * 
  * @typedef {Object} chaveC100Saida
  * @property {String} dm_entrada_saida 1 - Entrada | 2 - Saída
- * @property {String} nr_documento Número do Documento
+ * @property {Number} nr_documento Número do Documento
  * @property {String} serie_subserie_documento Numero de Série
  * @property {String} dt_emissao_documento Data da emissão do documento
  * @property {Number} id_empresa Identificação da Empresa
@@ -338,7 +337,7 @@ module.exports.Entrada = NotaFiscalEntradaProdutoItem;
  * @property {String} dm_entrada_saida
  * @property {Number} id_modelo_documento
  * @property {String} serie_subserie_documento
- * @property {String} nr_documento
+ * @property {Number} nr_documento
  * @property {String} dt_emissao_documento
  * @property {Number} nr_sequencia
  * @property {Number} id_produto_servico
@@ -407,7 +406,7 @@ module.exports.Entrada = NotaFiscalEntradaProdutoItem;
  * Campos da Chave da Tabela Nota Fiscal de Entrada
  * 
  * @typedef {Object} chaveC100Entrada
- * @property {String} nr_documento Número do Documento
+ * @property {Number} nr_documento Número do Documento
  * @property {String} serie_subserie_documento Numero de Série
  * @property {String} dt_emissao_documento Data da emissão do documento
  * @property {Number} id_modelo_documento Identificação do Modelo Documento
@@ -422,7 +421,7 @@ module.exports.Entrada = NotaFiscalEntradaProdutoItem;
  * @typedef {Object} dataNotaFiscalEntradaItem
  * @property {Number} id_modelo_documento
  * @property {String} serie_subserie_documento
- * @property {String} nr_documento
+ * @property {Number} nr_documento
  * @property {String} dt_emissao_documento
  * @property {Number} id_pessoa_remetente
  * @property {Number} nr_sequencia

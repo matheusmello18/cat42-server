@@ -192,6 +192,7 @@ ExIPI.prototype.select = async (cd_exipi, id_ref_331_ncm) => {
          and nr_ex_ipi = :nr_ex_ipi`,
       {nr_ex_ipi: cd_exipi, id_ref_331_ncm: id_ref_331_ncm});
   } catch (err) {
+    console.log(err);
     throw new Error(err);
   }
 }

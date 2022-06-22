@@ -300,7 +300,7 @@ module.exports.Entrada = NotaFiscalEntradaProduto;
  * 
  * @typedef {Object} chaveC100Saida
  * @property {String} dm_entrada_saida 1 - Entrada | 2 - Saída
- * @property {String} nr_documento Número do Documento
+ * @property {Number} nr_documento Número do Documento
  * @property {String} serie_subserie_documento Numero de Série
  * @property {String} dt_emissao_documento Data da emissão do documento
  * @property {Number} id_empresa Identificação da Empresa
@@ -353,7 +353,7 @@ module.exports.Entrada = NotaFiscalEntradaProduto;
  * Campos da Chave da Tabela Nota Fiscal de Entrada
  * 
  * @typedef {Object} chaveC100Entrada
- * @property {String} nr_documento Número do Documento
+ * @property {Number} nr_documento Número do Documento
  * @property {String} serie_subserie_documento Numero de Série
  * @property {String} dt_emissao_documento Data da emissão do documento
  * @property {Number} id_modelo_documento Identificação do Modelo Documento
@@ -369,7 +369,7 @@ module.exports.Entrada = NotaFiscalEntradaProduto;
  * @property {Number} id_pessoa_remetente
  * @property {Number} id_modelo_documento
  * @property {String} serie_subserie_documento
- * @property {String} nr_documento
+ * @property {Number} nr_documento
  * @property {String} dm_tipo_fatura
  * @property {String} dt_emissao_documento
  * @property {String} dt_entrada

@@ -216,7 +216,7 @@ module.exports.SfC195Entrada = SfC195Entrada;
  * 
  * @typedef {Object} chaveC100Saida
  * @property {String} dm_entrada_saida 1 - Entrada | 2 - Saída
- * @property {String} nr_documento Número do Documento
+ * @property {Number} nr_documento Número do Documento
  * @property {String} serie_subserie_documento Numero de Série
  * @property {String} dt_emissao_documento Data da emissão do documento
  * @property {Number} id_empresa Identificação da Empresa
@@ -228,7 +228,7 @@ module.exports.SfC195Entrada = SfC195Entrada;
  * 
  * @typedef {Object} dataSfC195Saida
  * @property {String} dm_entrada_saida
- * @property {String} nr_item
+ * @property {Number} nr_item
  * @property {String} ds_complementar
  * @property {Number} id_0460
  * @property {Number} id_nota_fiscal_saida
@@ -245,7 +245,7 @@ module.exports.SfC195Entrada = SfC195Entrada;
  * Campos da Chave da Tabela Nota Fiscal de Entrada
  * 
  * @typedef {Object} chaveC100Entrada
- * @property {String} nr_documento Número do Documento
+ * @property {Number} nr_documento Número do Documento
  * @property {String} serie_subserie_documento Numero de Série
  * @property {String} dt_emissao_documento Data da emissão do documento
  * @property {Number} id_modelo_documento Identificação do Modelo Documento
@@ -258,8 +258,8 @@ module.exports.SfC195Entrada = SfC195Entrada;
  * Campos da Tabela SfC195Entrada
  * 
  * @typedef {Object} dataSfC195Entrada
- * @property {String} nr_item
- * @property {String} nr_sequencia
+ * @property {Number} nr_item
+ * @property {Number} nr_sequencia
  * @property {Number} ds_complementar
  * @property {String} id_0460
  * @property {Number} id_nota_fiscal_entrada
