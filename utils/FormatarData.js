@@ -1,5 +1,4 @@
 module.exports.DateXmlToDateOracleString = (DateXml) => {
-  console.log(DateXml);
   let dateParts = DateXml.split("T")[0].split("-");
   return ''.concat(dateParts[2],'/',dateParts[1],'/',dateParts[0]);
 }

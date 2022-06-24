@@ -93,17 +93,16 @@ SfC110Saida.prototype.insert = async (paramSfC110Saida) => {
 
  SfC110Saida.prototype.delete = async (chaveC100Saida) => {
  let sql = `
-   DELETE SF_C110_SAIDA
-    WHERE ID_NOTA_FISCAL_SAIDA IN (
-           SELECT ID_NOTA_FISCAL_SAIDA
-             FROM IN_NOTA_FISCAL_SAIDA
-            WHERE DM_ENTRADA_SAIDA                      = :dm_entrada_saida
-              AND (NVL(TRIM(SERIE_SUBSERIE_DOCUMENTO),0) = NVL(TRIM(:serie_subserie_documento),0)
-               OR F_STRZERO(NVL(SERIE_SUBSERIE_DOCUMENTO, '0'), 3) = F_STRZERO(NVL(:serie_subserie_documento, '0'), 3))
-              AND NR_DOCUMENTO                          = :nr_documento
-              and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
-              AND ID_EMPRESA                            = :id_empresa)
- `;
+  delete sf_c110_saida
+   where id_nota_fiscal_saida in (
+          select id_nota_fiscal_saida
+            from in_nota_fiscal_saida
+           where (nvl(trim(serie_subserie_documento),0) = nvl(trim(:serie_subserie_documento),0)
+                  or f_strzero(nvl(serie_subserie_documento, '0'), 3) = f_strzero(nvl(:serie_subserie_documento, '0'), 3))
+             and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
+             and dm_entrada_saida                           = :dm_entrada_saida
+             and nr_documento                               = :nr_documento
+             and id_empresa                                 = :id_empresa)`;
 
  try {
    return await Oracle.delete(sql, chaveC100Saida);

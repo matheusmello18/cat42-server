@@ -91,13 +91,12 @@ var AcC700Saida = function(){
  AcC700Saida.prototype.delete = async (chaveC100Saida) => {
   let sql = `
   delete ac_c700_saida
-  where nvl(trim(serie_subserie_documento),0) = nvl(trim(:serie_subserie_documento),0)
-    and id_pessoa_remetente  = :id_pessoa_remetente
-    and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
-    and nr_documento         = :nr_documento
-    and id_modelo_documento  = :id_modelo_documento
-    and id_empresa           = :id_empresa
-  `;
+   where (nvl(trim(serie_subserie_documento),0) = nvl(trim(:serie_subserie_documento),0)
+          or f_strzero(nvl(serie_subserie_documento, '0'), 3) = f_strzero(nvl(:serie_subserie_documento, '0'), 3))
+     and to_char(dt_emissao_documento,'dd/mm/yyyy') = :dt_emissao_documento
+     and dm_entrada_saida                           = :dm_entrada_saida
+     and nr_documento                               = :nr_documento
+     and id_empresa                                 = :id_empresa`;
 
   try {
     return await Oracle.delete(sql, chaveC100Saida);

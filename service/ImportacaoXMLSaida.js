@@ -31,10 +31,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   .catch((err) => {
     throw new Error('Falha na busca pela empresa cadastrada. Erro: ' + err.message);
   });
-  
-  if(Empresa.CNPJ_EMPRESA !== xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0].CNPJ[0]) { //senão saida
+
+  if(Empresa.CNPJ_EMPRESA === xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0].CNPJ[0]) { //senão saida
     throw new Error('Nota fiscal informada não é uma nota fiscal de saída.');
-  } else if(Empresa.CNPJ_EMPRESA !== cpfOrCnpj) {
+  } else if(Empresa.CNPJ_EMPRESA !== xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.CNPJ[0]) { 
     throw new Error('Nota fiscal informada não pertence a empresa cadastrada.');
   }
   
@@ -55,7 +55,11 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   });
   //#endregion Empresa
   
-  const dSaiEnt = inParametro.DM_APURACAO_DTEMISSAO === 'N' ? utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dhSaiEnt, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dSaiEnt)[0]) : dhEmi;
+  let dSaiEnt;
+  if (utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dhSaiEnt, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dSaiEnt) !== "")
+    dSaiEnt = utils.FormatarData.DateXmlToDateOracleString(utils.Validar.ifelse(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dhSaiEnt, xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.ide[0]?.dSaiEnt)[0]);
+  else
+    dSaiEnt = dhEmi;
 
   //#region Pais
   const Pais = await new model.Ac331.Pais().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.enderDest[0]?.cPais[0])
@@ -190,28 +194,28 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   });
   //#endregion CFOP
   
-  let vl_outras_despesas = parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0].ICMSTot[0]?.vOutro, 0, "0").replace(',','.'))
+  // let vl_outras_despesas = parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0].ICMSTot[0]?.vOutro, 0, "0").replace(',','.'))
 
-  if (['3', '7'].includes(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det[0]?.prod[0]?.CFOP[0][0])) {
-    if (Cfop.DM_ICMS_VL_CONTABIL === 'S') {
-      vl_outras_despesas = vl_outras_despesas + 
-        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vICMS, 0).replace(',','.'));
-    }
-    if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S') {
-      vl_outras_despesas = vl_outras_despesas + 
-        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vPIS, 0).replace(',','.')) +
-        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vCOFINS, 0).replace(',','.'));
-    }
-    if (Cfop.DM_VLCONTABIL_II === 'S') {
-      vl_outras_despesas = vl_outras_despesas + 
-        parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vII, 0).replace(',','.'));
-    }
-  }
+  // if (['3', '7'].includes(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det[0]?.prod[0]?.CFOP[0][0])) {
+  //   if (Cfop.DM_ICMS_VL_CONTABIL === 'S') {
+  //     vl_outras_despesas = vl_outras_despesas + 
+  //       parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vICMS, 0).replace(',','.'));
+  //   }
+  //   if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S') {
+  //     vl_outras_despesas = vl_outras_despesas + 
+  //       parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vPIS, 0).replace(',','.')) +
+  //       parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vCOFINS, 0).replace(',','.'));
+  //   }
+  //   if (Cfop.DM_VLCONTABIL_II === 'S') {
+  //     vl_outras_despesas = vl_outras_despesas + 
+  //       parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vII, 0).replace(',','.'));
+  //   }
+  // }
 
-  if (utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0, "X") !== "X"){
-    vl_outras_despesas = vl_outras_despesas + 
-    parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0).replace(',','.'));
-  }
+  // if (utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0, "X") !== "X"){
+  //   vl_outras_despesas = vl_outras_despesas + 
+  //   parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPIDevol, 0).replace(',','.'));
+  // }
 
   //#region C100
   const chaveC100 = {
@@ -237,21 +241,53 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     id_empresa: id_empresa
   };
   
-  await new model.NotaFiscal.Saida().SfC110.delete({
-    ...chaveC100,
-  });
-  /*await new model.NotaFiscal.Saida().Item.delete({
-    ...chaveC100,
+  await new model.NotaFiscal.Saida().Item.AcC050.delete(chaveC100)
+  .then((data) => {
+    return data;
   })
-  await new model.NotaFiscal.Saida().Item.AcC050.delete({
-    ...chaveC100,
+  .catch((err) => {
+    throw new Error('Falha ao deletar o registro AcC050 Saída. Error:' + err.message);
   })
-  await new model.NotaFiscal.Saida().SfC195.delete({
-    ...chaveC100,
+
+  await new model.NotaFiscal.Saida().Item.delete(chaveC100)
+  .then((data) => {
+    return data;
   })
-  await new model.NotaFiscal.Saida().delete({
-    ...chaveC100,
-  })*/
+  .catch((err) => {
+    throw new Error('Falha ao deletar o registro item da nota fiscal de saída. Error:' + err.message);
+  })
+
+  await new model.NotaFiscal.Saida().SfC110.delete(chaveC100)
+  .then((data) => {
+    return data;
+  })
+  .catch((err) => {
+    throw new Error('Falha ao deletar o registro C110 Saída. Error:' + err.message);
+  })
+
+  await new model.NotaFiscal.Saida().AcC700.delete(chaveC100)
+  .then((data) => {
+    return data;
+  })
+  .catch((err) => {
+    throw new Error('Falha ao deletar o registro C700 Saída. Error:' + err.message);
+  })
+
+  await new model.NotaFiscal.Saida().SfC195.delete(chaveC100)
+  .then((data) => {
+    return data;
+  })
+  .catch((err) => {
+    throw new Error('Falha ao deletar o registro C195 Saída. Error:' + err.message);
+  })
+
+  await new model.NotaFiscal.Saida().delete(chaveC100)
+  .then((data) => {
+    return data;
+  })
+  .catch((err) => {
+    throw new Error('Falha ao deletar o registro da nota fiscal saída. Error:' + err.message);
+  })
 
   //C100
   await new model.NotaFiscal.Saida().insert({
@@ -263,7 +299,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     vl_total_nota_fiscal: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vNF, 0).replace(',','.'),
     vl_desconto: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vDesc, 0, "0").replace(',','.'),
     vl_icms_substituicao: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vST, 0, "0").replace(',','.'),
-    vl_outras_despesas: vl_outras_despesas,
+    vl_outras_despesas: parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0].ICMSTot[0]?.vOutro, 0, "0").replace(',','.')),
     vl_total_mercadoria: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vProd, 0, "0").replace(',','.'),
     vl_frete: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vFrete, 0, "0").replace(',','.'),
     vl_ipi: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0]?.ICMSTot[0]?.vIPI, 0, "0").replace(',','.'),
@@ -621,11 +657,11 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       /**
        * @param {number} qQtde
        */
-      qtde: 0, //qQtde
+      qtde: parseFloat(utils.Validar.getValueArray(det.prod[0].qCom, 0, "0").replace(',','.')), //qQtde
       /**
        * @param {string} qUnid
        */
-      unidade:'', // qUnid
+      unidade: ds_unidade, // qUnid
       /**
        * @param {string} dm_tributacao_ipi '5'
        */
@@ -633,15 +669,15 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       /**
        * @param {number} nVl_Icms_Outro
        */
-      vl_outras_despesas: 0, //nVl_Icms_Outro
+      vl_outras_despesas: parseFloat(utils.Validar.getValueArray(det.prod[0]?.vOutro, 0, "0").replace(',','.')), //nVl_Icms_Outro
       /**
        * @param {number} svFrete
        */
-      vl_frete: 0, //svFrete
+      vl_frete: parseFloat(utils.Validar.getValueArray(det.prod[0].vFrete, 0, "0").replace(',','.')), //svFrete
       /**
        * @param {number} svSeg
        */
-      vl_seguro: 0, //svSeg
+      vl_seguro: parseFloat(utils.Validar.getValueArray(det.prod[0].vSeg, 0, "0").replace(',','.')), //svSeg
       /**
        * @param {string} sDs_Prod
        */
@@ -808,8 +844,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     }
 
     //#region ICMS
-    let impostoICMS;
-    impostoICMS.calcReBC = false
+    let impostoICMS = {};
+    let calcReBC = false
     
     if (det.imposto[0]?.ICMS[0]?.ICMS00 !== undefined) {
       impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS00[0];
@@ -818,10 +854,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace(',','.')); //sAliq_ICMS
       paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace(',','.')); //sVl_ICMS
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; //nVl_Icms_Outro
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; //nVl_Icms_Outro
+      // }
 
       paramC170.dm_mod_bc_icms = utils.Validar.getValueArray(impostoICMS.modBC, 0, ""); //sModBC
       paramC170.aliq_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCP, 0, "0").replace(',','.')); //sAliq_FCP_OP
@@ -837,10 +873,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace(',','.')); 
       paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace(',','.')); 
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+      // }
 
       paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace(',','.')); 
       paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace(',','.')); 
@@ -861,16 +897,16 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     } else if (det.imposto[0]?.ICMS[0]?.ICMS20 !== undefined) {
       impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS20[0];
-      impostoICMS.calcReBC = true;
+      calcReBC = true;
 
       paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace(',','.')); 
       paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace(',','.')); 
       paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace(',','.')); 
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+      // }
 
       if (impostoICMS.motDesICMS !== undefined) {
         paramC170.dm_mot_desc_icms = utils.Validar.getValueArray(impostoICMS.motDesICMS, 0, "").padStart(2, '0');
@@ -914,16 +950,16 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     } else if (det.imposto[0]?.ICMS[0]?.ICMS51 !== undefined) {
       impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS51[0];
-      impostoICMS.calcReBC = true;
+      calcReBC = true;
 
       paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace(',','.')); 
       paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace(',','.')); 
       paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace(',','.')); 
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+      // }
 
       paramC170.vl_reducao_bc_icms = paramC170.vl_total_item * ((parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace(',','.')) / 100) / 100); 
       paramC170.vl_perc_red_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace(',','.'));
@@ -945,16 +981,16 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     } else if (det.imposto[0]?.ICMS[0]?.ICMS70 !== undefined) {
       impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS70[0];
-      impostoICMS.calcReBC = true;
+      calcReBC = true;
 
       paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace(',','.')); 
       paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace(',','.')); 
       paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace(',','.')); 
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+      // }
 
       paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace(',','.')); 
       paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace(',','.')); 
@@ -982,16 +1018,16 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       
     } else if (det.imposto[0]?.ICMS[0]?.ICMS90 !== undefined) {
       impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS90[0];
-      impostoICMS.calcReBC = true;
+      calcReBC = true;
 
       paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace(',','.')); 
       paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace(',','.')); 
       paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace(',','.')); 
       
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+      // }
 
       paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace(',','.')); 
       paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace(',','.')); 
@@ -1019,16 +1055,16 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     } else if (det.imposto[0]?.ICMS[0]?.ICMSPart !== undefined) {
       impostoICMS = det.imposto[0]?.ICMS[0]?.ICMSPart[0];
-      impostoICMS.calcReBC = true;
+      calcReBC = true;
 
       paramC170.vl_base_calculo_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace(',','.')); 
       paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace(',','.')); 
       paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace(',','.')); 
       
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+      // }
 
       paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace(',','.')); 
       paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace(',','.')); 
@@ -1052,10 +1088,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vCredICMSSN, 0, "0").replace(',','.'));
       
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+      // }
 
       paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pCredSN, 0, "0").replace(',','.')); 
 
@@ -1066,10 +1102,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vCredICMSSN, 0, "0").replace(',','.'));
       
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+      // }
 
       paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pCredSN, 0, "0").replace(',','.')); 
 
@@ -1124,10 +1160,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC170.aliq_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMS, 0, "0").replace(',','.')); 
       paramC170.vl_icms = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMS, 0, "0").replace(',','.')); 
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_ICMS_VL_CONTABIL === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC170.vl_icms; 
+      // }
 
       paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace(',','.')); 
       paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace(',','.')); 
@@ -1203,6 +1239,16 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     } else if (det.imposto[0]?.IPI[0]?.IPINT !== undefined) {
       paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.CST, 0, "");
     }
+
+    const Ac432 = await new model.Ac432().selectByCodigo(paramC170.id_ref_432.toString())
+    .then((data) => {
+      return data.rows[0]
+    })
+    .catch((err) => {
+      throw new Error('Falha na busca pelo o Ac432 cadastrada. Erro: ' + err.message);
+    });
+
+    if(Ac432 !== undefined) paramC170.id_ref_432 = Ac432.ID_REF_432;
     //#endregion IPI
 
     //#region II
@@ -1212,10 +1258,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC170.vl_ii = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.II[0]?.vII, 0, "0").replace(',','.'));
       paramC170.vl_iof = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.II[0]?.vIOF, 0, "0").replace(',','.'));
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_VLCONTABIL_II === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC170.vl_ii; 
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_VLCONTABIL_II === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC170.vl_ii; 
+      // }
     }
     //#endregion II
 
@@ -1226,20 +1272,20 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC050.aliq_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISAliq[0]?.pPIS, 0, "0").replace(',','.'));
       paramC050.vl_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISAliq[0]?.vPIS, 0, "0").replace(',','.'));
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC050.vl_pis;
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC050.vl_pis;
+      // }
     } else if (det.imposto[0]?.PIS[0]?.PISQtde !== undefined) {
       paramC050.id_ref_433 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISQtde[0]?.CST, 0, "");
       paramC050.vl_aliq_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISQtde[0]?.vAliqProd, 0, "0").replace(',','.'));
       paramC050.vl_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISQtde[0]?.vPIS, 0, "0").replace(',','.'));
       paramC050.qtde_bc_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISQtde[0]?.qBCProd, 0, "0").replace(',','.'));
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC050.vl_pis;
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC050.vl_pis;
+      // }
     } else if (det.imposto[0]?.PIS[0]?.PISNT !== undefined) {
       paramC050.id_ref_433 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISNT[0]?.CST, 0, "");
     } else if (det.imposto[0]?.PIS[0]?.PISOutr !== undefined) {
@@ -1250,10 +1296,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC050.vl_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISOutr[0]?.vPIS, 0, "0").replace(',','.'));
       paramC050.qtde_bc_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISOutr[0]?.qBCProd, 0, "0").replace(',','.'));
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC050.vl_pis;
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC050.vl_pis;
+      // }
     } else if (det.imposto[0]?.PIS[0]?.PISST !== undefined) {
       paramC050.id_ref_433 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISST[0]?.CST, 0, "");
       paramC050.vl_bc_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISST[0]?.vBC, 0, "0").replace(',','.'));
@@ -1262,10 +1308,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC050.vl_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISST[0]?.vPIS, 0, "0").replace(',','.'));
       paramC050.qtde_bc_pis = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISST[0]?.qBCProd, 0, "0").replace(',','.'));
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC050.vl_pis;
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC050.vl_pis;
+      // }
     }
 
     const Sf433 = await new model.Sf433().selectByCodigo(paramC050.id_ref_433.toString())
@@ -1286,20 +1332,20 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC050.aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSAliq[0]?.pCOFINS, 0, "0").replace(',','.'));          
       paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSAliq[0]?.vCOFINS, 0, "0").replace(',','.'));
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC050.vl_cofins;
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC050.vl_cofins;
+      // }
     } else if (det.imposto[0]?.COFINS[0]?.COFINSQtde !== undefined) {
       paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSQtde[0]?.CST, 0, "");
       paramC050.vl_aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSQtde[0]?.vAliqProd, 0, "0").replace(',','.'));
       paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSQtde[0]?.vCOFINS, 0, "0").replace(',','.'));
       paramC050.qtde_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSQtde[0]?.qBCProd, 0, "0").replace(',','.'));
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC050.vl_cofins;
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC050.vl_cofins;
+      // }
     } else if (det.imposto[0]?.COFINS[0]?.COFINSNT !== undefined) {
       paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSNT[0]?.CST, 0, "");
     } else if (det.imposto[0]?.COFINS[0]?.COFINSOutr !== undefined) { 
@@ -1310,10 +1356,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.vCOFINS, 0, "0").replace(',','.'));
       paramC050.qtde_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.qBCProd, 0, "0").replace(',','.'));
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC050.vl_cofins;
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC050.vl_cofins;
+      // }
     } else if (det.imposto[0]?.COFINS[0]?.COFINSST !== undefined) {
       paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.CST, 0, "");
       paramC050.vl_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.vBC, 0, "0").replace(',','.'));
@@ -1322,10 +1368,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.vCOFINS, 0, "0").replace(',','.'));
       paramC050.qtde_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.qBCProd, 0, "0").replace(',','.'));
 
-      if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
-        if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
-          vl_outras_despesas = vl_outras_despesas + paramC050.vl_cofins;
-      }
+      // if (['3', '7'].includes(det?.prod[0]?.CFOP[0][0])) {
+      //   if (Cfop.DM_VLCONTABIL_PISCOFINS === 'S')
+      //     vl_outras_despesas = vl_outras_despesas + paramC050.vl_cofins;
+      // }
     }
 
     const Sf434 = await new model.Sf434().selectByCodigo(paramC050.id_ref_434.toString())
@@ -1353,7 +1399,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     //#endregion Imposto
 
     //#region Calculo BC
-    if (impostoICMS.calcReBC) {
+    if (calcReBC) {
       let somatoria = 0;
       if (Cfop.DM_ICMS_VL_CONTABIL == 'S') {
         somatoria = somatoria + paramC170.vl_icms_substituicao; //sVl_ICMS
@@ -1382,7 +1428,16 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC170.vl_reducao_bc_icms = paramC170.vl_total_item * (nRedBC / 100);
     }
     
-    paramC170.vl_outras_despesas = vl_outras_despesas;
+    // paramC170.vl_outras_despesas = vl_outras_despesas;
+
+    // if (det.impostoDevol !== undefined){
+    //   if (det.impostoDevol[0].IPI !== undefined){
+    //     if (det.impostoDevol[0].IPI[0].vIPIDevol !== undefined){
+    //       paramC170.vl_outras_despesas =parseFloat(utils.Validar.getValueArray(det.impostoDevol[0].IPI[0].vIPIDevol, 0, "0").replace(',','.'))
+    //     }
+    //   }
+    // }
+
     //#endregion Calculo BC
     
     //#region C170

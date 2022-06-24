@@ -99,7 +99,7 @@ router.post("/upload", async (req, res) => {
         if (req.body.nm_method === 'ImportarArqExcel') {
           await Importacoes.Excel(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nm_procedure1, req.body.nm_procedure2);
         } else if (req.body.nm_method === 'ImportarArqTexto') {
-            await Importacoes.Text(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nm_procedure1, req.body.nm_procedure2, req.body.id_modulo, req.body.id_projeto);  
+          await Importacoes.Text(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nm_procedure1, req.body.nm_procedure2, req.body.id_modulo, req.body.id_projeto);  
         } else if (req.body.nm_method === 'ImportarArqXMLSaida') {
           await Importacoes.XmlSaida(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
         } else if (req.body.nm_method === 'ImportarArqXMLEntrada') {
