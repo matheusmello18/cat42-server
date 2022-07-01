@@ -34,8 +34,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
   if(Empresa.CNPJ_EMPRESA === xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0].CNPJ[0]) { //senão saida
     throw new Error('Nota fiscal informada não é uma nota fiscal de saída.');
-  } else if(Empresa.CNPJ_EMPRESA !== xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.CNPJ[0]) { 
-    throw new Error('Nota fiscal informada não pertence a empresa cadastrada.','etse', '1');
+  } else if(Empresa.CNPJ_EMPRESA !== xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.CNPJ[0]) {
+    throw new Error('Nota fiscal informada não pertence a empresa cadastrada.');
   }
   
   var inParametro = await Oracle.select(

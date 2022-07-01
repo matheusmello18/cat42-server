@@ -60,6 +60,12 @@ const users = require("./route/v1/users")
  */
 const etapas = require("./route/v1/etapas")
 
+/**
+ * Rota de gerar
+ * @requires gerar
+ */
+ const gerar = require("./route/v1/gerar")
+
 const model = require('./service/model')
 const utils = require('./utils')
 const jsonNfe = require("./test/35201153309795000180550010005589881507126891.json")
@@ -81,6 +87,7 @@ serve.use(express.static(path.join(__dirname, "public")))
 serve.use('/api/v1/cliente', cliente)
 serve.use('/api/v1/user', users)
 serve.use('/api/v1/etapas', etapas)
+serve.use('/api/v1/gerar', gerar)
 
 serve.get('*', (req, res) => {
   res.json({msg: "rota não existe"})
