@@ -18,9 +18,7 @@ router.post("/cat", async (req, res) => {
     success = 'false';
   }
 
-  let retorno = await new model.Etapas().select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
-  var retStatus = await new model.EtapaStatus().select(req.body.id_empresa, req.body.id_usuario, req.body.id_simul_etapa);
-  retorno.rows[0].STATUS = retStatus.rows;
+  let retorno = await new model.EtapaStatus().select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
 
   if (success === 'true')
     return res.status(200).json({success:"true", message: 'Importação finalizada.', row: retorno.rows[0]});

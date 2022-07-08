@@ -234,7 +234,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro AcC050 Entrada. Error:' + err.message);
+    throw new Error('Falha ao deletar o registro AcC050 Entrada. Erro:' + err.message);
   })
 
   await new model.NotaFiscal.Entrada().Item.delete(chaveC100)
@@ -242,7 +242,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro item da nota fiscal de entrada. Error:' + err.message);
+    throw new Error('Falha ao deletar o registro item da nota fiscal de entrada. Erro:' + err.message);
   })
 
   await new model.NotaFiscal.Entrada().SfC110.delete(chaveC100)
@@ -250,7 +250,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro do C110 Entrada. Error:' + err.message);
+    throw new Error('Falha ao deletar o registro do C110 Entrada. Erro:' + err.message);
   })
 
   await new model.NotaFiscal.Entrada().AcC700.delete(chaveC100)
@@ -258,7 +258,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro do C700 Entrada. Error:' + err.message);
+    throw new Error('Falha ao deletar o registro do C700 Entrada. Erro:' + err.message);
   })
 
   await new model.NotaFiscal.Entrada().AcC060.delete(chaveC100)
@@ -266,7 +266,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro do C060 Entrada. Error:' + err.message);
+    throw new Error('Falha ao deletar o registro do C060 Entrada. Erro:' + err.message);
   })
 
   await new model.NotaFiscal.Entrada().delete(chaveC100)
@@ -274,7 +274,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro da nota fiscal entrada. Error:' + err.message);
+    throw new Error('Falha ao deletar o registro da nota fiscal entrada. Erro:' + err.message);
   })
 
   //C100

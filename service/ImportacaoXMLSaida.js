@@ -224,7 +224,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro AcC050 Saída. Error:' + err.message);
+    throw new Error('Falha ao deletar o registro AcC050 Saída. Erro:' + err.message);
   })
 
   await new model.NotaFiscal.Saida().Item.delete(chaveC100)
@@ -232,7 +232,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro item da nota fiscal de saída. Error:' + err.message);
+    throw new Error('Falha ao deletar o registro item da nota fiscal de saída. Erro:' + err.message);
   })
 
   await new model.NotaFiscal.Saida().SfC110.delete(chaveC100)
@@ -240,7 +240,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro C110 Saída. Error:' + err.message);
+    throw new Error('Falha ao deletar o registro C110 Saída. Erro:' + err.message);
   })
 
   await new model.NotaFiscal.Saida().AcC700.delete(chaveC100)
@@ -248,7 +248,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro C700 Saída. Error:' + err.message);
+    throw new Error('Falha ao deletar o registro C700 Saída. Erro:' + err.message);
   })
 
   await new model.NotaFiscal.Saida().SfC195.delete(chaveC100)
@@ -256,7 +256,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro C195 Saída. Error:' + err.message);
+    throw new Error('Falha ao deletar o registro C195 Saída. Erro:' + err.message);
   })
 
   await new model.NotaFiscal.Saida().delete(chaveC100)
@@ -264,7 +264,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro da nota fiscal saída. Error:' + err.message);
+    throw new Error('Falha ao deletar o registro da nota fiscal saída. Erro:' + err.message);
   })
 
   //C100

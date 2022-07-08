@@ -9,19 +9,8 @@ const Importacoes = require('../../service/Importacoes');
 
 router.post("/show", async (req, res) => {
   try {
-    var retorno = await new model.Etapas().select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
-    
-  
-    for (let index = 0; index < retorno.rows.length; index++) {
-      const etapa = retorno.rows[index];
-      if (etapa.ID_SIMUL_STATUS !== null){
-        var retStatus = await new model.EtapaStatus().select(req.body.id_empresa, req.body.id_usuario, etapa.ID_SIMUL_ETAPA);
-        retorno.rows[index].STATUS = retStatus.rows;
-      } else {
-        retorno.rows[index].STATUS = [];
-      }
-    }
-  
+    var retorno = await new model.EtapaStatus().select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
+     
     return res.status(200).json({success:"true", rows: retorno.rows})
   } catch (err) {
     return res.status(200).json({success:"false", message: err.message, rows: null})
@@ -55,7 +44,9 @@ var upload = multer({
         var filetypes = /x-xls|xlsx|xls|vnd.openxmlformats-officedocument.spreadsheetml.sheet|excel/;
       } else if (req.body.nm_method === 'ImportarArqTexto') {
         var filetypes = /text|txt|tex\/plain|plain/;
-      } else if (req.body.nm_method === 'ImportarArqXML') {
+      } else if (req.body.nm_method === 'ImportarArqXMLSaida') {
+        var filetypes = /xml|xhtml+xml|zip/; /*application/x-zip-compressed*/
+      } else if (req.body.nm_method === 'ImportarArqXMLEntrada') {
         var filetypes = /xml|xhtml+xml/;
       } else {
         var filetypes = /||/;
@@ -75,7 +66,10 @@ var upload = multer({
       } else if (req.body.nm_method === 'ImportarArqTexto') {
         // @ts-ignore
         cb("O upload do arquivo não é compativel com o esperado. Permitdo arquivo Texto");
-      } else if (req.body.nm_method === 'ImportarArqXML') {
+      } else if (req.body.nm_method === 'ImportarArqXMLSaida') {
+        // @ts-ignore
+        cb("O upload do arquivo não é compativel com o esperado. Permitdo arquivo XML/ZIP");
+      } else if (req.body.nm_method === 'ImportarArqXMLEntrada') {
         // @ts-ignore
         cb("O upload do arquivo não é compativel com o esperado. Permitdo arquivo XML");
       }
@@ -112,9 +106,7 @@ router.post("/upload", async (req, res) => {
         success = 'false';
       }
 
-      let retorno = await new model.Etapas().select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
-      var retStatus = await new model.EtapaStatus().select(req.body.id_empresa, req.body.id_usuario, req.body.id_simul_etapa);
-      retorno.rows[0].STATUS = retStatus.rows;
+      let retorno = await new model.EtapaStatus().select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.id_simul_etapa);
 
       if (success === 'true')
         return res.status(200).json({success:"true", message: 'Importação finalizada.', row: retorno.rows[0]});
