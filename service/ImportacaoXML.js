@@ -50,6 +50,10 @@ console.log(filename, ' -----> ',path);
         })
         .then(async (jsonXML) => {
           try {
+            if (jsonXML.nfeProc === undefined || jsonXML.CFe === undefined) {
+              throw new Error('XML fora do padrão da importação. - Arquivo: ' + file);
+            }
+
             if (jsonXML.nfeProc !== undefined){
               await impXmlSaida.Nfe(jsonXML, id_simul_etapa, id_empresa, id_usuario, dt_periodo);
             } else if (jsonXML.CFe !== undefined) { //c800
@@ -64,10 +68,6 @@ console.log(filename, ' -----> ',path);
             throw new Error(err.message + ' - Arquivo: ' + file);
           }
           
-          
-          if (jsonXML.nfeProc !== undefined && jsonXML.CFe !== undefined) {
-            throw new Error('XML fora do padrão da importação. - Arquivo: ' + file);
-          }
         });
         
       }//fim for
@@ -90,6 +90,10 @@ console.log(filename, ' -----> ',path);
     })
     .then(async (jsonXML) => {
       try {
+        if (jsonXML.nfeProc === undefined || jsonXML.CFe === undefined) {
+          throw new Error('XML fora do padrão da importação. - Arquivo: ' + filename);
+        }
+
         if (jsonXML.nfeProc !== undefined){
           await impXmlSaida.Nfe(jsonXML, id_simul_etapa, id_empresa, id_usuario, dt_periodo);
         } else if (jsonXML.CFe !== undefined) { //c800
@@ -102,11 +106,6 @@ console.log(filename, ' -----> ',path);
           Oracle.execProcedure(nm_procedure2, {id_empresa: id_empresa, id_usuario: id_usuario});
       } catch (err) {
         throw new Error(err.message + ' - Arquivo: ' + filename);
-      }
-      
-      
-      if (jsonXML.nfeProc !== undefined && jsonXML.CFe !== undefined) {
-        throw new Error('XML fora do padrão da importação. - Arquivo: ' + filename);
       }
     });
   } 
@@ -126,20 +125,22 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
   })
   .then(async (jsonXML) => {
     try {
+        
+      if (jsonXML.nfeProc === undefined) {
+        throw new Error('XML fora do padrão da importação. - Arquivo: ' + filename);
+      }
+
       if (jsonXML.nfeProc !== undefined){
         await impXmlEntrada.Nfe(jsonXML, id_simul_etapa, id_empresa, id_usuario, dt_periodo);
-      } 
+      }
 
       if (nm_procedure1 !== undefined || nm_procedure1 !== "")
         Oracle.execProcedure(nm_procedure1, {id_empresa: id_empresa, id_usuario: id_usuario});
       if (nm_procedure2 !== undefined || nm_procedure2 !== "")
         Oracle.execProcedure(nm_procedure2, {id_empresa: id_empresa, id_usuario: id_usuario});
     } catch (err) {
-      throw new Error(err.message);
+      throw new Error(err.message + ' - Arquivo: ' + filename);
     }
-        
-    if (jsonXML.nfeProc !== undefined && jsonXML.CFe !== undefined) {
-      throw new Error('XML fora do padrão da importação.');
-    }
+
   })
 }

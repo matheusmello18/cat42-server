@@ -103,7 +103,7 @@ EtapaStatus.prototype.select = async (id_empresa, id_usuario, dt_periodo, id_sim
 
           // produto
           if (row.DM_LISTA_PROD == 'S'){
-            const prods = await new EtapaProdutoStatus().select(row.ID_SIMUL_ETAPA).then((data) => {
+            const prods = await new EtapaProdutoStatus().select(row.ID_SIMUL_ETAPA, id_empresa, id_usuario).then((data) => {
               return data.rows;
             });
             data.rows[index].PRODS = prods;

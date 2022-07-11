@@ -100,4 +100,43 @@ ProdutoSimulador.prototype.Delete = async (id_empresa, id_usuario) => {
   }
 }
 
+/**
+ * Função selecionar os dados do Produto Simulador por Cód Produto Fornecedor (vindo do XML)
+ * 
+ * @param {String} cdProdForn
+ * @param {Number} id_empresa
+ * @param {Number} id_usuario
+ * @returns {Promise} Promise
+ * @example
+ * await ProdutoSimulador.selectByCodProdForn('00981', 1, 1);
+ * 
+ * ou
+ *
+ * const data = await ProdutoSimulador.selectByCodProdForn('00981', 1, 1).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao inserir o registro.');
+ * })
+ */
+ProdutoSimulador.prototype.selectByCodProdForn = async (cdProdForn, id_empresa, id_usuario) => {
+  const sql= `select * 
+                from simul_produto 
+               where cd_produto_forn in (:cd_produto_forn) 
+                 and id_empresa = :id_empresa 
+                 and id_usuario = :id_usuario 
+                 and id_simul_tp_status in (2,3)`;
+  try {
+    let params = {
+      cd_produto_forn: cdProdForn,
+      id_empresa: id_empresa,
+      id_usuario: id_usuario
+    };
+
+    return await Oracle.delete(sql, params);
+  
+  } catch (err) {
+    throw new Error(err);
+  }
+}
+
 module.exports.ProdutoSimulador = ProdutoSimulador;
