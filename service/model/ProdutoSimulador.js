@@ -18,6 +18,17 @@ const Oracle = require('../Oracle');
     return new ProdutoSimulador();
 };
 
+ProdutoSimulador.prototype.BuscarPeloProdutosSimul = async (xmlObj, id_empresa, id_usuario) => {
+  let cd_prods = '';
+  for (let i = 0; i < xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det.length; i++) {
+    const det = xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det[i];
+    cd_prods = cd_prods.concat(`'${det.prod[0]?.cProd[0].trim()}',`)    
+  }
+  cd_prods = cd_prods.slice(0, -1);
+
+  return await new ProdutoSimulador().selectByCodProdForn(cd_prods, id_empresa, id_usuario);  
+}
+
 /**
  * Função inserir os dados do Produto Simulador 
  * 
@@ -120,19 +131,57 @@ ProdutoSimulador.prototype.Delete = async (id_empresa, id_usuario) => {
  */
 ProdutoSimulador.prototype.selectByCodProdForn = async (cdProdForn, id_empresa, id_usuario) => {
   const sql= `select * 
-                from simul_produto 
-               where cd_produto_forn in (:cd_produto_forn) 
-                 and id_empresa = :id_empresa 
-                 and id_usuario = :id_usuario 
-                 and id_simul_tp_status in (2,3)`;
+                from simul_produto a
+               inner join simul_produto_etp_sta b on a.id_produto = b.id_produto and a.id_empresa = b.id_empresa
+               where a.cd_produto_forn in (${cdProdForn}) 
+                 and a.id_empresa = :id_empresa
+                 and a.id_usuario = :id_usuario
+                 and b.id_simul_tp_status in (2,3)`;
   try {
     let params = {
-      cd_produto_forn: cdProdForn,
       id_empresa: id_empresa,
       id_usuario: id_usuario
     };
+    return await Oracle.select(sql, params);
+  
+  } catch (err) {
+    throw new Error(err);
+  }
+}
 
-    return await Oracle.delete(sql, params);
+/**
+ * Função selecionar os dados do Produto Simulador por Cód Produto Fornecedor (vindo do XML)
+ * 
+ * @param {Number} id_simul_tp_status 1 - SUCESSO / 2 - ERRO / 3 PENDENCIA
+ * @param {Number} id_produto
+ * @param {Number} id_empresa
+ * @param {Number} id_usuario
+ * @returns {Promise} Promise
+ * @example
+ * await ProdutoSimulador.updateStatus(1, 3, 1, 1);
+ * 
+ * ou
+ *
+ * const data = await ProdutoSimulador.updateStatus(1, 3, 1, 1).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao alterar o registro.');
+ * })
+ */
+ProdutoSimulador.prototype.updateStatus = async (id_simul_tp_status, id_produto, id_empresa, id_usuario) => {
+  const sql= `update simul_produto_etp_sta
+                set id_simul_tp_status = :id_simul_tp_status
+              where id_produto = :id_produto
+                and id_empresa = :id_empresa
+                and id_usuario = :id_usuario`;
+  try {
+    let params = {
+      id_simul_tp_status: id_simul_tp_status,
+      id_produto: id_produto,
+      id_empresa: id_empresa,
+      id_usuario: id_usuario
+    };
+    return await Oracle.update(sql, params);
   
   } catch (err) {
     throw new Error(err);

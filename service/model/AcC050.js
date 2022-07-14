@@ -120,7 +120,7 @@ AcC050Saida.prototype.insert = async (dataAcC050Saida) => {
  AcC050Saida.prototype.update = async (dataAcC050Saida) => {
 	let sql = ``;
 	try {
-		return await Oracle.insert(sql, dataAcC050Saida)
+		return await Oracle.update(sql, dataAcC050Saida)
 	} catch (err) {
 		throw new Error(err);
 	}

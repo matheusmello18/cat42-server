@@ -1,4 +1,5 @@
 const Oracle = require('./Oracle');
+const model = require('./model');
 const impXmlSaida = require('./ImportacaoXMLSaida');
 const impXmlEntrada = require('./ImportacaoXMLEntrada');
 const parseString = require('xml2js').parseString;
@@ -138,7 +139,27 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
         Oracle.execProcedure(nm_procedure1, {id_empresa: id_empresa, id_usuario: id_usuario});
       if (nm_procedure2 !== undefined || nm_procedure2 !== "")
         Oracle.execProcedure(nm_procedure2, {id_empresa: id_empresa, id_usuario: id_usuario});
+
+
+      const ProdsSimul = await new model.ProdutoSimulador().BuscarPeloProdutosSimul(jsonXML, id_empresa, id_usuario).then((data) => {
+        return data.rows;
+      });
+      for (let i = 0; i < ProdsSimul.length; i++) {
+        await new model.ProdutoSimulador().updateStatus(1, ProdsSimul[i].ID_PRODUTO, id_empresa, id_usuario).catch((err) => {
+          throw new Error('Erro ao atualizar o status do produto. Produto: ' + ProdsSimul[i].DS_PRODUTO);
+        });
+      }
+      
     } catch (err) {
+
+      const ProdsSimul = await new model.ProdutoSimulador().BuscarPeloProdutosSimul(jsonXML, id_empresa, id_usuario).then((data) => {
+        return data.rows;
+      });
+      for (let i = 0; i < ProdsSimul.length; i++) {
+        await new model.ProdutoSimulador().updateStatus(3, ProdsSimul[i].ID_PRODUTO, id_empresa, id_usuario).catch((err) => {
+          throw new Error('Erro ao atualizar o status do produto. Produto: ' + ProdsSimul[i].DS_PRODUTO);
+        });
+      }
       throw new Error(err.message + ' - Arquivo: ' + filename);
     }
 

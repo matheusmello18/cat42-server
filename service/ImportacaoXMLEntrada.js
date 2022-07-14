@@ -18,13 +18,15 @@ const utils = require('../utils');
 module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo) => {
 
   //#region validação dos produtos existentes
-  let cd_prods = '';
-  for (let i = 0; i < xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det.length; i++) {
-    const det = xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.det[i];
-    cd_prods = cd_prods.concat(`"${det.prod[0]?.cProd[0]}",`)
+  const ProdsSimul = await new model.ProdutoSimulador().BuscarPeloProdutosSimul(xmlObj, id_empresa, id_usuario).then((data) => {
+    return data.rows;
+  }).catch((err) => {
+    throw new Error('Falha na busca dos Produtos Simulador.');
+  })
+
+  if (ProdsSimul.length === 0) {
+    throw new Error('Não foi encontrado no XML nenhum produto cadastrado pelo Excel.');
   }
-  cd_prods = cd_prods.slice(cd_prods.length, -1);
-  await new model.ProdutoSimulador().selectByCodProdForn(cd_prods, id_empresa, id_usuario);
   //#endregion
 
   //#region Configurações iniciais
@@ -436,6 +438,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       ).then((data) => {
         return data.rows[0];
       }).catch((err) => {
+        // aqui mudar o status
         throw new Error('Falha ao buscar pelo De Para Unidade Medida. Erro: ' + err.message);
       })
       
