@@ -28,7 +28,7 @@ const Sf0460 = require('./Sf0460').Sf0460;
 const SfC800 = require('./SfC800').SfC800;
 
 const ProdutoSimulador = require('./ProdutoSimulador').ProdutoSimulador;
-const Sf_Importa_Arquivo = require('./Sf_Importa_Arquivo').SFImportaArquivo;
+const Sf_Importa_Arquivo = require('./Sf_Importa_Arquivo').Sf_Importa_Arquivo;
 
 module.exports = {
   Ac331, Ac0450, Ac413, Ac431, Ac432, SfCest,

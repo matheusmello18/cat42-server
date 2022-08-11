@@ -210,8 +210,8 @@ EtapaStatus.prototype.selectold = async (id_empresa, id_usuario, id_simul_etapa 
           T.CD_STATUS,
           T.DS_STATUS,
           S.DS_STATUS DS_STATUS_LOG,
-          S.ID_SIMUL_ETAPA,
-          S.ID_EMPRESA,
+          S.ID_SIMUL_ETAPA,F
+          S.ID_EMPRESA,F
           S.ID_USUARIO,
           TO_CHAR(S.DT_STATUS, 'DD/MM/YYYY HH24:MI:SS') DT_STATUS
       FROM SIMUL_ETAPA_STATUS S 

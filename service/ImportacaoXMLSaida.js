@@ -1410,15 +1410,15 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     pDt_Final: utils.FormatarData.DateOracleToUltimoDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo))
   }
 
-  Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_ENTRADA", paramProcedures)
+  await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_ENTRADA", paramProcedures)
   .catch((err) => {
     throw new Error('Falha ao Atualizar Mapa Entrada. Erro: ' + err.message);
   });
-  Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_SAIDA", paramProcedures)
+  await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_SAIDA", paramProcedures)
   .catch((err) => {
     throw new Error('Falha ao Atualizar Mapa Saída. Erro: ' + err.message);
   });
-  Oracle.execProcedure("SP_SF_ATUALIZA_NF_XML", paramProcedures)
+  await Oracle.execProcedure("SP_SF_ATUALIZA_NF_XML", paramProcedures)
   .catch((err) => {
     throw new Error('Falha ao Atualizar NF XML. Erro: ' + err.message);
   });
@@ -1956,15 +1956,15 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     pDt_Final: utils.FormatarData.DateOracleToUltimoDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo))
   }
 
-  Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_ENTRADA", paramProcedures)
+  await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_ENTRADA", paramProcedures)
   .catch((err) => {
     throw new Error('Falha ao Atualizar Mapa Entrada. Erro: ' + err.message);
   });
-  Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_SAIDA", paramProcedures)
+  await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_SAIDA", paramProcedures)
   .catch((err) => {
     throw new Error('Falha ao Atualizar Mapa Saída. Erro: ' + err.message);
   });
-  Oracle.execProcedure("SP_SF_ATUALIZA_NF_XML", paramProcedures)
+  await Oracle.execProcedure("SP_SF_ATUALIZA_NF_XML", paramProcedures)
   .catch((err) => {
     throw new Error('Falha ao Atualizar NF XML. Erro: ' + err.message);
   });

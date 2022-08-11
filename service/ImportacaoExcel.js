@@ -1,8 +1,6 @@
 const Oracle = require('./Oracle');
 const model = require('./model');
 const ExcelJS = require('exceljs'); // documentação: https://www.npmjs.com/package/exceljs
-const { parseString } = require('xml2js');
-const { parseNumbers } = require('xml2js/lib/processors');
 
 module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2) => {
   try {
@@ -65,8 +63,11 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
 
     if (!existeErrorCampoNulo){
       //executar a procedure configurada
-      
-      await Oracle.execProcedure(nm_procedure1, {id_empresa: id_empresa, id_usuario: id_usuario, abc: `teste`, xyz: `xxxx`});
+      var dateParts = dt_periodo.split("/");
+      var dt_inicial = new Date(parseInt(dateParts[2]), parseInt(dateParts[1])-1, 1);
+      var dt_final = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]), 0);
+      if (nm_procedure1 !== undefined || nm_procedure1.trim() !== "")
+        await Oracle.execProcedure(nm_procedure1, {id_empresa: id_empresa, id_usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
       await new model.EtapaStatus().insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
     }
   } catch (err) {
