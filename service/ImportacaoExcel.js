@@ -7,6 +7,7 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
     let existeErrorCampoNulo = false;
     // realizar os deletes da tabela produto
     await new model.ProdutoSimulador().Delete(id_empresa, id_usuario);
+    await new model.EtapaProdutoStatus().deleteAll(id_empresa, id_usuario);
 
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(path);
@@ -54,6 +55,13 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
             row.getCell(6).value, //vl_fator_conversao
             row.getCell(7).value, //aliq_icms
             row.getCell(8).value, //vl_saldo_estoque_inicial
+            id_empresa, 
+            id_usuario
+          );
+
+          await new model.EtapaProdutoStatus().insert(
+            parseFloat(nProx_Codigo),
+            id_simul_etapa,
             id_empresa, 
             id_usuario
           );

@@ -14,7 +14,6 @@ const Ac0450 = require('./Ac0450').Ac0450;
 const Sf0190 = require('./Sf0190').Sf0190;
 const CtrlEmpresa = require('./CtrlEmpresa').CtrlEmpresa;
 const CtrlUsuario = require('./CtrlUsuario').CtrlUsuario;
-const EtapaStatus = require('./EtapaStatus').EtapaStatus;
 const ModeloDocumento = require('./ModeloDocumento').ModeloDocumento;
 const Cfop = require('./Cfop').CFOP;
 const Pessoa = require('./Pessoa').Pessoa;
@@ -30,6 +29,10 @@ const SfC800 = require('./SfC800').SfC800;
 const ProdutoSimulador = require('./ProdutoSimulador').ProdutoSimulador;
 const Sf_Importa_Arquivo = require('./Sf_Importa_Arquivo').Sf_Importa_Arquivo;
 
+const EtapaStatus = require('./EtapaStatus').EtapaStatus;
+const EtapaStatusLog = require('./EtapaStatusLog').EtapaStatusLog;
+const EtapaProdutoStatus = require('./EtapaProdutoStatus').EtapaProdutoStatus;
+
 module.exports = {
   Ac331, Ac0450, Ac413, Ac431, Ac432, SfCest,
   ProdutoSimulador, Sf_Importa_Arquivo, 
@@ -37,5 +40,5 @@ module.exports = {
   EtapaStatus, ModeloDocumento, Cfop,
   Pessoa, Produto, NotaFiscal, 
   Sf433, Sf434, Sf453, Sf0460, SfC800,
-  Sf0190
+  Sf0190, EtapaStatusLog, EtapaProdutoStatus
 }

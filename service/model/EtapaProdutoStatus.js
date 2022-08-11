@@ -37,7 +37,7 @@
  *    throw new Error('Erro ao inserir o registro.');
  * })
  */
-EtapaProdutoStatus.prototype.insert = async (id_produto, id_simul_etapa, id_empresa, id_usuario, ds_status) => {
+EtapaProdutoStatus.prototype.insert = async (id_produto, id_simul_etapa, id_empresa, id_usuario) => {
 
   const sqlInsert = `insert into simul_produto_etp_sta (id_produto, id_simul_etapa, dt_status, id_simul_tp_status, id_empresa, id_usuario)
   value (:id_produto, :id_simul_etapa, :dt_status, :id_simul_tp_status, :id_empresa, :id_usuario)`;
@@ -56,6 +56,44 @@ EtapaProdutoStatus.prototype.insert = async (id_produto, id_simul_etapa, id_empr
     throw new Error(err);
   }
 
+}
+
+/**
+ * Função deletar todo os Status da Etapa do Produto
+ * 
+ * @param {Number} id_empresa
+ * @param {Number} id_usuario
+ * @returns {Promise} Promise
+ * @example
+ * await EtapaProdutoStatus.deleteAll(1, 1);
+ * 
+ * ou
+ *
+ * const data = await EtapaProdutoStatus.deleteAll(1, 1).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao deletar o registro.');
+ * })
+ */
+ EtapaProdutoStatus.prototype.deleteAll = async (id_empresa, id_usuario) => {
+  const sqlDelete = `
+    DELETE
+      FROM SIMUL_PRODUTO_ETP_STA 
+     WHERE ID_EMPRESA = :pId_Empresa
+       AND ID_USUARIO = :pId_Usuario
+  `;
+
+  try {
+    let params = {
+      pId_Empresa: id_empresa,
+      pId_Usuario: id_usuario,
+    };
+
+    await Oracle.delete(sqlDelete, params);
+  
+  } catch (err) {
+    throw new Error(err);
+  }
 }
 
 /**
