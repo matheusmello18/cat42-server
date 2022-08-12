@@ -50,7 +50,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
   if(Empresa.CNPJ_EMPRESA === xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.CNPJ[0]) { //então entrada
     throw new Error('Nota fiscal informada não é uma nota fiscal de entrada.');
-  } else if(Empresa.CNPJ_EMPRESA !== xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CNPJ[0]) { 
+  } else if(Empresa.CNPJ_EMPRESA !== xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0]?.CNPJ[0].trim()) { 
     throw new Error('Nota fiscal informada não pertence a empresa cadastrada.');
   }
 
@@ -279,6 +279,14 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   })
   .catch((err) => {
     throw new Error('Falha ao deletar o registro do C060 Entrada. Erro:' + err.message);
+  })
+
+  await new model.NotaFiscal.Entrada().SfC195.delete(chaveC100)
+  .then((data) => {
+    return data;
+  })
+  .catch((err) => {
+    throw new Error('Falha ao deletar o registro do C195 Entrada. Erro:' + err.message);
   })
 
   await new model.NotaFiscal.Entrada().delete(chaveC100)
@@ -915,7 +923,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       id_nota_fiscal_entrada: null,
     }
 
-
+    
     //#region ICMS
     let impostoICMS = {};
     let calcReBC = false
@@ -1193,7 +1201,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       impostoICMS.codAc431 = '090';
 
     //#endregion ICMS
-
+    
     //#region IPI
     const Sf453 = await new model.Sf453().selectByCodigo(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.cEnq, 0, ""))
     .then((data) => {
@@ -1218,7 +1226,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         paramC170.id_ref_432 = 49;
       }
     } else if (det.imposto[0]?.IPI[0]?.IPINT !== undefined) {
-      paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.CST, 0, "");
+      paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPINT[0]?.CST, 0, "");
     }
 
     const Ac432 = await new model.Ac432().selectByCodigo(paramC170.id_ref_432.toString())
@@ -1230,9 +1238,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     });
 
     if(Ac432 !== undefined) paramC170.id_ref_432 = Ac432.ID_REF_432;
+    
 
     //#endregion IPI
-  
+    
     //#region II
     if (det.imposto[0]?.II !== undefined) {
       paramC170.vl_bc_ii = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.II[0]?.vBC, 0, "0").replace(',','.'));
@@ -1241,7 +1250,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC170.vl_iof = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.II[0]?.vIOF, 0, "0").replace(',','.'));
     }
     //#endregion II
-
+    
     //#region Imposto Difal
     if (det.imposto[0]?.ICMSUFDest !== undefined) {
       paramC170.vl_bc_icms_uf_dest = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.ICMSUFDest[0]?.vBCUFDest, 0, "0").replace(',','.'));
@@ -1254,7 +1263,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC170.vl_icms_uf_remet = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.ICMSUFDest[0]?.vICMSUFRemet, 0, "0").replace(',','.'));
     }
     //#endregion Imposto Difal
-
+    
     //#region PIS
     if (det.imposto[0]?.PIS[0]?.PISAliq !== undefined) {
       paramC050.id_ref_433 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.PISAliq[0]?.CST, 0, "");
@@ -1298,7 +1307,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     if(Sf433 !== undefined) paramC050.id_ref_433 = Sf433.ID_REF_433;
     //#endregion PIS
-  
+    
     //#region COFINS
     if (det.imposto[0]?.COFINS[0]?.COFINSAliq !== undefined) {
       paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSAliq[0]?.CST, 0, "");
@@ -1373,7 +1382,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     }
 
     //#endregion Calculo BC
-  
+    
     //#region C170
     await new model.NotaFiscal.Entrada().Item.insert({
       ...chaveC170,
@@ -1387,7 +1396,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       throw new Error('Falha ao inserir o item da nota fiscal de entrada no cadastrado. Erro: ' + err.message);
     });
     //#endregion C170
-
+    
     //#region ACC050
     const AcC050Entrada = {
       ...chaveC170ParaC050,
@@ -1403,7 +1412,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       throw new Error('Falha ao inserir o AcC050 no cadastrado. Erro: ' + err.message);
     });
     //#endregion ACC050
-
+    
     //#region SFC195
     if (det?.infAdProd !== undefined){
       let ds0460 = det?.infAdProd[0];
@@ -1453,25 +1462,30 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     //#endregion SFC195
   }
 
+  console.log('chegou');//parei aqui para corrigir essas datas que estão gerando erro
+
   var paramProcedures = {
     pId_Usuario: id_usuario,
     pId_Empresa: id_empresa,
     pDt_Inicial: utils.FormatarData.DateOracleToPrimeiroDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo)),
     pDt_Final: utils.FormatarData.DateOracleToUltimoDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo))
   }
-
+console.log('1');
   await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_ENTRADA", paramProcedures)
   .catch((err) => {
     throw new Error('Falha ao Atualizar Mapa Entrada. Erro: ' + err.message);
   });
+  console.log('2');
   await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_SAIDA", paramProcedures)
   .catch((err) => {
     throw new Error('Falha ao Atualizar Mapa Saída. Erro: ' + err.message);
   });
+  console.log('3');
   await Oracle.execProcedure("SP_SF_ATUALIZA_NF_XML", paramProcedures)
   .catch((err) => {
     throw new Error('Falha ao Atualizar NF XML. Erro: ' + err.message);
   });
+  console.log('4');
 }
 
 

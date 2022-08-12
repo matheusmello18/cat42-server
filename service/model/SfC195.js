@@ -153,6 +153,8 @@ var SfC195Entrada = function(){
  */
 
 SfC195Entrada.prototype.insert = async (dataSfC195Entrada) => {
+	console.log('sfc195');
+	console.log(dataSfC195Entrada);
 	let sql = `insert into sf_c195_entrada 
 						( id_0460, ds_complementar, id_nota_fiscal_entrada, serie_subserie_documento, nr_documento, dt_emissao_documento, id_pessoa_remetente, nr_sequencia, nr_item, id_empresa, id_usuario, id_modelo_documento) 
 						values 
