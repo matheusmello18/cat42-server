@@ -24,7 +24,6 @@ const appDir = dirname(require.main.filename);
  * @param {String} nm_procedure2 
  */
 module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2) => {
-console.log(filename, ' -----> ',path);
 
   if (path.endsWith('.zip')){
 
@@ -37,7 +36,6 @@ console.log(filename, ' -----> ',path);
   
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        console.log(file);
 
         const xml = fs.readFileSync(newPath+'\\'+file, {encoding:'utf8', flag:'r'})
 
@@ -65,10 +63,15 @@ console.log(filename, ' -----> ',path);
             var dt_inicial = new Date(parseInt(dateParts[2]), parseInt(dateParts[1])-1, 1);
             var dt_final = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]), 0);
             
-            if (nm_procedure1 !== undefined || nm_procedure1.trim() !== "")
-              await Oracle.execProcedure(nm_procedure1, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
-            if (nm_procedure2 !== undefined || nm_procedure2.trim() !== "")
+            if (nm_procedure1 !== undefined) {
+              if (nm_procedure1.trim() !== "")
+                await Oracle.execProcedure(nm_procedure1, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+            }
+
+            if (nm_procedure2 !== undefined){
+              if (nm_procedure2.trim() !== "")
               await Oracle.execProcedure(nm_procedure2, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+            }
           } catch (err) {
             throw new Error(err.message + ' - Arquivo: ' + file);
           }
@@ -109,10 +112,15 @@ console.log(filename, ' -----> ',path);
         var dt_inicial = new Date(parseInt(dateParts[2]), parseInt(dateParts[1])-1, 1);
         var dt_final = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]), 0);
 
-        if (nm_procedure1 !== undefined || nm_procedure1.trim() !== "")
-          await Oracle.execProcedure(nm_procedure1, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
-        if (nm_procedure2 !== undefined || nm_procedure2.trim() !== "")
-          await Oracle.execProcedure(nm_procedure2, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+        if (nm_procedure1 !== undefined){
+          if (nm_procedure1.trim() !== "")
+            await Oracle.execProcedure(nm_procedure1, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+        }
+
+        if (nm_procedure2 !== undefined){
+          if (nm_procedure2.trim() !== "")
+            await Oracle.execProcedure(nm_procedure2, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+        }
       } catch (err) {
         throw new Error(err.message + ' - Arquivo: ' + filename);
       }
@@ -147,31 +155,45 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
       var dt_inicial = new Date(parseInt(dateParts[2]), parseInt(dateParts[1])-1, 1);
       var dt_final = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]), 0);
 
-      if (nm_procedure1 !== undefined || nm_procedure1.trim() !== "")
-        await Oracle.execProcedure(nm_procedure1, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
-      if (nm_procedure2 !== undefined || nm_procedure2.trim() !== "")
-        await Oracle.execProcedure(nm_procedure2, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+      if (nm_procedure1 !== undefined){
+        if (nm_procedure1.trim() !== "")
+          await Oracle.execProcedure(nm_procedure1, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+      }
 
+      if (nm_procedure2 !== undefined) {
+        if (nm_procedure2.trim() !== "")
+          await Oracle.execProcedure(nm_procedure2, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+      }
 
-      const ProdsSimul = await new model.ProdutoSimulador().BuscarPeloProdutosSimul(jsonXML, id_empresa, id_usuario).then((data) => {
+      await new model.ProdutoSimulador().BuscarPeloProdutosSimul(jsonXML, id_empresa, id_usuario).then(async (data) => {
+        for (let i = 0; i < data.rows.length; i++) {
+          await new model.ProdutoSimulador().updateStatus(1, data.rows[i].ID_PRODUTO, id_empresa, id_usuario).catch((err) => {
+            throw new Error('Erro ao atualizar o status do produto. Produto: ' + data.rows[i].DS_PRODUTO);
+          });
+        }
         return data.rows;
       });
-      for (let i = 0; i < ProdsSimul.length; i++) {
-        await new model.ProdutoSimulador().updateStatus(1, ProdsSimul[i].ID_PRODUTO, id_empresa, id_usuario).catch((err) => {
-          throw new Error('Erro ao atualizar o status do produto. Produto: ' + ProdsSimul[i].DS_PRODUTO);
-        });
-      }
+
+      await new model.ProdutoSimulador().ComPendencia(id_empresa, id_usuario).then(async (data) => {
+        console.log(data.rows);
+        if (data.rows[0].TOTAL === 0){
+          await new model.EtapaStatus().insert(dt_periodo, 1, id_simul_etapa, id_empresa, id_usuario, 'Dados importado com sucesso.');
+        } else {
+          await new model.EtapaStatus().insert(dt_periodo, 3, id_simul_etapa, id_empresa, id_usuario, 'Pendência de importação de XML para o Produto');
+        }
+        return data.rows;
+      });
       
     } catch (err) {
 
-      const ProdsSimul = await new model.ProdutoSimulador().BuscarPeloProdutosSimul(jsonXML, id_empresa, id_usuario).then((data) => {
+      await new model.ProdutoSimulador().BuscarPeloProdutosSimul(jsonXML, id_empresa, id_usuario).then(async (data) => {
+        for (let i = 0; i < data.rows.length; i++) {
+          await new model.ProdutoSimulador().updateStatus(3, data.rows[i].ID_PRODUTO, id_empresa, id_usuario).catch((err) => {
+            throw new Error('Erro ao atualizar o status do produto. Produto: ' + data.rows[i].DS_PRODUTO);
+          });
+        }
         return data.rows;
       });
-      for (let i = 0; i < ProdsSimul.length; i++) {
-        await new model.ProdutoSimulador().updateStatus(3, ProdsSimul[i].ID_PRODUTO, id_empresa, id_usuario).catch((err) => {
-          throw new Error('Erro ao atualizar o status do produto. Produto: ' + ProdsSimul[i].DS_PRODUTO);
-        });
-      }
       throw new Error(err.message + ' - Arquivo: ' + filename);
     }
 

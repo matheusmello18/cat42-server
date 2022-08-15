@@ -1403,11 +1403,13 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     //#endregion SFC195
   }
   
+  var dt_periodo1 = new Date(dt_periodo);
+
   var paramProcedures = {
     pId_Usuario: id_usuario,
     pId_Empresa: id_empresa,
-    pDt_Inicial: utils.FormatarData.DateOracleToPrimeiroDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo)),
-    pDt_Final: utils.FormatarData.DateOracleToUltimoDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo))
+    pDt_Inicial: {type: Oracle.oracledb.DATE, val: utils.FormatarData.DateToPrimeiroDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo1))},
+    pDt_Final: {type: Oracle.oracledb.DATE, val: utils.FormatarData.DateToUltimoDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo1))}
   }
 
   await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_ENTRADA", paramProcedures)
@@ -1949,13 +1951,15 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     //#endregion SFC850
   }
 
+  var dt_periodo1 = new Date(dt_periodo);
+
   var paramProcedures = {
     pId_Usuario: id_usuario,
     pId_Empresa: id_empresa,
-    pDt_Inicial: utils.FormatarData.DateOracleToPrimeiroDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo)),
-    pDt_Final: utils.FormatarData.DateOracleToUltimoDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo))
+    pDt_Inicial: {type: Oracle.oracledb.DATE, val: utils.FormatarData.DateToPrimeiroDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo1))},
+    pDt_Final: {type: Oracle.oracledb.DATE, val: utils.FormatarData.DateToUltimoDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo1))}
   }
-
+  
   await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_ENTRADA", paramProcedures)
   .catch((err) => {
     throw new Error('Falha ao Atualizar Mapa Entrada. Erro: ' + err.message);

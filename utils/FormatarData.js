@@ -31,6 +31,17 @@ module.exports.DateOracleToUltimoDia = (DateOracle) => {
   return module.exports.DateNodeToDateOracleString(new Date(dateParts[2], dateParts[1], 0));
 }
 
+module.exports.DateToPrimeiroDia = (aDate) => {
+  var dateParts = aDate.split("/");
+  return new Date(dateParts[2], dateParts[1]-1, 1);
+}
+
+module.exports.DateToUltimoDia = (aDate) => {
+  var dateParts = aDate.split("/");
+  return new Date(dateParts[2], dateParts[1], 0);
+}
+
+
 module.exports.RetornarMenorDataEmNode = (DataOracle1, DataOracle2) => {
   let DataNode1 = module.exports.DateOracleToDateNode(DataOracle1);
   let DataNode2 = module.exports.DateOracleToDateNode(DataOracle2);

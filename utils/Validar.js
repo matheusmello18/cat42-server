@@ -29,7 +29,6 @@ module.exports.getValueArray = (array, pos, valueDefault = "") => {
   try {
     return (this.isArray(array) ? (array[pos] == undefined ? valueDefault : array[pos]) : valueDefault)
   } catch (error) {
-    console.log(error);
     return valueDefault;
   }
 }

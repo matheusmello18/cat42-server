@@ -226,7 +226,6 @@ module.exports.AcC050Saida = AcC050Saida;
  */
 
 AcC050Entrada.prototype.insert = async (dataAcC050Entrada) => {
-  console.log(dataAcC050Entrada);
 	let sql = `insert into ac_c050_entrada 
 		( id_ref_433, aliq_pis, vl_bc_pis, vl_pis, vl_aliq_pis, vl_pis_st, qtde_bc_pis, id_ref_434, aliq_cofins, vl_bc_cofins, 
 			vl_cofins, vl_aliq_cofins, vl_cofins_st, qtde_bc_cofins, id_nota_fiscal_entrada, dt_emissao_documento, id_pessoa_remetente, 

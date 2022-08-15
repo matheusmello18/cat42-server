@@ -1461,31 +1461,30 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     }
     //#endregion SFC195
   }
-
-  console.log('chegou');//parei aqui para corrigir essas datas que estão gerando erro
+  
+  var dt_periodo1 = new Date(dt_periodo);
 
   var paramProcedures = {
     pId_Usuario: id_usuario,
     pId_Empresa: id_empresa,
-    pDt_Inicial: utils.FormatarData.DateOracleToPrimeiroDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo)),
-    pDt_Final: utils.FormatarData.DateOracleToUltimoDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo))
+    pDt_Inicial: {type: Oracle.oracledb.DATE, val: utils.FormatarData.DateToPrimeiroDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo1))},
+    pDt_Final: {type: Oracle.oracledb.DATE, val: utils.FormatarData.DateToUltimoDia(utils.FormatarData.DateNodeToDateOracleString(dt_periodo1))}
   }
-console.log('1');
+
   await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_ENTRADA", paramProcedures)
   .catch((err) => {
     throw new Error('Falha ao Atualizar Mapa Entrada. Erro: ' + err.message);
   });
-  console.log('2');
+
   await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_SAIDA", paramProcedures)
   .catch((err) => {
     throw new Error('Falha ao Atualizar Mapa Saída. Erro: ' + err.message);
   });
-  console.log('3');
+
   await Oracle.execProcedure("SP_SF_ATUALIZA_NF_XML", paramProcedures)
   .catch((err) => {
     throw new Error('Falha ao Atualizar NF XML. Erro: ' + err.message);
   });
-  console.log('4');
 }
 
 

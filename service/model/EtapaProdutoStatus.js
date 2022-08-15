@@ -155,7 +155,7 @@ EtapaProdutoStatus.prototype.select = async (id_simul_etapa, id_empresa, id_usua
              and a.id_empresa = :id_empresa
              and a.id_usuario = :id_usuario
              and c.id_simul_tp_status in (1)
-        ) x  order by x.id_produto, x.id_simul_tp_status 
+        ) x  order by x.id_simul_tp_status, x.id_produto
     `;
 
   try {

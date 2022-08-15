@@ -30,6 +30,43 @@ ProdutoSimulador.prototype.BuscarPeloProdutosSimul = async (xmlObj, id_empresa, 
 }
 
 /**
+ * Função selecionar total de produtos com pendencia
+ * 
+ * @param {Number} id_empresa
+ * @param {Number} id_usuario
+ * @returns {Promise} Promise
+ * @example
+ * await ProdutoSimulador.ComPendencia(1, 1);
+ * 
+ * ou
+ *
+ * const data = await ProdutoSimulador.ComPendencia(1, 1).then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao inserir o registro.');
+ * })
+ */
+ ProdutoSimulador.prototype.ComPendencia = async (id_empresa, id_usuario) => {
+  const sql= `select count(*) total
+                from simul_produto a
+               inner join simul_produto_etp_sta b on a.id_produto = b.id_produto and a.id_empresa = b.id_empresa
+               where a.id_empresa = :id_empresa
+                 and a.id_usuario = :id_usuario
+                 and b.id_simul_tp_status in (2,3)`;
+  try {
+    let params = {
+      id_empresa: id_empresa,
+      id_usuario: id_usuario
+    };
+    return await Oracle.select(sql, params);
+  
+  } catch (err) {
+    throw new Error(err);
+  }
+}
+
+
+/**
  * Função inserir os dados do Produto Simulador 
  * 
  * @param {Number} id_produto

@@ -16,15 +16,19 @@ module.exports.Cat42 = async (id_simul_etapa, id_empresa, id_usuario, dt_periodo
     var dt_inicial = new Date(parseInt(dateParts[2]), parseInt(dateParts[1])-1, 1);
     var dt_final = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]), 0);
   
-    if (nm_procedure1 !== undefined || nm_procedure1.trim() !== "")
-      await Oracle.execProcedure(nm_procedure1, { 
-        pDt_Inicial: dt_inicial,
-        pDt_Final: dt_final,
-        pId_Empresa: id_empresa,
-        pId_Usuario: id_usuario,
-      });
-    if (nm_procedure2 !== undefined || nm_procedure2.trim() !== "")
-      await Oracle.execProcedure(nm_procedure2, {id_empresa: id_empresa, id_usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});  
+    if (nm_procedure1 !== undefined){
+      if(nm_procedure1.trim() !== "")
+        await Oracle.execProcedure(nm_procedure1, { 
+          pDt_Inicial: dt_inicial,
+          pDt_Final: dt_final,
+          pId_Empresa: id_empresa,
+          pId_Usuario: id_usuario,
+        });
+    }
+    if (nm_procedure2 !== undefined)
+      if(nm_procedure2.trim() !== ""){
+        await Oracle.execProcedure(nm_procedure2, {id_empresa: id_empresa, id_usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});  
+      }
   } catch (error) {
     throw new Error(error.message);
   }
