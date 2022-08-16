@@ -99,7 +99,6 @@ router.post("/upload", async (req, res) => {
         } else if (req.body.nm_method === 'ImportarArqXMLEntrada') {
           await Importacoes.XmlEntrada(req.file.filename, req.file.path, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
         }        
-        
         success = 'true';
       } catch (error) {
         await new model.EtapaStatus().insert(req.body.dt_periodo, 2, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, error.message);  

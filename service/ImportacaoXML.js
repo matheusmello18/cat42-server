@@ -63,14 +63,22 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
             var dt_inicial = new Date(parseInt(dateParts[2]), parseInt(dateParts[1])-1, 1);
             var dt_final = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]), 0);
             
+            var paramProcedures = {
+              pId_Simul_Etapa: id_simul_etapa,
+              pId_Empresa: id_empresa,
+              pId_Usuario: id_usuario,
+              pDt_Inicial: {type: Oracle.oracledb.DATE, val: dt_inicial },
+              pDt_Final: {type: Oracle.oracledb.DATE, val: dt_final }
+            }
+            
             if (nm_procedure1 !== undefined) {
               if (nm_procedure1.trim() !== "")
-                await Oracle.execProcedure(nm_procedure1, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+                await Oracle.execProcedure(nm_procedure1, paramProcedures);
             }
 
             if (nm_procedure2 !== undefined){
               if (nm_procedure2.trim() !== "")
-              await Oracle.execProcedure(nm_procedure2, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+                await Oracle.execProcedure(nm_procedure2, paramProcedures);
             }
           } catch (err) {
             throw new Error(err.message + ' - Arquivo: ' + file);
@@ -80,6 +88,8 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         
       }//fim for
 
+      await new model.EtapaStatus().insert(dt_periodo, 1, id_simul_etapa, id_empresa, id_usuario, 'Dados importado com sucesso.');
+      
     } catch (err) {
       throw new Error(err.message);
     }
@@ -112,20 +122,30 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         var dt_inicial = new Date(parseInt(dateParts[2]), parseInt(dateParts[1])-1, 1);
         var dt_final = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]), 0);
 
+        var paramProcedures = {
+          pId_Simul_Etapa: id_simul_etapa,
+          pId_Empresa: id_empresa,
+          pId_Usuario: id_usuario,
+          pDt_Inicial: {type: Oracle.oracledb.DATE, val: dt_inicial },
+          pDt_Final: {type: Oracle.oracledb.DATE, val: dt_final }
+        }
+
         if (nm_procedure1 !== undefined){
           if (nm_procedure1.trim() !== "")
-            await Oracle.execProcedure(nm_procedure1, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+            await Oracle.execProcedure(nm_procedure1, paramProcedures);
         }
 
         if (nm_procedure2 !== undefined){
           if (nm_procedure2.trim() !== "")
-            await Oracle.execProcedure(nm_procedure2, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+            await Oracle.execProcedure(nm_procedure2, paramProcedures);
         }
+
+        await new model.EtapaStatus().insert(dt_periodo, 1, id_simul_etapa, id_empresa, id_usuario, 'Dados importado com sucesso.');
       } catch (err) {
         throw new Error(err.message + ' - Arquivo: ' + filename);
       }
     });
-  } 
+  }
 }
 
 module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2) => {
@@ -155,14 +175,22 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
       var dt_inicial = new Date(parseInt(dateParts[2]), parseInt(dateParts[1])-1, 1);
       var dt_final = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]), 0);
 
+      var paramProcedures = {
+        pId_Simul_Etapa: id_simul_etapa,
+        pId_Empresa: id_empresa,
+        pId_Usuario: id_usuario,
+        pDt_Inicial: {type: Oracle.oracledb.DATE, val: dt_inicial },
+        pDt_Final: {type: Oracle.oracledb.DATE, val: dt_final }
+      }
+
       if (nm_procedure1 !== undefined){
         if (nm_procedure1.trim() !== "")
-          await Oracle.execProcedure(nm_procedure1, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+          await Oracle.execProcedure(nm_procedure1, paramProcedures);
       }
 
       if (nm_procedure2 !== undefined) {
         if (nm_procedure2.trim() !== "")
-          await Oracle.execProcedure(nm_procedure2, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+          await Oracle.execProcedure(nm_procedure2, paramProcedures);
       }
 
       await new model.ProdutoSimulador().BuscarPeloProdutosSimul(jsonXML, id_empresa, id_usuario).then(async (data) => {

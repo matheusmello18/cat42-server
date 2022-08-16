@@ -6,6 +6,8 @@ const model = require('../../service/model');
 const GeracaoCat = require('../../service/GeracaoCat');
 
 router.post("/cat", async (req, res) => {
+  console.log(req);
+  console.log(req.body);
   var success;
   try {
     if (req.body.nm_method === 'GeraResultadoCat42') {

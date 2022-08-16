@@ -83,8 +83,16 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
 
   if (rows.length > 0){
     if (nm_procedure2 !== undefined){
-      if (nm_procedure2.trim() !== "")
-        await Oracle.execProcedure(nm_procedure2, {pId_Simul_Etapa: id_simul_etapa, pId_Empresa: id_empresa, pId_Usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+      if (nm_procedure2.trim() !== ""){
+        var paramProcedures = {
+          pId_Simul_Etapa: id_simul_etapa,
+          pId_Empresa: id_empresa,
+          pId_Usuario: id_usuario,
+          pDt_Inicial: {type: Oracle.oracledb.DATE, val: dt_inicial },
+          pDt_Final: {type: Oracle.oracledb.DATE, val: dt_final }
+        }
+        await Oracle.execProcedure(nm_procedure2, paramProcedures);
+      }
     }
   } else {
     await new model.EtapaStatus().insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');

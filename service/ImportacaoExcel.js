@@ -74,9 +74,16 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
       var dateParts = dt_periodo.split("/");
       var dt_inicial = new Date(parseInt(dateParts[2]), parseInt(dateParts[1])-1, 1);
       var dt_final = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]), 0);
+      var paramProcedures = {
+        pId_Usuario: id_usuario,
+        pId_Empresa: id_empresa,
+        pDt_Inicial: {type: Oracle.oracledb.DATE, val: dt_inicial },
+        pDt_Final: {type: Oracle.oracledb.DATE, val: dt_final }
+      }
+
       if (nm_procedure1 !== undefined){
         if (nm_procedure1.trim() !== "")
-          await Oracle.execProcedure(nm_procedure1, {id_empresa: id_empresa, id_usuario: id_usuario, pDt_Inicial: dt_inicial, pDt_Final: dt_final});
+          await Oracle.execProcedure(nm_procedure1, paramProcedures);
       }
       await new model.EtapaStatus().insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
     }

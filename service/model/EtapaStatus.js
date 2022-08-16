@@ -180,17 +180,19 @@ EtapaStatus.prototype.insert = async (dt_periodo,id_simul_tp_status,id_simul_eta
 
   } else {
     const nProx_Codigo = await Oracle.proxCod("SIMUL_ETAPA_STATUS");
+    var parametros = {
+      id_simul_status: nProx_Codigo,
+      dt_periodo:  { type: Oracle.oracledb.DATE, val: new Date(dt_periodo)},
+      id_simul_tp_status: id_simul_tp_status,
+      id_simul_etapa: id_simul_etapa,
+      id_empresa: id_empresa,
+      id_usuario: id_usuario,
+      ds_status: msg,
+      dt_status: { type: Oracle.oracledb.DATE, val: new Date() }
+    }
+
     try {
-      await Oracle.insert(sqlInsert, {
-        id_simul_status: nProx_Codigo,
-        dt_periodo:  { type: Oracle.oracledb.DATE, val: new Date(dt_periodo)},
-        id_simul_tp_status: id_simul_tp_status,
-        id_simul_etapa: id_simul_etapa,
-        id_empresa: id_empresa,
-        id_usuario: id_usuario,
-        ds_status: msg,
-        dt_status: { type: Oracle.oracledb.DATE, val: new Date() }
-      });
+      await Oracle.insert(sqlInsert, parametros);
     
       await new EtapaStatusLog().insert(nProx_Codigo, id_empresa, id_usuario, ds_status);
 
