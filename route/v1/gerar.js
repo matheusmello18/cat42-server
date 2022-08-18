@@ -6,13 +6,11 @@ const model = require('../../service/model');
 const GeracaoCat = require('../../service/GeracaoCat');
 
 router.post("/cat", async (req, res) => {
-  console.log(req);
-  console.log(req.body);
   var success;
   try {
     if (req.body.nm_method === 'GeraResultadoCat42') {
       await GeracaoCat.Cat42(req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo, req.body.nm_procedure1, req.body.nm_procedure2);
-    } 
+    }
     await new model.EtapaStatus().insert(req.body.dt_periodo, 1, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, 'Dados importado com sucesso.');  
     success = 'true';
   } catch (error) {
