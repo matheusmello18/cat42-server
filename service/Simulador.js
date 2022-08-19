@@ -27,6 +27,28 @@ module.exports.inserir = async (obj) => {
   }
 }
 
+module.exports.update = async (obj) => {
+  let sqlUpdate = `UPDATE SIMUL_CADASTRO 
+  SET NM_EMPRESA = :NM_EMPRESA,
+      NM_CONTATO = :NM_CONTATO,
+      NR_TELEFONE = :NR_TELEFONE 
+WHERE ID_SIMUL_CADASTRO = :ID_SIMUL_CADASTRO`;
+  try {
+    
+    const params = {
+      ID_SIMUL_CADASTRO: obj.ID_SIMUL_CADASTRO,
+      NM_EMPRESA: obj.NM_EMPRESA,
+      NM_CONTATO: obj.NM_CONTATO,
+      NR_TELEFONE: obj.NR_TELEFONE
+    };
+
+    await Oracle.update(sqlUpdate, params);
+
+  } catch (err) {
+    throw new Error(err);
+  }
+}
+
 const sql = `SELECT * FROM SIMUL_CADASTRO ORDER BY ID_SIMUL_CADASTRO`;
 const sqlWhere = `SELECT * FROM SIMUL_CADASTRO WHERE ID_SIMUL_CADASTRO = :ID_SIMUL_CADASTRO`;
 

@@ -20,4 +20,19 @@ router.post("/add", async (req, res) => {
   }
 })
 
+router.post("/edit", async (req, res) => {
+  try {
+    
+    await simulador.update(req.body)
+    var retorno = await simulador.select(req.body.ID_SIMUL_CADASTRO);
+  
+    //const usuario = await new Usuario.CtrlUsuario().select(req.body.email);
+    //await new Usuario.CtrlUsuario().updateSenha(req.body.id, req.body.senhaWeb, req.body.senha)
+
+    return res.status(200).json({success:"true", rows: retorno.rows})
+  } catch (err) {
+    return res.status(200).json({success:"false", rows: null})
+  }
+})
+
 module.exports = router;
