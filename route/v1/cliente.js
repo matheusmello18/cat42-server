@@ -1,6 +1,7 @@
 const express = require("express")
 const router = express.Router();
 const simulador = require("../../service/Simulador")
+const Usuario = require("../../service/model/CtrlUsuario")
 const sendEmail = require("../../service/SendEmail")
 
 router.post("/add", async (req, res) => {
@@ -21,17 +22,29 @@ router.post("/add", async (req, res) => {
 })
 
 router.post("/edit", async (req, res) => {
-  try {
-    
-    await simulador.update(req.body)
-    var retorno = await simulador.select(req.body.ID_SIMUL_CADASTRO);
-  
-    //const usuario = await new Usuario.CtrlUsuario().select(req.body.email);
-    //await new Usuario.CtrlUsuario().updateSenha(req.body.id, req.body.senhaWeb, req.body.senha)
+  try { 
+    const usuario = await new Usuario.CtrlUsuario().select(req.body.E_MAIL, req.body.senhaWebAtual);
 
-    return res.status(200).json({success:"true", rows: retorno.rows})
+    if (usuario.rows.length > 0) {
+      await simulador.update(req.body)
+      if (req.body.senhaSistema.length > 0 && req.body.senhaWeb.length > 0){
+        await new Usuario.CtrlUsuario().updateSenha(req.body.ID_USUARIO, req.body.senhaWeb, req.body.senhaSistema)
+        .catch(async (err) => {
+          throw new Error('Falha ao alterar a senha. Erro: ' + err.message);
+        });
+      }
+      const usuario = await new Usuario.CtrlUsuario().select(req.body.E_MAIL)
+      .catch(async (err) => {
+        throw new Error('Falha ao buscar o cliente por E-mail. Erro: ' + err.message);
+      });
+      
+      return res.status(200).json({success:"true", rows: usuario.rows[0], message: ''})
+    } else {
+      return res.status(200).json({success:"false", rows: null, message: 'Campo Senha atual não corresponde com sua senha de login!'})
+    }
   } catch (err) {
-    return res.status(200).json({success:"false", rows: null})
+    console.log(err.message);
+    return res.status(200).json({success:"false", rows: null, message: err.message})
   }
 })
 

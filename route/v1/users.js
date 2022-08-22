@@ -67,8 +67,15 @@ router.post("/hash", async (req, res) => {
 
 router.post("/recovery", async (req, res) => {
   try {
-    const usuario = await new Usuario.CtrlUsuario().select(req.body.email);
+    const usuario = await new Usuario.CtrlUsuario().select(req.body.email)
+    .catch(async (err) => {
+      throw new Error('Falha ao buscar o cliente por E-mail. Erro: ' + err.message);
+    });
+
     await new Usuario.CtrlUsuario().updateSenha(req.body.id, req.body.senhaWeb, req.body.senha)
+    .catch(async (err) => {
+      throw new Error('Falha ao alterar a senha. Erro: ' + err.message);
+    });
   
     if (usuario.rows[0] !== undefined)
       return res.status(200).json({success:"true", user: usuario.rows[0]});
