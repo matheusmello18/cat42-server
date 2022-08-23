@@ -15,9 +15,9 @@ router.post("/add", async (req, res) => {
       sendEmail.administrador(retorno.rows).catch(console.error);
     }
   
-    return res.status(200).json({success:"true", rows: retorno.rows})
+    return res.status(200).json({success:"true", rows: null, message: 'Obrigado pelo cadastro em breve entraremos em contato'})
   } catch (err) {
-    return res.status(200).json({success:"false", rows: null})
+    return res.status(200).json({success:"false", rows: null, message: 'Tente novamente em instantes. Obrigado!'})
   }
 })
 

@@ -7,16 +7,6 @@ const router = express.Router();
 const model = require('../../service/model');
 const Importacoes = require('../../service/Importacoes');
 
-router.post("/show", async (req, res) => {
-  try {
-    var retorno = await new model.EtapaStatus().select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
-     
-    return res.status(200).json({success:"true", rows: retorno.rows})
-  } catch (err) {
-    return res.status(200).json({success:"false", message: err.message, rows: null})
-  }
-})
-
 var storage = multer.diskStorage({
   // @ts-ignore
   destination: function (req, file, cb) {
@@ -77,6 +67,16 @@ var upload = multer({
   
 // mypic is the name of file attribute
 }).single("arquivo"); 
+
+router.post("/show", async (req, res) => {
+  try {
+    var retorno = await new model.EtapaStatus().select(req.body.id_empresa, req.body.id_usuario, req.body.dt_periodo);
+     
+    return res.status(200).json({success:"true", rows: retorno.rows})
+  } catch (err) {
+    return res.status(200).json({success:"false", message: err.message, rows: null})
+  }
+})
 
 router.post("/upload", async (req, res) => {
     await upload(req,res, async function(err) {
