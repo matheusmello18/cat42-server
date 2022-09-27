@@ -61,7 +61,7 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
 
           await new model.EtapaProdutoStatus().insert(
             parseFloat(nProx_Codigo),
-            id_simul_etapa,
+            4,
             id_empresa, 
             id_usuario
           );

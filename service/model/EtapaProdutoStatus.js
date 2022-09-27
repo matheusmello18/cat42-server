@@ -40,7 +40,7 @@
 EtapaProdutoStatus.prototype.insert = async (id_produto, id_simul_etapa, id_empresa, id_usuario) => {
 
   const sqlInsert = `insert into simul_produto_etp_sta (id_produto, id_simul_etapa, dt_status, id_simul_tp_status, id_empresa, id_usuario)
-  value (:id_produto, :id_simul_etapa, :dt_status, :id_simul_tp_status, :id_empresa, :id_usuario)`;
+  values (:id_produto, :id_simul_etapa, :dt_status, :id_simul_tp_status, :id_empresa, :id_usuario)`;
   
   try {
     await Oracle.insert(sqlInsert, {

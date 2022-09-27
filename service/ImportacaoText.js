@@ -1,6 +1,7 @@
 const Oracle = require('./Oracle');
 const model = require('./model');
 const nReadlines = require('n-readlines');
+var readline = require('linebyline');
 
 module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2, id_modulo, id_projeto) => {
 
@@ -23,32 +24,29 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
   );
 
   const broadbandLines = new nReadlines(path);
-  
   let nr_linha = 0;
   let nextline, linha, arrLinha;
-  
+  let binds =[]
+
   while (nextline = broadbandLines.next()) {
     nr_linha = nr_linha + 1;
     linha = nextline.toString('ascii');
     arrLinha = linha.split("|");
-
-    try {
-      await new model.Sf_Importa_Arquivo().Insert(
-        arrLinha[1],
-        linha,
-        id_empresa,
-        id_usuario,
-        dt_inicial, 
-        dt_final, 
-        nr_linha,
-        id_projeto,
-        id_modulo,
-        filename
-      );
-    } catch (err) {
-      throw new Error(err);
-    }
+    binds.push({
+      nr_referencia: arrLinha[1],
+      ds_conteudo: linha,
+      id_empresa: id_empresa,
+      id_usuario: id_usuario,
+      dt_inicial:  dt_inicial,
+      dt_final:  dt_final,
+      nr_linha: nr_linha,
+      id_projeto: id_projeto,
+      id_modulo: id_modulo,
+      ds_arquivo: filename
+    });
   }
+
+  await new model.Sf_Importa_Arquivo().InsertMany(binds);
 
   if (nm_procedure1 !== undefined){
     if (nm_procedure1.trim() !== ""){
@@ -68,6 +66,7 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
           }
         );    
       } catch (err) {
+        console.log(err.message);
         /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
         await new model.EtapaStatus().insert(dt_periodo, 3, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message.split(/\sORA-[0-9]*:/)[1].trim());
         throw new Error(err.message);
@@ -78,6 +77,7 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
   const rows = await new model.Sf_Importa_Arquivo().SelectLogImportacao(id_empresa, id_usuario).then((data) => {
     return data.rows;
   }).catch((err) => {
+    console.log(err.message);
     throw new Error(err.message);
   })
 

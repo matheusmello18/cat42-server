@@ -59,8 +59,35 @@ Sf_Importa_Arquivo.prototype.Insert = async ( nr_referencia, ds_conteudo, id_emp
       id_modulo: id_modulo,
       ds_arquivo: ds_arquivo
     };
-    await Oracle.insert(sqlInsert, params);
+    await Oracle.insert(sqlInsert, params).then((result) => { return }).catch((e) => {return});
   
+  } catch (err) {
+    throw new Error(err);
+  }
+}
+
+/**
+ * Função inserir os dados na Importa Arquivo 
+ * 
+ * @param {array} binds
+ * @returns {Promise} Promise
+ * @example
+ * await Sf_Importa_Arquivo.insert('1','descricao', 1, 1, '01/08/2019', '31/08/2019', 1, 1, 1, 'descricao');
+ * 
+ * ou
+ *
+ * const data = await Sf_Importa_Arquivo.insert('1','descricao', 1, 1, '01/08/2019', '31/08/2019', 1, 1, 1, 'descricao').then((e) => {
+ *    return e;
+ * }).catch((err) => {
+ *    throw new Error('Erro ao inserir o registro.');
+ * })
+ */
+ Sf_Importa_Arquivo.prototype.InsertMany = async ( binds ) => {
+  const sqlInsert = `insert into sf_importa_texto (nr_referencia, ds_conteudo, id_empresa, id_usuario, dt_inicial, dt_final, nr_linha, id_projeto, id_modulo, ds_arquivo ) 
+  values (:nr_referencia, :ds_conteudo, :id_empresa, :id_usuario, :dt_inicial, :dt_final, :nr_linha, :id_projeto, :id_modulo, :ds_arquivo)`;
+  
+  try {
+    await Oracle.insertMany(sqlInsert, binds); 
   } catch (err) {
     throw new Error(err);
   }
@@ -91,8 +118,7 @@ Sf_Importa_Arquivo.prototype.Delete = async (id_projeto, id_modulo, dt_inicial, 
   const sqlDelete = `
   delete from sf_importa_texto
    where id_empresa = :id_empresa
-     and to_char(dt_inicial,'dd/mm/yyyy') between :dt_inicial 
-                                              and :dt_final
+     and dt_inicial between :dt_inicial and :dt_final
      and id_projeto = :id_projeto
      and id_modulo  = :id_modulo
      and id_usuario = :id_usuario
@@ -111,7 +137,7 @@ Sf_Importa_Arquivo.prototype.Delete = async (id_projeto, id_modulo, dt_inicial, 
     await Oracle.delete(sqlDelete, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw new Error(err+'test');
   }
 }
 
@@ -180,7 +206,7 @@ Sf_Importa_Arquivo.prototype.Delete = async (id_projeto, id_modulo, dt_inicial, 
   `;
 
   try {
-    return await Oracle.select(sqlSelect, {id_empresa: id_empresa, pId_Usuario: id_usuario})
+    return await Oracle.select(sqlSelect, {pId_empresa: id_empresa, pId_Usuario: id_usuario})
   } catch (err) {
     throw new Error(err);
   }

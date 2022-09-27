@@ -40,6 +40,35 @@ module.exports.insert = async (sql,params) => {
   }
 }
 
+module.exports.insertMany = async (sql,binds) => {
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection(config.db);
+
+    return await connection.executeMany(
+      sql, binds, {autoCommit: true}
+    ).catch(err => {
+      if (err.errorNum === 1008){
+        throw new Error('Nem todas as variáveis ​​vinculadas');
+      } else{
+        throw new Error(err);
+      }
+    });
+
+  } catch (err) {
+    throw new Error(err.message);
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();   // Always close connections
+      } catch (err) {
+        throw new Error(err.message);
+      }
+    }
+  }
+}
+
 module.exports.select = async (sql,params) => {
   let connection;
 

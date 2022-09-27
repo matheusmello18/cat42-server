@@ -12,7 +12,7 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
 
 module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2, id_modulo, id_projeto) => {
   try {
-    await ImportacaoText.Text(filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2);
+    await ImportacaoText.Text(filename, path, id_simul_etapa, id_empresa, id_usuario, dt_periodo, nm_procedure1, nm_procedure2, id_modulo, id_projeto);
   } catch (err) {
     throw new Error(err.message);
   }
