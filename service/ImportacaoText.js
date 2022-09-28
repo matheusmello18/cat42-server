@@ -1,5 +1,6 @@
 const Oracle = require('./Oracle');
 const model = require('./model');
+const utils = require('../utils');
 const nReadlines = require('n-readlines');
 var readline = require('linebyline');
 
@@ -8,7 +9,8 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
   var dateParts = dt_periodo.split("/");
   var dt_inicial = new Date(dateParts[2], dateParts[1]-1, 1);
   var dt_final = new Date(dateParts[2], dateParts[1], 0);
-  
+
+  console.log(dt_inicial, dt_final);
   await new model.Sf_Importa_Arquivo().DeleteLog(
     id_empresa, 
     id_usuario
@@ -37,8 +39,8 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
       ds_conteudo: linha,
       id_empresa: id_empresa,
       id_usuario: id_usuario,
-      dt_inicial:  dt_inicial,
-      dt_final:  dt_final,
+      dt_inicial:  utils.FormatarData.DateNodeToDateOracleString(dt_inicial),
+      dt_final: utils.FormatarData.DateNodeToDateOracleString(dt_final),
       nr_linha: nr_linha,
       id_projeto: id_projeto,
       id_modulo: id_modulo,
@@ -47,14 +49,14 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
   }
 
   await new model.Sf_Importa_Arquivo().InsertMany(binds);
-
+console.log(00);
   if (nm_procedure1 !== undefined){
     if (nm_procedure1.trim() !== ""){
       try {
         await Oracle.execProcedure(nm_procedure1, 
           { 
-            pDt_Inicial: dt_inicial,
-            pDt_Final: dt_final,
+            pDt_Inicial: { type: Oracle.oracledb.DATE, val: dt_inicial},
+            pDt_Final: { type: Oracle.oracledb.DATE, val: dt_final},
             pId_Empresa: parseInt(id_empresa),
             pId_Usuario: parseInt(id_usuario),
             pId_Projeto: parseInt(id_projeto),
@@ -73,14 +75,14 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
       }
     }
   }
-
+console.log('passsou');
   const rows = await new model.Sf_Importa_Arquivo().SelectLogImportacao(id_empresa, id_usuario).then((data) => {
     return data.rows;
   }).catch((err) => {
     console.log(err.message);
     throw new Error(err.message);
   })
-
+console.log(1);
   if (rows.length > 0){
     if (nm_procedure2 !== undefined){
       if (nm_procedure2.trim() !== ""){
@@ -95,6 +97,7 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
       }
     }
   } else {
+    console.log(2);
     await new model.EtapaStatus().insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
   }
 }

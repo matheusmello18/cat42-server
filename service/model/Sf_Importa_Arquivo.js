@@ -84,7 +84,7 @@ Sf_Importa_Arquivo.prototype.Insert = async ( nr_referencia, ds_conteudo, id_emp
  */
  Sf_Importa_Arquivo.prototype.InsertMany = async ( binds ) => {
   const sqlInsert = `insert into sf_importa_texto (nr_referencia, ds_conteudo, id_empresa, id_usuario, dt_inicial, dt_final, nr_linha, id_projeto, id_modulo, ds_arquivo ) 
-  values (:nr_referencia, :ds_conteudo, :id_empresa, :id_usuario, :dt_inicial, :dt_final, :nr_linha, :id_projeto, :id_modulo, :ds_arquivo)`;
+  values (:nr_referencia, :ds_conteudo, :id_empresa, :id_usuario, to_date(:dt_inicial,'dd/mm/yyyy'), to_date(:dt_final,'dd/mm/yyyy'), :nr_linha, :id_projeto, :id_modulo, :ds_arquivo)`;
   
   try {
     await Oracle.insertMany(sqlInsert, binds); 

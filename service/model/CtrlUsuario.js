@@ -58,7 +58,7 @@ CtrlUsuario.prototype.select = async (email, senha = '') => {
                       C.HASH_RECOVERY,
                       S.ID_EMPRESA,
                       O.ID_PROJETO,
-                      O.ID_MODULO
+                      DECODE(O.ID_MODULO,20,4,O.ID_MODULO) ID_MODULO
                  FROM SIMUL_CADASTRO S
                 INNER JOIN CTRL_USUARIO C ON (C.ID_USUARIO = S.ID_USUARIO)
                 INNER JOIN IN_ORGAO O ON (O.ID_ORGAO = S.ID_ORGAO)
