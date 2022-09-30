@@ -10,7 +10,7 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
   var dt_inicial = new Date(dateParts[2], dateParts[1]-1, 1);
   var dt_final = new Date(dateParts[2], dateParts[1], 0);
 
-  console.log(dt_inicial, dt_final);
+  
   await new model.Sf_Importa_Arquivo().DeleteLog(
     id_empresa, 
     id_usuario
@@ -49,11 +49,11 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
   }
 
   await new model.Sf_Importa_Arquivo().InsertMany(binds);
-console.log(00);
+
   if (nm_procedure1 !== undefined){
     if (nm_procedure1.trim() !== ""){
       try {
-        await Oracle.execProcedure(nm_procedure1, 
+        await Oracle.execLargProcedure(nm_procedure1, 
           { 
             pDt_Inicial: { type: Oracle.oracledb.DATE, val: dt_inicial},
             pDt_Final: { type: Oracle.oracledb.DATE, val: dt_final},
@@ -64,9 +64,9 @@ console.log(00);
             pRemove: 1,
             pEmissPropria: 1,
             pCupomFiscalE: 1,
-            pCad_Aux: 0 
+            pCad_Aux: 0
           }
-        );    
+        );
       } catch (err) {
         console.log(err.message);
         /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
@@ -75,17 +75,18 @@ console.log(00);
       }
     }
   }
-console.log('passsou');
+
   const rows = await new model.Sf_Importa_Arquivo().SelectLogImportacao(id_empresa, id_usuario).then((data) => {
     return data.rows;
   }).catch((err) => {
     console.log(err.message);
     throw new Error(err.message);
   })
-console.log(1);
+  
   if (rows.length > 0){
     if (nm_procedure2 !== undefined){
       if (nm_procedure2.trim() !== ""){
+        console.log('tem dados');
         var paramProcedures = {
           pId_Simul_Etapa: id_simul_etapa,
           pId_Empresa: id_empresa,
@@ -93,11 +94,10 @@ console.log(1);
           pDt_Inicial: {type: Oracle.oracledb.DATE, val: dt_inicial },
           pDt_Final: {type: Oracle.oracledb.DATE, val: dt_final }
         }
-        await Oracle.execProcedure(nm_procedure2, paramProcedures);
+        await Oracle.execLargProcedure(nm_procedure2, paramProcedures);
       }
     }
   } else {
-    console.log(2);
     await new model.EtapaStatus().insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
   }
 }

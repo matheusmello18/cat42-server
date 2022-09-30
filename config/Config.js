@@ -4,7 +4,8 @@ module.exports.appFrontEnd = {
 }
 
 module.exports.oracle = {
-  libDir: `C:\\app\\mathe\\product\\11.2.0\\client_1`
+  libDir: `C:\\app\\mathe\\product\\11.2.0\\client_1`,
+  libDir21: `C:\\app\\mathe\\product\\11.2.0\\instantclient_21_6`
 }
 
 module.exports.db = {

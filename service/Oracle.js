@@ -2,9 +2,9 @@
 // https://github.com/oracle/node-oracledb/blob/main/examples
 const oracledb = require('oracledb');
 const config = require('../config/Config');
-
+const dbConfig = config.db;
 if (process.platform === 'win32') { // Windows
-  oracledb.initOracleClient({ libDir: config.oracle.libDir });
+  oracledb.initOracleClient({ libDir: config.oracle.libDir21 });
 } else if (process.platform === 'linux') { // macOS
   oracledb.initOracleClient({ libDir: '/opt/oracle/instantclient_21_4' });
 }
@@ -15,7 +15,7 @@ module.exports.insert = async (sql,params) => {
   let connection;
 
   try {
-    connection = await oracledb.getConnection(config.db);
+    connection = await oracledb.getConnection(dbConfig);
 
     return await connection.execute(
       sql, params, {autoCommit: true}
@@ -44,7 +44,7 @@ module.exports.insertMany = async (sql,binds) => {
   let connection;
 
   try {
-    connection = await oracledb.getConnection(config.db);
+    connection = await oracledb.getConnection(dbConfig);
 
     return await connection.executeMany(
       sql, binds, {autoCommit: true}
@@ -73,7 +73,7 @@ module.exports.select = async (sql,params) => {
   let connection;
 
   try {
-    connection = await oracledb.getConnection(config.db);
+    connection = await oracledb.getConnection(dbConfig);
 
     return await connection.execute(
       sql, params, { outFormat: oracledb.OUT_FORMAT_OBJECT }
@@ -98,7 +98,7 @@ module.exports.update = async (sql,params) => {
   let connection;
 
   try {
-    connection = await oracledb.getConnection(config.db);
+    connection = await oracledb.getConnection(dbConfig);
 
     await connection.execute(
       sql, params, {autoCommit: true}
@@ -123,7 +123,7 @@ module.exports.delete = async (sql,params) => {
   let connection;
 
   try {
-    connection = await oracledb.getConnection(config.db);
+    connection = await oracledb.getConnection(dbConfig);
 
     return await connection.execute(
       sql, params, {autoCommit: true}
@@ -148,7 +148,7 @@ module.exports.proxCod = async (NomeEntidade) => {
   let connection;
 
   try {
-    connection = await oracledb.getConnection(config.db);
+    connection = await oracledb.getConnection(dbConfig);
 
     const ProxCodId = await connection.execute(
       `BEGIN
@@ -178,35 +178,95 @@ module.exports.proxCod = async (NomeEntidade) => {
 }
 
 module.exports.execProcedure = async (nm_procedure, nameByName = {}) => {
-  let connection;
+
+  if (oracledb.oracleClientVersion < 1800000000) {
+    throw new Error("Oracle Client libraries must be 18c or later");
+  }
+
+  const timeout  = 1; // 10 minuto the application will wait for the database operation
 
   try {
-    connection = await oracledb.getConnection(config.db);
-
     var params = '';
     Object.keys(nameByName).forEach(element => {
       params = params + `:${element},`;
     });
     params = params.substring(0, params.length-1);
 
+    
+    let connection = await oracledb.getConnection(dbConfig);
+    connection.callTimeout = timeout * 600000;  // milliseconds
+
     await connection.execute(
-      `BEGIN
-        ${nm_procedure}(${params});
-       END;`,
+      `BEGIN 
+        ${nm_procedure.trim()}(${params}); 
+      END;`,
       nameByName,
     ).catch(err => {
+      console.log(err);
       throw new Error(err);
     });
-    
   } catch (err) {
+    console.log(err);
     throw new Error(err.message);
-  } finally {
-    if (connection) {
-      try {
-        await connection.close();   // Always close connections
-      } catch (err) {
-        throw new Error(err.message);
-      }
-    }
   }
 }
+
+const exec_procedure_asynchronous = (nm_procedure, nameByName = {}) => {
+  try {
+    var params = '';
+    Object.keys(nameByName).forEach(element => {
+      params = params + `:${element},`;
+    });
+    params = params.substring(0, params.length-1);
+
+    
+    oracledb.getConnection(dbConfig, (error, connection) => {
+      if (error)
+        throw new Error(error.message);
+
+      connection.execute(
+        `BEGIN 
+          ${nm_procedure.trim()}(${params}); 
+        END;`,
+        nameByName, ((error, result) => {
+          if (error)
+            throw new Error(error.message);
+        })
+      );
+
+      connection.close();
+    });    
+  } catch (err) {
+    console.log(err);
+    throw new Error(err.message);
+  }
+}
+
+module.exports.execLargProcedure = async (nm_procedure, nameByName = {}) => {
+  const sleep = ms => {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+  
+  try{
+    let terminou = '0'
+    
+    await module.exports.delete(`DELETE FROM SIMUL_SEMAFORO WHERE ID_USUARIO = :pId_Usuario`, {pId_Usuario:nameByName.pId_Usuario});
+    await module.exports.insert('INSERT INTO SIMUL_SEMAFORO(ID_USUARIO, DM_TERMINOU) VALUES (:pId_Usuario, :dm_terminou)',{pId_Usuario:nameByName.pId_Usuario, dm_terminou:'0'});
+
+    exec_procedure_asynchronous(nm_procedure,nameByName);
+    
+    while (terminou === '0') {
+      console.log('object');
+      await sleep(60000).then( async(v) => {
+        const row = (await module.exports.select(`select DM_TERMINOU from SIMUL_SEMAFORO where ID_USUARIO = :pId_Usuario`, {pId_Usuario:nameByName.pId_Usuario})).rows[0]
+        console.log(row);
+        terminou = row.DM_TERMINOU;
+      })
+    }
+
+    
+  } catch(err){
+    throw new Error(err.message);
+  }
+
+};
