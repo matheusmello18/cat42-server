@@ -18,7 +18,7 @@ const utils = require('../utils');
 module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo) => {
 
   //#region validação dos produtos existentes
-  const ProdsSimul = await new model.ProdutoSimulador().BuscarPeloProdutosSimul(xmlObj, id_empresa, id_usuario).then((data) => {
+  /*const ProdsSimul = await new model.ProdutoSimulador().BuscarPeloProdutosSimul(xmlObj, id_empresa, id_usuario).then((data) => {
     return data.rows;
   }).catch((err) => {
     throw new Error('Falha na busca dos Produtos Simulador.');
@@ -26,7 +26,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
   if (ProdsSimul.length === 0) {
     throw new Error('Não foi encontrado no XML nenhum produto cadastrado pelo Excel.');
-  }
+  }*/
   //#endregion
 
   //#region Configurações iniciais
@@ -72,13 +72,18 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   //#endregion Empresa  
 
   //#region Pais
-  const Pais = await new model.Ac331.Pais().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.cPais[0])
-  .then((data) => {
-    return data.rows[0]
-  })
-  .catch((err) => {
-    throw new Error('Falha na busca pelo o país cadastrado. Erro: ' + err.message);
-  });
+  let Pais;
+  if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.cPais !== undefined){
+    Pais = await new model.Ac331.Pais().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.cPais[0])
+    .then((data) => {
+      return data.rows[0]
+    })
+    .catch((err) => {
+      throw new Error('Falha na busca pelo o país cadastrado. Erro: ' + err.message);
+    });
+  } else {
+    console.log(xmlObj);
+  }
   //#endregion Pais
 
   //#region Municipio
@@ -119,7 +124,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       ds_bairro: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.xBairro, 0),
       id_ref_331_municipio: Municipio.ID_REF_331_MUNICIPIO,
       uf: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.UF, 0),
-      id_ref_331_pais: Pais.ID_REF_331_PAIS,
+      id_ref_331_pais: Pais !== undefined ? Pais.ID_REF_331_PAIS : '',
       nr_cep: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.CEP, 0),
       nr_cnpj_cpf: cpfOrCnpj,
       nr_inscricao_estadual: utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.IE, 0),
@@ -469,13 +474,19 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     let Unidade = await new model.Sf0190().selectByDsUnidade(ds_unidade, id_empresa, dhEmi)
     .then((data) => {
+      console.log('retorno => ',data);
       return data.rows[0]
     })
     .catch((err) => {
       throw new Error('Falha na busca pela a unidade cadastrada. Erro: ' + err.message);
     });
 
+    console.log('fora -> ',Unidade);
+
     if (Unidade === undefined) {
+      console.log('entrou no if');
+      console.log('dentro -> ',Unidade);
+      console.log(xmlObj.nfeProc?.NFe[0]?.infNFe[0]);
       //0190
       await new model.Sf0190().insert({
         ds_unidade: ds_unidade,
@@ -484,6 +495,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         dt_movimento: dhEmi,
         id_empresa: id_empresa,
         id_usuario: id_usuario
+      }).then((v) => {
+        console.log(v);
+      }).catch((e) => {
+        console.log(e);
       });
 
       Unidade = await new model.Sf0190().selectByDsUnidade(ds_unidade, id_empresa, dhEmi)
@@ -494,6 +509,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         throw new Error('Falha na busca pela a unidade cadastrada. Erro: ' + err.message);
       });
     } else {
+      console.log('entrou no else');
       ds_unidade = Unidade.DS_UNIDADE;
     }
 
@@ -950,7 +966,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace(',','.')); 
       paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace(',','.')); 
-      paramC170.aliq_icms_subs = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
+      paramC170.aliq_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
       
       paramC170.vl_bc_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCFCP, 0, "0").replace(',','.'));
       paramC170.aliq_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCP, 0, "0").replace(',','.')); 
@@ -984,7 +1000,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace(',','.')); 
       paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace(',','.')); 
-      paramC170.aliq_icms_subs = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
+      paramC170.aliq_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
       
       if (impostoICMS.motDesICMS !== undefined) {
         paramC170.dm_mot_desc_icms = utils.Validar.getValueArray(impostoICMS.motDesICMS, 0, "").padStart(2, '0');
@@ -1037,7 +1053,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace(',','.')); 
       paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace(',','.')); 
-      paramC170.aliq_icms_subs = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
+      paramC170.aliq_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
 
       paramC170.vl_reducao_bc_icms = paramC170.vl_total_item * ((parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace(',','.')) / 100) / 100); 
 
@@ -1064,7 +1080,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace(',','.')); 
       paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace(',','.')); 
-      paramC170.aliq_icms_subs = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
+      paramC170.aliq_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
 
       paramC170.vl_reducao_bc_icms = paramC170.vl_total_item * ((parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace(',','.')) / 100) / 100); 
       
@@ -1091,7 +1107,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace(',','.')); 
       paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace(',','.')); 
-      paramC170.aliq_icms_subs = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
+      paramC170.aliq_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
 
       paramC170.vl_reducao_bc_icms = paramC170.vl_total_item * ((parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace(',','.')) / 100) / 100); 
 
@@ -1119,7 +1135,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace(',','.')); 
       paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace(',','.')); 
-      paramC170.aliq_icms_subs = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
+      paramC170.aliq_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
 
       paramC170.vl_bc_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCFCPST, 0, "0").replace(',','.'));
       paramC170.aliq_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCPST, 0, "0").replace(',','.')); 
@@ -1130,7 +1146,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace(',','.')); 
       paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace(',','.')); 
-      paramC170.aliq_icms_subs = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
+      paramC170.aliq_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
       
       paramC170.vl_bc_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCFCPST, 0, "0").replace(',','.'));
       paramC170.aliq_fcp_st = parseFloat(utils.Validar.getValueArray(impostoICMS.pFCPST, 0, "0").replace(',','.')); 
@@ -1162,7 +1178,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
       paramC170.vl_base_calculo_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.vBCST, 0, "0").replace(',','.')); 
       paramC170.vl_icms_substituicao = parseFloat(utils.Validar.getValueArray(impostoICMS.vICMSST, 0, "0").replace(',','.')); 
-      paramC170.aliq_icms_subs = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
+      paramC170.aliq_icms_subst = parseFloat(utils.Validar.getValueArray(impostoICMS.pICMSST, 0, "0").replace(',','.')); 
 
       paramC170.vl_reducao_bc_icms = paramC170.vl_total_item * ((parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace(',','.')) / 100) / 100); 
 
@@ -1203,43 +1219,44 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     //#endregion ICMS
     
     //#region IPI
-    const Sf453 = await new model.Sf453().selectByCodigo(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.cEnq, 0, ""))
-    .then((data) => {
-      return data.rows[0]
-    })
-    .catch((err) => {
-      throw new Error('Falha na busca pelo o SF453 cadastrada. Erro: ' + err.message);
-    });
+    if (det.imposto[0]?.IPI !== undefined){
+      const Sf453 = await new model.Sf453().selectByCodigo(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.cEnq, 0, ""))
+      .then((data) => {
+        return data.rows[0]
+      })
+      .catch((err) => {
+        throw new Error('Falha na busca pelo o SF453 cadastrada. Erro: ' + err.message);
+      });
 
-    if (Sf453 !== undefined) paramC170.id_ref_453 = Sf453.ID_REF_453;
+      if (Sf453 !== undefined) paramC170.id_ref_453 = Sf453.ID_REF_453;
 
-    if (det.imposto[0]?.IPI[0]?.IPITrib !== undefined) {
-      paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.CST, 0, "");
-      paramC170.vl_base_calculo_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vBC, 0, "").replace(',','.'));
-      paramC170.vl_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vIPI, 0, "").replace(',','.'));
-      paramC170.aliq_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.pIPI, 0, "0").replace(',','.'));
-      
-      if (paramC170.vl_base_calculo_ipi === null && 
-          paramC170.vl_ipi === null &&
-          det.imposto[0]?.IPI[0]?.IPITrib[0]?.qUnid !== undefined &&
-          det.imposto[0]?.IPI[0]?.IPITrib[0]?.vUnid !== undefined) {
-        paramC170.id_ref_432 = 49;
+      if (det.imposto[0]?.IPI[0]?.IPITrib !== undefined) {
+        paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.CST, 0, "");
+        paramC170.vl_base_calculo_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vBC, 0, "").replace(',','.'));
+        paramC170.vl_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vIPI, 0, "").replace(',','.'));
+        paramC170.aliq_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.pIPI, 0, "0").replace(',','.'));
+        
+        if (paramC170.vl_base_calculo_ipi === null && 
+            paramC170.vl_ipi === null &&
+            det.imposto[0]?.IPI[0]?.IPITrib[0]?.qUnid !== undefined &&
+            det.imposto[0]?.IPI[0]?.IPITrib[0]?.vUnid !== undefined) {
+          paramC170.id_ref_432 = 49;
+        }
+      } else if (det.imposto[0]?.IPI[0]?.IPINT !== undefined) {
+        paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPINT[0]?.CST, 0, "");
       }
-    } else if (det.imposto[0]?.IPI[0]?.IPINT !== undefined) {
-      paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPINT[0]?.CST, 0, "");
+
+      const Ac432 = await new model.Ac432().selectByCodigo(paramC170.id_ref_432.toString())
+      .then((data) => {
+        return data.rows[0]
+      })
+      .catch((err) => {
+        throw new Error('Falha na busca pelo o Ac432 cadastrada. Erro: ' + err.message);
+      });
+
+      if(Ac432 !== undefined) paramC170.id_ref_432 = Ac432.ID_REF_432;
+      
     }
-
-    const Ac432 = await new model.Ac432().selectByCodigo(paramC170.id_ref_432.toString())
-    .then((data) => {
-      return data.rows[0]
-    })
-    .catch((err) => {
-      throw new Error('Falha na busca pelo o Ac432 cadastrada. Erro: ' + err.message);
-    });
-
-    if(Ac432 !== undefined) paramC170.id_ref_432 = Ac432.ID_REF_432;
-    
-
     //#endregion IPI
     
     //#region II
@@ -1316,28 +1333,28 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSAliq[0]?.vCOFINS, 0, "0").replace(',','.'));
 
     } else if (det.imposto[0]?.COFINS[0]?.COFINSQtde !== undefined) {
-      paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSQtde[0]?.CST, 0, "");
-      paramC050.vl_aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSQtde[0]?.vAliqProd, 0, "0").replace(',','.'));
-      paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSQtde[0]?.vCOFINS, 0, "0").replace(',','.'));
-      paramC050.qtde_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSQtde[0]?.qBCProd, 0, "0").replace(',','.'));
+      paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSQtde[0]?.CST, 0, "");
+      paramC050.vl_aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSQtde[0]?.vAliqProd, 0, "0").replace(',','.'));
+      paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSQtde[0]?.vCOFINS, 0, "0").replace(',','.'));
+      paramC050.qtde_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSQtde[0]?.qBCProd, 0, "0").replace(',','.'));
 
     } else if (det.imposto[0]?.COFINS[0]?.COFINSNT !== undefined) {
-      paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSNT[0]?.CST, 0, "");
+      paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSNT[0]?.CST, 0, "");
     } else if (det.imposto[0]?.COFINS[0]?.COFINSOutr !== undefined) { 
-      paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.CST, 0, "");
-      paramC050.vl_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.vBC, 0, "0").replace(',','.'));
-      paramC050.aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.pCOFINS, 0, "0").replace(',','.'));
-      paramC050.vl_aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.vAliqProd, 0, "0").replace(',','.'));
-      paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.vCOFINS, 0, "0").replace(',','.'));
-      paramC050.qtde_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSOutr[0]?.qBCProd, 0, "0").replace(',','.'));
+      paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSOutr[0]?.CST, 0, "");
+      paramC050.vl_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSOutr[0]?.vBC, 0, "0").replace(',','.'));
+      paramC050.aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSOutr[0]?.pCOFINS, 0, "0").replace(',','.'));
+      paramC050.vl_aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSOutr[0]?.vAliqProd, 0, "0").replace(',','.'));
+      paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSOutr[0]?.vCOFINS, 0, "0").replace(',','.'));
+      paramC050.qtde_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSOutr[0]?.qBCProd, 0, "0").replace(',','.'));
 
     } else if (det.imposto[0]?.COFINS[0]?.COFINSST !== undefined) {
-      paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.CST, 0, "");
-      paramC050.vl_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.vBC, 0, "0").replace(',','.'));
-      paramC050.aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.pCOFINS, 0, "0").replace(',','.'));
-      paramC050.vl_aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.vAliqProd, 0, "0").replace(',','.'));
-      paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.vCOFINS, 0, "0").replace(',','.'));
-      paramC050.qtde_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.PIS[0]?.COFINSST[0]?.qBCProd, 0, "0").replace(',','.'));
+      paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSST[0]?.CST, 0, "");
+      paramC050.vl_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSST[0]?.vBC, 0, "0").replace(',','.'));
+      paramC050.aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSST[0]?.pCOFINS, 0, "0").replace(',','.'));
+      paramC050.vl_aliq_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSST[0]?.vAliqProd, 0, "0").replace(',','.'));
+      paramC050.vl_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSST[0]?.vCOFINS, 0, "0").replace(',','.'));
+      paramC050.qtde_bc_cofins = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSST[0]?.qBCProd, 0, "0").replace(',','.'));
     }
 
     const Sf434 = await new model.Sf434().selectByCodigo(paramC050.id_ref_434.toString())
@@ -1357,10 +1374,9 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       if (Cfop.DM_ICMS_VL_CONTABIL == 'S') {
         somatoria = somatoria + paramC170.vl_icms_substituicao; //sVl_ICMS
       }
-
       if (Cfop.DM_VLCONTABIL_PISCOFINS == 'S') {
-        somatoria = somatoria + paramC170.vl_pis; //sVl_PIS
-        somatoria = somatoria + paramC170.vl_cofins; //sVl_COF  
+        somatoria = somatoria + paramC050.vl_pis; //sVl_PIS
+        somatoria = somatoria + paramC050.vl_cofins; //sVl_COF  
       }
 
       if (Cfop.DM_VLCONTABIL_II == 'S') {
@@ -1373,9 +1389,9 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       
       somatoria = somatoria + (paramC170.qtde * paramC170.vl_unitario) + parseFloat(utils.Validar.getValueArray(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.total[0].ICMSTot[0]?.vOutro, 0, "0").replace(',','.')) +
         paramC170.vl_frete + paramC170.vl_seguro + paramC170.vl_ipi + paramC170.vl_icms + paramC170.cd_fiscal_operacao - paramC170.vl_desconto_item;
-
-      paramC170.vl_reducao_bc_icms = somatoria * (parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace(',','.')) / 100);
       
+      paramC170.vl_reducao_bc_icms = somatoria * (parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace(',','.')) / 100);
+
     } else {
       let nRedBC = (parseFloat(utils.Validar.getValueArray(impostoICMS.pRedBC, 0, "0").replace(',','.')) / 100)
       paramC170.vl_reducao_bc_icms = paramC170.vl_total_item * (nRedBC / 100);
@@ -1446,7 +1462,9 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       }
 
       await new model.NotaFiscal.Entrada().SfC195.insert({
-        ...chaveC170,
+        ...chaveC100,
+        nr_sequencia: chaveC170.nr_item,
+        nr_item: null,
         id_0460: Sf0460.ID_0460,
         ds_complementar: Sf0460.DS_OBS,
         id_nota_fiscal_entrada: null,

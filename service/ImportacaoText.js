@@ -10,7 +10,8 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
   var dt_inicial = new Date(dateParts[2], dateParts[1]-1, 1);
   var dt_final = new Date(dateParts[2], dateParts[1], 0);
 
-  
+  await new model.EtapaStatus().insert(dt_periodo, 3, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com pendencia.');
+
   await new model.Sf_Importa_Arquivo().DeleteLog(
     id_empresa, 
     id_usuario
@@ -51,7 +52,7 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
   await new model.Sf_Importa_Arquivo().InsertMany(binds);
 
   if (nm_procedure1 !== undefined){
-    if (nm_procedure1.trim() !== ""){
+    if (nm_procedure1 !== ""){
       try {
         await Oracle.execLargProcedure(nm_procedure1, 
           { 
@@ -60,11 +61,7 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
             pId_Empresa: parseInt(id_empresa),
             pId_Usuario: parseInt(id_usuario),
             pId_Projeto: parseInt(id_projeto),
-            pId_Modulo: parseInt(id_modulo),
-            pRemove: 1,
-            pEmissPropria: 1,
-            pCupomFiscalE: 1,
-            pCad_Aux: 0
+            pId_Modulo: parseInt(id_modulo)
           }
         );
       } catch (err) {
@@ -85,7 +82,7 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
   
   if (rows.length > 0){
     if (nm_procedure2 !== undefined){
-      if (nm_procedure2.trim() !== ""){
+      if (nm_procedure2 !== ""){
         console.log('tem dados');
         var paramProcedures = {
           pId_Simul_Etapa: id_simul_etapa,
@@ -94,7 +91,12 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
           pDt_Inicial: {type: Oracle.oracledb.DATE, val: dt_inicial },
           pDt_Final: {type: Oracle.oracledb.DATE, val: dt_final }
         }
-        await Oracle.execLargProcedure(nm_procedure2, paramProcedures);
+        
+        try {
+          await Oracle.execLargProcedure(nm_procedure2, paramProcedures);
+        } catch (err) {
+          throw new Error(err.message);
+        }
       }
     }
   } else {

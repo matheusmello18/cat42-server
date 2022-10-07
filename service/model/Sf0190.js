@@ -49,6 +49,7 @@ Sf0190.prototype.selectByDsUnidade = async (ds_unidade, id_empresa, dt_inicial) 
                                       and sf.dt_inicial <= to_date(:dt_inicial,'dd/mm/yyyy'))
                  or dt_inicial is null)`;
   try {
+    console.log(sql, {ds_unidade: ds_unidade, id_empresa: id_empresa, dt_inicial: dt_inicial});
     return await Oracle.select(sql, {ds_unidade: ds_unidade, id_empresa: id_empresa, dt_inicial: dt_inicial})
   } catch (err) {
     throw new Error(err);

@@ -269,6 +269,7 @@ NotaFiscalEntradaProdutoItem.prototype.insert = async (dataNotaFiscalEntradaItem
   try {
     await Oracle.insert(sql, dataNotaFiscalEntradaItem)
   } catch (err) {
+    console.log(sql, dataNotaFiscalEntradaItem);
     throw new Error(err);
   }
 };

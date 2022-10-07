@@ -194,14 +194,16 @@ module.exports.execProcedure = async (nm_procedure, nameByName = {}) => {
 
     
     let connection = await oracledb.getConnection(dbConfig);
-    connection.callTimeout = timeout * 600000;  // milliseconds
+    //connection.callTimeout = timeout * 600000;  // milliseconds
 
     await connection.execute(
-      `BEGIN 
-        ${nm_procedure.trim()}(${params}); 
+      `BEGIN
+        ${nm_procedure.trim()}(${params});
       END;`,
-      nameByName,
-    ).catch(err => {
+      nameByName, {autoCommit: true}
+    ).then((v) => {
+      console.log(v);
+    }).catch(err => {
       console.log(err);
       throw new Error(err);
     });
@@ -212,6 +214,7 @@ module.exports.execProcedure = async (nm_procedure, nameByName = {}) => {
 }
 
 const exec_procedure_asynchronous = (nm_procedure, nameByName = {}) => {
+  console.log(nm_procedure, nameByName);
   try {
     var params = '';
     Object.keys(nameByName).forEach(element => {
@@ -250,15 +253,47 @@ module.exports.execLargProcedure = async (nm_procedure, nameByName = {}) => {
   try{
     let terminou = '0'
     
-    await module.exports.delete(`DELETE FROM SIMUL_SEMAFORO WHERE ID_USUARIO = :pId_Usuario`, {pId_Usuario:nameByName.pId_Usuario});
-    await module.exports.insert('INSERT INTO SIMUL_SEMAFORO(ID_USUARIO, DM_TERMINOU) VALUES (:pId_Usuario, :dm_terminou)',{pId_Usuario:nameByName.pId_Usuario, dm_terminou:'0'});
+    await module.exports.delete(`
+      DELETE FROM SIMUL_SEMAFORO 
+       WHERE ID_USUARIO = :pId_Usuario
+         and ID_EMPRESA = :pId_Empresa
+         and DT_PERIODO = :pDt_Inicial`, 
+      {
+        pId_Usuario:nameByName.pId_Usuario,
+        pId_Empresa:nameByName.pId_Empresa,
+        pDt_Inicial:nameByName.pDt_Inicial,
+      }
+    );
+    await module.exports.insert(
+      `INSERT INTO SIMUL_SEMAFORO
+          (ID_USUARIO, DM_TERMINOU, ID_EMPRESA, DT_PERIODO) 
+       VALUES
+          (:pId_Usuario, :dm_terminou, :pId_Empresa, :pDt_Inicial)`,
+      {
+        pId_Usuario:nameByName.pId_Usuario, 
+        dm_terminou:'0',
+        pId_Empresa:nameByName.pId_Empresa,
+        pDt_Inicial:nameByName.pDt_Inicial,
+      }
+    );
 
     exec_procedure_asynchronous(nm_procedure,nameByName);
     
     while (terminou === '0') {
       console.log('object');
       await sleep(60000).then( async(v) => {
-        const row = (await module.exports.select(`select DM_TERMINOU from SIMUL_SEMAFORO where ID_USUARIO = :pId_Usuario`, {pId_Usuario:nameByName.pId_Usuario})).rows[0]
+        const row = (await module.exports.select(
+          `select DM_TERMINOU 
+             from SIMUL_SEMAFORO 
+            where ID_USUARIO = :pId_Usuario
+              and ID_EMPRESA = :pId_Empresa
+              and DT_PERIODO = :pDt_Inicial `, 
+          {
+            pId_Usuario:nameByName.pId_Usuario,
+            pId_Empresa:nameByName.pId_Empresa,
+            pDt_Inicial:nameByName.pDt_Inicial,
+          }
+        )).rows[0]
         console.log(row);
         terminou = row.DM_TERMINOU;
       })

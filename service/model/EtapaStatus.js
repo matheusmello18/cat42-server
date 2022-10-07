@@ -151,7 +151,7 @@ EtapaStatus.prototype.insert = async (dt_periodo,id_simul_tp_status,id_simul_eta
                       where id_simul_status = :id_simul_status`;
 
   const sqlInsert = `insert into simul_etapa_status (id_simul_status,dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status,dt_status)
-  values (:id_simul_status,:dt_periodo,:id_simul_tp_status,:id_simul_etapa,:id_empresa,:id_usuario,:ds_status,:dt_status)`;
+  values (:id_simul_status,to_date(:dt_periodo,'dd/mm/yyyy'),:id_simul_tp_status,:id_simul_etapa,:id_empresa,:id_usuario,:ds_status,:dt_status)`;
   
   var etapastatus = await Oracle.select(sqlSelect, {
     id_simul_etapa: id_simul_etapa,
@@ -182,7 +182,7 @@ EtapaStatus.prototype.insert = async (dt_periodo,id_simul_tp_status,id_simul_eta
     const nProx_Codigo = await Oracle.proxCod("SIMUL_ETAPA_STATUS");
     var parametros = {
       id_simul_status: nProx_Codigo,
-      dt_periodo:  { type: Oracle.oracledb.DATE, val: new Date(dt_periodo)},
+      dt_periodo:  dt_periodo,
       id_simul_tp_status: id_simul_tp_status,
       id_simul_etapa: id_simul_etapa,
       id_empresa: id_empresa,

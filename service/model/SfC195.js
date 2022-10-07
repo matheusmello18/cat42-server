@@ -126,6 +126,7 @@ var SfC195Entrada = function(){
  * @param {dataSfC195Entrada} dataSfC195Entrada
  * @returns {Promise} Promise
  * @example
+ * 
  * var dataSfC195Entrada = {
  *   id_0460: 1,
  *   ds_complementar: '',
@@ -158,6 +159,7 @@ SfC195Entrada.prototype.insert = async (dataSfC195Entrada) => {
 						values 
 						( :id_0460, :ds_complementar, :id_nota_fiscal_entrada, :serie_subserie_documento, :nr_documento, to_date(:dt_emissao_documento, 'dd/mm/yyyy'), :id_pessoa_remetente, :nr_sequencia, :nr_item, :id_empresa, :id_usuario, :id_modelo_documento)
 						`;
+						console.log(sql, dataSfC195Entrada);
 	try {
 		await Oracle.insert(sql, dataSfC195Entrada)
 	} catch (err) {
@@ -200,7 +202,7 @@ SfC195Entrada.prototype.delete = async (chaveC100Entrada) => {
     and id_modelo_documento  = :id_modelo_documento
     and id_empresa           = :id_empresa
   `;
-
+console.log(sql, chaveC100Entrada);
   try {
     return await Oracle.delete(sql, chaveC100Entrada);
   } catch (err) {
