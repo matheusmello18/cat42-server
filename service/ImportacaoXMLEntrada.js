@@ -18,7 +18,7 @@ const utils = require('../utils');
 module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_periodo) => {
 
   //#region validação dos produtos existentes
-  /*const ProdsSimul = await new model.ProdutoSimulador().BuscarPeloProdutosSimul(xmlObj, id_empresa, id_usuario).then((data) => {
+  const ProdsSimul = await new model.ProdutoSimulador().BuscarPeloProdutosSimul(xmlObj, id_empresa, id_usuario).then((data) => {
     return data.rows;
   }).catch((err) => {
     throw new Error('Falha na busca dos Produtos Simulador.');
@@ -26,7 +26,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
   if (ProdsSimul.length === 0) {
     throw new Error('Não foi encontrado no XML nenhum produto cadastrado pelo Excel.');
-  }*/
+  }
   //#endregion
 
   //#region Configurações iniciais
@@ -71,9 +71,12 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   });
   //#endregion Empresa  
 
+  console.log(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.$.Id);
+
   //#region Pais
   let Pais;
   if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.cPais !== undefined){
+    console.log(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.cPais);
     Pais = await new model.Ac331.Pais().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.cPais[0])
     .then((data) => {
       return data.rows[0]
@@ -81,8 +84,6 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     .catch((err) => {
       throw new Error('Falha na busca pelo o país cadastrado. Erro: ' + err.message);
     });
-  } else {
-    console.log(xmlObj);
   }
   //#endregion Pais
 
@@ -474,19 +475,13 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     let Unidade = await new model.Sf0190().selectByDsUnidade(ds_unidade, id_empresa, dhEmi)
     .then((data) => {
-      console.log('retorno => ',data);
       return data.rows[0]
     })
     .catch((err) => {
       throw new Error('Falha na busca pela a unidade cadastrada. Erro: ' + err.message);
     });
 
-    console.log('fora -> ',Unidade);
-
     if (Unidade === undefined) {
-      console.log('entrou no if');
-      console.log('dentro -> ',Unidade);
-      console.log(xmlObj.nfeProc?.NFe[0]?.infNFe[0]);
       //0190
       await new model.Sf0190().insert({
         ds_unidade: ds_unidade,
@@ -509,7 +504,6 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         throw new Error('Falha na busca pela a unidade cadastrada. Erro: ' + err.message);
       });
     } else {
-      console.log('entrou no else');
       ds_unidade = Unidade.DS_UNIDADE;
     }
 
@@ -955,7 +949,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       paramC170.vl_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.vFCP, 0, "0").replace(',','.')); //sFCP_OP
       
       if (paramC170.vl_fcp_op > 0)
-        paramC170.vl_bc_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "").replace(',','.')); //sFCP_OP
+        paramC170.vl_bc_fcp_op = parseFloat(utils.Validar.getValueArray(impostoICMS.vBC, 0, "0").replace(',','.')); //sFCP_OP
 
     } else if (det.imposto[0]?.ICMS[0]?.ICMS10 !== undefined) {
       impostoICMS = det.imposto[0]?.ICMS[0]?.ICMS10[0];
@@ -1231,11 +1225,20 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       if (Sf453 !== undefined) paramC170.id_ref_453 = Sf453.ID_REF_453;
 
       if (det.imposto[0]?.IPI[0]?.IPITrib !== undefined) {
-        paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.CST, 0, "");
-        paramC170.vl_base_calculo_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vBC, 0, "").replace(',','.'));
-        paramC170.vl_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vIPI, 0, "").replace(',','.'));
+        if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.$.Id === 'NFe35181207894222000144550010000271511000284652'){
+          console.log(paramC170.vl_base_calculo_ipi);
+          console.log(det.imposto[0]?.IPI[0]?.IPITrib[0]);
+          console.log(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vBC, 0, "0").replace(',','.'));
+        }
+        paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.CST, 0, "0");
+        paramC170.vl_base_calculo_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vBC, 0, "0").replace(',','.'));
+        paramC170.vl_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vIPI, 0, "0").replace(',','.'));
         paramC170.aliq_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.pIPI, 0, "0").replace(',','.'));
         
+        if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.$.Id === 'NFe35181207894222000144550010000271511000284652'){
+          console.log(paramC170.vl_base_calculo_ipi, paramC170.vl_ipi);
+        }
+
         if (paramC170.vl_base_calculo_ipi === null && 
             paramC170.vl_ipi === null &&
             det.imposto[0]?.IPI[0]?.IPITrib[0]?.qUnid !== undefined &&
@@ -1460,7 +1463,20 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
           throw new Error('Falha ao inserir o Sf046 no cadastrado. Erro: ' + err.message);
         });
       }
-
+/*
+ *   id_0460: 1,
+ *   ds_complementar: '',
+ *   id_nota_fiscal_entrada: 1,
+ *   serie_subserie_documento: '',
+ *   nr_documento: '',
+ *   dt_emissao_documento: '',
+ *   id_pessoa_remetente: 1,
+ *   nr_sequencia: 1,
+ *   nr_item: 1,
+ *   id_empresa: 1,
+ *   id_usuario: 1,
+ *   id_modelo_documento: 1
+ */
       await new model.NotaFiscal.Entrada().SfC195.insert({
         ...chaveC100,
         nr_sequencia: chaveC170.nr_item,

@@ -56,9 +56,10 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         })
         .then(async (jsonXML) => {
           try {
-            /*if (jsonXML.nfeProc === undefined && jsonXML.CFe === undefined) {
-              throw new Error('XML fora do padrão da importação. - Arquivo: ' + file);
-            }*/
+            if (jsonXML.nfeProc === undefined) {
+              if (jsonXML.CFe === undefined)
+                throw new Error('XML fora do padrão da importação. - Arquivo: ' + file);
+            } 
 
             if (jsonXML.nfeProc !== undefined){
               await impXmlSaida.Nfe(jsonXML, id_simul_etapa, id_empresa, id_usuario, dt_periodo);
@@ -118,8 +119,9 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
     })
     .then(async (jsonXML) => {
       try {
-        if (jsonXML.nfeProc === undefined || jsonXML.CFe === undefined) {
-          throw new Error('XML fora do padrão da importação. - Arquivo: ' + filename);
+        if (jsonXML.nfeProc === undefined) {
+          if (jsonXML.CFe === undefined)
+            throw new Error('XML fora do padrão da importação. - Arquivo: ' + filename);
         }
 
         if (jsonXML.nfeProc !== undefined){
