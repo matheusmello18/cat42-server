@@ -37,18 +37,18 @@
  *    throw new Error('Erro ao inserir o registro.');
  * })
  */
-EtapaStatusLog.prototype.insert = async (id_simul_status, id_empresa, id_usuario, ds_status) => {
+EtapaStatusLog.prototype.insert = async (id_simul_status, id_empresa, id_usuario, ds_status, ds_pilha = '') => {
   const sqlMax = `select max(nr_item) nr_item from SIMUL_STATUS_LOG where id_simul_status = :id_simul_status`;
 
-  const sqlInsert = `insert into SIMUL_STATUS_LOG (id_simul_status, nr_item, dt_log, ds_tarefa, id_empresa, id_usuario)
-  values (:id_simul_status, :nr_item, :dt_log, :ds_tarefa, :id_empresa, :id_usuario)`;
+  const sqlInsert = `insert into SIMUL_STATUS_LOG (id_simul_status, nr_item, dt_log, ds_tarefa, id_empresa, id_usuario, ds_pilha)
+  values (:id_simul_status, :nr_item, :dt_log, :ds_tarefa, :id_empresa, :id_usuario, :ds_pilha)`;
   
   let statusLog = await Oracle.select(sqlMax, {
     id_simul_status: id_simul_status
   }).then((data) => {
     return data.rows[0]
-  }).catch((erro) => {
-    throw new Error(erro.message);
+  }).catch((err) => {
+    throw err
   })
   
   let nr_item = statusLog.NR_ITEM == null ? 1 : 1 + parseInt(statusLog.NR_ITEM);
@@ -61,10 +61,11 @@ EtapaStatusLog.prototype.insert = async (id_simul_status, id_empresa, id_usuario
       ds_tarefa: ds_status,
       id_empresa: id_empresa,
       id_usuario: id_usuario,
+      ds_pilha: ds_pilha,
     });
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 
 }
@@ -81,7 +82,7 @@ EtapaStatusLog.prototype.insert = async (id_simul_status, id_empresa, id_usuario
  * const rows = await EtapaStatusLog.select(3).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 EtapaStatusLog.prototype.select = async (id_simul_status) => {
@@ -107,7 +108,7 @@ EtapaStatusLog.prototype.select = async (id_simul_status) => {
     return await Oracle.select(sql, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

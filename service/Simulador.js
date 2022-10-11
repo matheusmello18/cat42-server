@@ -23,7 +23,7 @@ module.exports.inserir = async (obj) => {
 
     return nProx_Codigo;
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -45,7 +45,7 @@ WHERE ID_SIMUL_CADASTRO = :ID_SIMUL_CADASTRO`;
     await Oracle.update(sqlUpdate, params);
 
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -66,6 +66,6 @@ module.exports.select = async (id = '') => {
     }
     
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }

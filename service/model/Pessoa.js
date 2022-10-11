@@ -65,7 +65,7 @@ Pessoa.prototype.insert = async (dataPessoa) => {
 	try {
 		return await Oracle.insert(sql, dataPessoa)
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 
@@ -77,7 +77,7 @@ Pessoa.prototype.sp_gera_pessoa_mestre_item = async () => {
   try {
     return await Oracle.execProcedure('SP_GERA_PESSOA_MESTRE_ITEM');
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -123,7 +123,7 @@ PessoaMestre.prototype.insert = async (dataPessoaMestre) => {
 	try {
 		return await Oracle.insert(sql, dataPessoaMestre)
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 };
 
@@ -142,7 +142,7 @@ PessoaMestre.prototype.insert = async (dataPessoaMestre) => {
  * const rows = await PessoaMestre.selectByCdPessoa('E44779', 1).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 PessoaMestre.prototype.selectByCdPessoa = async (cd_pessoa, id_empresa) => {
@@ -153,7 +153,7 @@ PessoaMestre.prototype.selectByCdPessoa = async (cd_pessoa, id_empresa) => {
 	try {
 		return await Oracle.select(sql, {cd_pessoa: cd_pessoa, id_empresa: id_empresa})
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 };
 
@@ -172,7 +172,7 @@ PessoaMestre.prototype.selectByCdPessoa = async (cd_pessoa, id_empresa) => {
  * const rows = await PessoaMestre.selectByCdPessoa('PJK FRANCO E CIA LTDA', 1).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 PessoaMestre.prototype.selectByRazaoSocial = async (nm_razao_social, id_empresa) => {
@@ -185,7 +185,7 @@ PessoaMestre.prototype.selectByRazaoSocial = async (nm_razao_social, id_empresa)
 	try {
 		return await Oracle.select(sql, {nm_razao_social: nm_razao_social, id_empresa: id_empresa})
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 };
 
@@ -204,7 +204,7 @@ PessoaMestre.prototype.selectByRazaoSocial = async (nm_razao_social, id_empresa)
  * const rows = await PessoaMestre.selectByCpfOrCpnj('08821071000167', '01/12/2019', 1).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 PessoaMestre.prototype.selectByCpfOrCpnj = async (nr_cnpj_cpf, dt_inicial, id_empresa) => {
@@ -224,7 +224,7 @@ PessoaMestre.prototype.selectByCpfOrCpnj = async (nr_cnpj_cpf, dt_inicial, id_em
 	try {
 		return await Oracle.select(sql, {nr_cnpj_cpf: nr_cnpj_cpf, dt_inicial: dt_inicial, id_empresa: id_empresa})
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 };
 

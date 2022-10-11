@@ -94,7 +94,7 @@ module.exports.GeraFunctionInsert = async () => {
     sql = sql + `\t\t\t\t\t\t(${campos.toLowerCase()}) \n\t\t\t\t\t\tvalues \n\t\t\t\t\t\t(${fields.toLowerCase()})\n\t\t\t\t\t\t`;
 
     tabela = tabela.split("_").map((e,index,array) => { return e.charAt(0).toUpperCase() + e.slice(1)}).join("")
-    func = `const Insert${tabela} = async (${tabela} = {}) => {\n\tlet sql = \`${sql}\`;\n\ttry {\n\t\tawait Oracle.insert(sql, ${tabela})\n\t} catch (err) {\n\t\tthrow new Error(err);\n\t}\n}\n\n`
+    func = `const Insert${tabela} = async (${tabela} = {}) => {\n\tlet sql = \`${sql}\`;\n\ttry {\n\t\tawait Oracle.insert(sql, ${tabela})\n\t} catch (err) {\n\t\tthrow err\n\t}\n}\n\n`
     func = `${func}/** Insert${tabela}\n\tInsert${tabela}({${params.toLowerCase()}\n\t})\n*/\n\n`;
 
     fs.appendFile('layoutX.php', func, (err) => {

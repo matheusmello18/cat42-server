@@ -71,7 +71,7 @@ AcC050Saida.prototype.insert = async (dataAcC050Saida) => {
 	try {
 		return await Oracle.insert(sql, dataAcC050Saida)
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 };
 
@@ -122,7 +122,7 @@ AcC050Saida.prototype.insert = async (dataAcC050Saida) => {
 	try {
 		return await Oracle.update(sql, dataAcC050Saida)
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 
@@ -163,7 +163,7 @@ AcC050Saida.prototype.insert = async (dataAcC050Saida) => {
   try {
     return await Oracle.delete(sql, chaveC100Saida);
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -236,7 +236,7 @@ AcC050Entrada.prototype.insert = async (dataAcC050Entrada) => {
 	try {
 		return await Oracle.insert(sql, dataAcC050Entrada)
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 
@@ -275,7 +275,7 @@ AcC050Entrada.prototype.insert = async (dataAcC050Entrada) => {
   try {
     await Oracle.insert(sql, chaveC100Entrada)
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 };
 

@@ -79,7 +79,7 @@
 		try {
 			await Oracle.insert(sql, dataSfC850)
 		} catch (err) {
-			throw new Error(err);
+			throw err
 		}
 	}
 

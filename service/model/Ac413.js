@@ -32,7 +32,7 @@ var Ac413 = function() {
  * const rows = await ac413.selectByCodigo('09').then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 
@@ -43,7 +43,7 @@ Ac413.prototype.selectByCodigo = async (cd_codigo) => {
   try {
     return await Oracle.select(sql, {cd_codigo: cd_codigo})
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

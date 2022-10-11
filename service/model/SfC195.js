@@ -60,7 +60,7 @@ SfC195Saida.prototype.insert = async (dataSfC195Saida) => {
 		await Oracle.insert(sql, dataSfC195Saida)
 	} catch (err) {
 		if (!err.message.includes('20211'))
-			throw new Error(err);
+			throw err
 	}
 }
 
@@ -101,7 +101,7 @@ SfC195Saida.prototype.insert = async (dataSfC195Saida) => {
   try {
     return await Oracle.delete(sql, chaveC100Saida);
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -165,7 +165,7 @@ SfC195Entrada.prototype.insert = async (dataSfC195Entrada) => {
 		await Oracle.insert(sql, dataSfC195Entrada)
 	} catch (err) {
 		if (!err.message.includes('20211'))
-			throw new Error(err);
+			throw err
 	}
 }
 
@@ -208,7 +208,7 @@ console.log(sql, chaveC100Entrada);
   try {
     return await Oracle.delete(sql, chaveC100Entrada);
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

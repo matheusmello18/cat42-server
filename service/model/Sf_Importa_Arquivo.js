@@ -62,7 +62,7 @@ Sf_Importa_Arquivo.prototype.Insert = async ( nr_referencia, ds_conteudo, id_emp
     await Oracle.insert(sqlInsert, params).then((result) => { return }).catch((e) => {return});
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -89,7 +89,7 @@ Sf_Importa_Arquivo.prototype.Insert = async ( nr_referencia, ds_conteudo, id_emp
   try {
     await Oracle.insertMany(sqlInsert, binds); 
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -137,7 +137,7 @@ Sf_Importa_Arquivo.prototype.Delete = async (id_projeto, id_modulo, dt_inicial, 
     await Oracle.delete(sqlDelete, params);
   
   } catch (err) {
-    throw new Error(err+'test');
+    throw err
   }
 }
 
@@ -175,7 +175,7 @@ Sf_Importa_Arquivo.prototype.Delete = async (id_projeto, id_modulo, dt_inicial, 
     await Oracle.delete(sqlDelete, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -194,7 +194,7 @@ Sf_Importa_Arquivo.prototype.Delete = async (id_projeto, id_modulo, dt_inicial, 
  * const data = await Sf_Importa_Arquivo.SelectLogImportacao(1, 1).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message);
+ *    throw err
  * })
  */
  Sf_Importa_Arquivo.prototype.SelectLogImportacao = async (id_empresa, id_usuario) => {
@@ -208,7 +208,7 @@ Sf_Importa_Arquivo.prototype.Delete = async (id_projeto, id_modulo, dt_inicial, 
   try {
     return await Oracle.select(sqlSelect, {pId_empresa: id_empresa, pId_Usuario: id_usuario})
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 module.exports.Sf_Importa_Arquivo = Sf_Importa_Arquivo;

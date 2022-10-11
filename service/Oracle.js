@@ -11,6 +11,42 @@ if (process.platform === 'win32') { // Windows
 
 module.exports.oracledb = oracledb;
 
+module.exports.monitorLogError = async (ds_query, JsonParams, msgError) => {
+  let connection;
+
+  let sql = `insert into simul_monitor_log_error 
+               (ds_query, ds_params, ds_error, dt_monitor)
+            values
+               (:ds_query, :ds_params, ds_error, :dt_monitor)`
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    
+    let objParams = {
+      ds_query: ds_query,
+      ds_params: JSON.stringify(JsonParams),
+      ds_error: msgError,
+      dt_monitor: { type: oracledb.DATE, val: new Date() },      
+    };
+
+    return await connection.execute(
+      sql, objParams, {autoCommit: true}
+    ).catch(err => {
+      // gravar em arquivo de log
+    });
+
+  } catch (err) {
+    // gravar em arquivo de log
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();   // Always close connections
+      } catch (err) {
+        // gravar em arquivo de log
+      }
+    }
+  }
+}
+
 module.exports.insert = async (sql,params) => {
   let connection;
 
@@ -20,21 +56,23 @@ module.exports.insert = async (sql,params) => {
     return await connection.execute(
       sql, params, {autoCommit: true}
     ).catch(err => {
+      module.exports.monitorLogError(sql, params, err.message);
+
       if (err.errorNum === 1008){
         throw new Error('Nem todas as variáveis ​​vinculadas');
       } else{
-        throw new Error(err);
+        throw err;
       }
     });
 
   } catch (err) {
-    throw new Error(err.message);
+    throw err;
   } finally {
     if (connection) {
       try {
         await connection.close();   // Always close connections
       } catch (err) {
-        throw new Error(err.message);
+        throw err
       }
     }
   }
@@ -49,21 +87,23 @@ module.exports.insertMany = async (sql,binds) => {
     return await connection.executeMany(
       sql, binds, {autoCommit: true}
     ).catch(err => {
+      module.exports.monitorLogError(sql, binds, err.message);
+
       if (err.errorNum === 1008){
         throw new Error('Nem todas as variáveis ​​vinculadas');
       } else{
-        throw new Error(err);
+        throw err
       }
     });
 
   } catch (err) {
-    throw new Error(err.message);
+    throw err
   } finally {
     if (connection) {
       try {
         await connection.close();   // Always close connections
       } catch (err) {
-        throw new Error(err.message);
+        throw err
       }
     }
   }
@@ -78,17 +118,19 @@ module.exports.select = async (sql,params) => {
     return await connection.execute(
       sql, params, { outFormat: oracledb.OUT_FORMAT_OBJECT }
     ).catch(err => {
-      throw new Error(err);
+      module.exports.monitorLogError(sql, params, err.message);
+
+      throw err
     });
   
   } catch (err) {
-    throw new Error(err.message);
+    throw err
   } finally {
     if (connection) {
       try {
         await connection.close();   // Always close connections
       } catch (err) {
-        throw new Error(err.message);
+        throw err
       }
     }
   }
@@ -103,17 +145,19 @@ module.exports.update = async (sql,params) => {
     await connection.execute(
       sql, params, {autoCommit: true}
     ).catch(err => {
-      throw new Error(err);
+      module.exports.monitorLogError(sql, params, err.message);
+
+      throw err
     });
 
   } catch (err) {
-    throw new Error(err.message);
+    throw err
   } finally {
     if (connection) {
       try {
         await connection.close();   // Always close connections
       } catch (err) {
-        throw new Error(err.message);
+        throw err
       }
     }
   }
@@ -128,17 +172,19 @@ module.exports.delete = async (sql,params) => {
     return await connection.execute(
       sql, params, {autoCommit: true}
     ).catch(err => {
-      throw new Error(err);
+      module.exports.monitorLogError(sql, params, err.message);
+
+      throw err
     }); 
 
   } catch (err) {
-    throw new Error(err.message);
+    throw err
   } finally {
     if (connection) {
       try {
         await connection.close();   // Always close connections
       } catch (err) {
-        throw new Error(err.message);
+        throw err
       }
     }
   }
@@ -150,40 +196,40 @@ module.exports.proxCod = async (NomeEntidade) => {
   try {
     connection = await oracledb.getConnection(dbConfig);
 
+    let sql =
+    `BEGIN
+       SP_PROX_CODIGO(:cNome_Entidade, :nProx_Codigo);
+     END;`;
+
+     let params = {
+      cNome_Entidade:  NomeEntidade,
+      nProx_Codigo:  { type: oracledb.NUMBER, dir: oracledb.BIND_OUT }
+    };
+
     const ProxCodId = await connection.execute(
-      `BEGIN
-        SP_PROX_CODIGO(:cNome_Entidade, :nProx_Codigo);
-        END;`,
-      {
-        cNome_Entidade:  NomeEntidade,
-        nProx_Codigo:  { type: oracledb.NUMBER, dir: oracledb.BIND_OUT }
-      }
+      sql, params
     ).catch(err => {
-      throw new Error(err);
+      module.exports.monitorLogError(sql, params, err.message);
+
+      throw err
     });
 
     return ProxCodId.outBinds.nProx_Codigo;
     
   } catch (err) {
-    throw new Error(err.message);
+    throw err
   } finally {
     if (connection) {
       try {
         await connection.close();   // Always close connections
       } catch (err) {
-        throw new Error(err.message);
+        throw err
       }
     }
   }
 }
 
 module.exports.execProcedure = async (nm_procedure, nameByName = {}) => {
-
-  if (oracledb.oracleClientVersion < 1800000000) {
-    throw new Error("Oracle Client libraries must be 18c or later");
-  }
-
-  const timeout  = 1; // 10 minuto the application will wait for the database operation
 
   try {
     var params = '';
@@ -194,22 +240,26 @@ module.exports.execProcedure = async (nm_procedure, nameByName = {}) => {
 
     
     let connection = await oracledb.getConnection(dbConfig);
-    //connection.callTimeout = timeout * 600000;  // milliseconds
+
+    let query = 
+    `BEGIN
+      ${nm_procedure.trim()}(${params});
+    END;`
 
     await connection.execute(
-      `BEGIN
-        ${nm_procedure.trim()}(${params});
-      END;`,
+      query,
       nameByName, {autoCommit: true}
     ).then((v) => {
       console.log(v);
     }).catch(err => {
+      module.exports.monitorLogError(query, params, err.message);
+
       console.log(err);
-      throw new Error(err);
+      throw err
     });
   } catch (err) {
     console.log(err);
-    throw new Error(err.message);
+    throw err
   }
 }
 
@@ -223,17 +273,21 @@ const exec_procedure_asynchronous = (nm_procedure, nameByName = {}) => {
     params = params.substring(0, params.length-1);
 
     
-    oracledb.getConnection(dbConfig, (error, connection) => {
-      if (error)
-        throw new Error(error.message);
+    oracledb.getConnection(dbConfig, (err, connection) => {
+      if (err)
+        throw err
 
+      let query = 
+      `BEGIN 
+        ${nm_procedure.trim()}(${params}); 
+       END;`;
       connection.execute(
-        `BEGIN 
-          ${nm_procedure.trim()}(${params}); 
-        END;`,
-        nameByName, ((error, result) => {
-          if (error)
-            throw new Error(error.message);
+        query,
+        nameByName, ((err, result) => {
+          if (err){
+            module.exports.monitorLogError(query, params, err.message);
+            throw err
+          }
         })
       );
 
@@ -241,7 +295,7 @@ const exec_procedure_asynchronous = (nm_procedure, nameByName = {}) => {
     });    
   } catch (err) {
     console.log(err);
-    throw new Error(err.message);
+    throw err
   }
 }
 
@@ -301,7 +355,7 @@ module.exports.execLargProcedure = async (nm_procedure, nameByName = {}) => {
 
     
   } catch(err){
-    throw new Error(err.message);
+    throw err
   }
 
 };

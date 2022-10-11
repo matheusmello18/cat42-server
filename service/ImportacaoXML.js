@@ -40,8 +40,8 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         
         try {
            xml = fs.readFileSync(newPath+'\\'+file, {encoding:'utf8', flag:'r'})
-        } catch (error) {
-          if (error.code === 'EISDIR')
+        } catch (err) {
+          if (err.code === 'EISDIR')
             throw new Error('O zip não pode conter pastas dentro dele, apenas os XML');
         }
 
@@ -51,8 +51,8 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
     
         await parseStringAsync
         .catch(async (err) => {
-          console.log(err);
-          throw new Error(err.message + ' - Arquivo: ' + file);
+          //err.message = err.message + ' - Arquivo: ' + file
+          throw err
         })
         .then(async (jsonXML) => {
           try {
@@ -62,7 +62,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
             } 
 
             if (jsonXML.nfeProc !== undefined){
-              await impXmlSaida.Nfe(jsonXML, id_simul_etapa, id_empresa, id_usuario, dt_periodo);
+              await impXmlSaida.Nfe(jsonXML, id_simul_etapa, id_empresa, id_usuario, dt_periodo)
             } else if (jsonXML.CFe !== undefined) { //c800
               await impXmlSaida.Cfe(jsonXML, id_simul_etapa, id_empresa, id_usuario, dt_periodo)
             }  
@@ -89,12 +89,11 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
                 await Oracle.execProcedure(nm_procedure2, paramProcedures);
             }
           } catch (err) {
-            console.log(err);
-            throw new Error(err.message + ' - Arquivo: ' + file);
+            err.message = err.message + ' - Arquivo: ' + file
+            
+            throw err;
           }
           
-        }).catch((err) => {
-          console.log(err);
         })
         
       }//fim for
@@ -102,7 +101,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
       await new model.EtapaStatus().insert(dt_periodo, 1, id_simul_etapa, id_empresa, id_usuario, 'Dados importado com sucesso.');
       
     } catch (err) {
-      throw new Error(err.message);
+      throw err
     }
     
   } else if (path.endsWith('.xml')){
@@ -115,7 +114,8 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
     await parseStringAsync
     .catch(async (err) => {
-      throw new Error(err.message + ' - Arquivo: ' + filename);
+      err.message = err.message + ' - Arquivo: ' + filename
+      throw err
     })
     .then(async (jsonXML) => {
       try {
@@ -154,7 +154,8 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
 
         await new model.EtapaStatus().insert(dt_periodo, 1, id_simul_etapa, id_empresa, id_usuario, 'Dados importado com sucesso.');
       } catch (err) {
-        throw new Error(err.message + ' - Arquivo: ' + filename);
+        err.message = err.message + ' - Arquivo: ' + filename;
+        throw err;
       }
     });
   }
@@ -170,7 +171,7 @@ module.exports.xXmlEntrada = async (filename, path, id_simul_etapa, id_empresa, 
 
   await parseStringAsync
   .catch(async (err) => {
-    throw new Error(err.message);
+    throw err
   })
   .then(async (jsonXML) => {
     try {
@@ -233,8 +234,8 @@ module.exports.xXmlEntrada = async (filename, path, id_simul_etapa, id_empresa, 
         }
         return data.rows;
       });
-      console.log(err);
-      throw new Error(err.message + ' - Arquivo: ' + filename);
+      err.message = err.message + ' - Arquivo: ' + filename
+      throw err
     }
 
   })
@@ -257,8 +258,8 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
         
         try {
            xml = fs.readFileSync(newPath+'\\'+file, {encoding:'utf8', flag:'r'})
-        } catch (error) {
-          if (error.code === 'EISDIR')
+        } catch (err) {
+          if (err.code === 'EISDIR')
             throw new Error('O zip não pode conter pastas dentro dele, apenas os XML');
         }
 
@@ -268,7 +269,7 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
 
         await parseStringAsync
         .catch(async (err) => {
-          throw new Error(err.message);
+          throw err
         })
         .then(async (jsonXML) => {
           try {
@@ -331,14 +332,13 @@ module.exports.XmlEntrada = async (filename, path, id_simul_etapa, id_empresa, i
               }
               return data.rows;
             });
-            console.log(err);
-            throw new Error(err.message + ' - Arquivo: ' + filename);
+            err.message = err.message + ' - Arquivo: ' + filename
+            throw err
           }
-
         })
       }
     } catch (err) {
-      throw new Error(err.message);
+      throw err
     }
   }
 }

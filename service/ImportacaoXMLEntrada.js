@@ -1225,19 +1225,10 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       if (Sf453 !== undefined) paramC170.id_ref_453 = Sf453.ID_REF_453;
 
       if (det.imposto[0]?.IPI[0]?.IPITrib !== undefined) {
-        if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.$.Id === 'NFe35181207894222000144550010000271511000284652'){
-          console.log(paramC170.vl_base_calculo_ipi);
-          console.log(det.imposto[0]?.IPI[0]?.IPITrib[0]);
-          console.log(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vBC, 0, "0").replace(',','.'));
-        }
-        paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.CST, 0, "0");
+        paramC170.id_ref_432 = utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.CST, 0, "");
         paramC170.vl_base_calculo_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vBC, 0, "0").replace(',','.'));
         paramC170.vl_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.vIPI, 0, "0").replace(',','.'));
         paramC170.aliq_ipi = parseFloat(utils.Validar.getValueArray(det.imposto[0]?.IPI[0]?.IPITrib[0]?.pIPI, 0, "0").replace(',','.'));
-        
-        if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.$.Id === 'NFe35181207894222000144550010000271511000284652'){
-          console.log(paramC170.vl_base_calculo_ipi, paramC170.vl_ipi);
-        }
 
         if (paramC170.vl_base_calculo_ipi === null && 
             paramC170.vl_ipi === null &&

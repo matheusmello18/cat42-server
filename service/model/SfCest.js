@@ -33,7 +33,7 @@
    * const rows = await SfCest.selectByCodigo('05.005', '01/08/2019').then((e) => {
    *    return e.rows;
    * }).catch((err) => {
-   *    throw new Error(err.message)
+   *    throw err
    * })
    */
   
@@ -49,7 +49,7 @@ SfCest.prototype.selectByCodigo = async (cd_cest, dt_movimento) => {
   try {
     return await Oracle.select(sql, {cd_cest: cd_cest, dt_movimento: dt_movimento})
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

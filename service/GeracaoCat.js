@@ -38,8 +38,8 @@ module.exports.Cat42 = async (id_simul_etapa, id_empresa, id_usuario, dt_periodo
       if(nm_procedure2.trim() !== ""){
         await Oracle.execProcedure(nm_procedure2, paramProcedures2);  
       }
-  } catch (error) {
-    throw new Error(error.message);
+  } catch (err) {
+    throw err
   }
   
 }

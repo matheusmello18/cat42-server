@@ -61,7 +61,7 @@ ProdutoSimulador.prototype.BuscarPeloProdutosSimul = async (xmlObj, id_empresa, 
     return await Oracle.select(sql, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -112,7 +112,7 @@ ProdutoSimulador.prototype.Insert = async (id_produto, cd_produto, ds_produto, d
     await Oracle.insert(sqlInsert, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -144,7 +144,7 @@ ProdutoSimulador.prototype.Delete = async (id_empresa, id_usuario) => {
     return await Oracle.delete(sqlDelete, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -182,7 +182,7 @@ ProdutoSimulador.prototype.selectByCodProdForn = async (cdProdForn, id_empresa, 
     return await Oracle.select(sql, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -221,7 +221,7 @@ ProdutoSimulador.prototype.updateStatus = async (id_simul_tp_status, id_produto,
     return await Oracle.update(sql, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

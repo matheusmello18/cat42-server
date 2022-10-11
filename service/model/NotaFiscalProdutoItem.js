@@ -117,7 +117,7 @@ NotaFiscalSaidaProdutoItem.prototype.insert = async (dataNotaFiscalSaidaItem) =>
   try {
     await Oracle.insert(sql, dataNotaFiscalSaidaItem)
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 };
 
@@ -158,7 +158,7 @@ NotaFiscalSaidaProdutoItem.prototype.insert = async (dataNotaFiscalSaidaItem) =>
   try {
     return await Oracle.delete(sql, chaveC100Saida);
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -270,7 +270,7 @@ NotaFiscalEntradaProdutoItem.prototype.insert = async (dataNotaFiscalEntradaItem
     await Oracle.insert(sql, dataNotaFiscalEntradaItem)
   } catch (err) {
     console.log(sql, dataNotaFiscalEntradaItem);
-    throw new Error(err);
+    throw err
   }
 };
 
@@ -309,7 +309,7 @@ NotaFiscalEntradaProdutoItem.prototype.insert = async (dataNotaFiscalEntradaItem
   try {
     await Oracle.insert(sql, chaveC100Entrada)
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 };
 

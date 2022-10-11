@@ -13,8 +13,8 @@ router.post("/cat", async (req, res) => {
     }
     await new model.EtapaStatus().insert(req.body.dt_periodo, 1, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, 'Dados importado com sucesso.');  
     success = 'true';
-  } catch (error) {
-    await new model.EtapaStatus().insert(req.body.dt_periodo, 2, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, error.message);  
+  } catch (err) {
+    await new model.EtapaStatus().insert(req.body.dt_periodo, 2, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, err.message, err.stack);  
     success = 'false';
   }
 

@@ -32,7 +32,7 @@ var Municipio = function(){
  * const rows = await municipio.select('3534302').then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 Municipio.prototype.select = async (cd_municipio) => {
@@ -48,7 +48,7 @@ Municipio.prototype.select = async (cd_municipio) => {
       );
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 module.exports.Municipio = Municipio;
@@ -80,7 +80,7 @@ module.exports.Municipio = Municipio;
  * const rows = await pais.select('01058').then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 
@@ -94,7 +94,7 @@ Pais.prototype.select = async (cd_pais) => {
        WHERE TO_NUMBER(CD_PAIS) = TO_NUMBER(:param1)`,
       {param1: cd_pais});
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 module.exports.Pais = Pais;
@@ -128,7 +128,7 @@ module.exports.Pais = Pais;
  * const rows = await ncm.select('01058').then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 
@@ -145,7 +145,7 @@ Ncm.prototype.select = async (cd_ncm, dt_movimento) => {
       `,
       {cd_ncm: cd_ncm, dt_movimento: dt_movimento});
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -179,7 +179,7 @@ module.exports.Ncm = Ncm;
  * const rows = await exipi.select('01058', 15).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 
@@ -192,7 +192,7 @@ ExIPI.prototype.select = async (cd_exipi, id_ref_331_ncm) => {
          and nr_ex_ipi = :nr_ex_ipi`,
       {nr_ex_ipi: cd_exipi, id_ref_331_ncm: id_ref_331_ncm});
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

@@ -33,7 +33,7 @@
  * const rows = await Sf0460.selectByCodigo('DOCUMENTO INTEGRADO AUTOMATICAMENTE VIA INTEGRACAO GKO RETORNO', 1).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
   
@@ -46,7 +46,7 @@ Sf0460.prototype.selectByCodigo = async (ds_obs, id_empresa) => {
   try {
     return await Oracle.select(sql, {ds_obs: ds_obs, id_empresa: id_empresa})
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -89,7 +89,7 @@ Sf0460.prototype.insert = async (dataSf0460) => {
     });
     
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 

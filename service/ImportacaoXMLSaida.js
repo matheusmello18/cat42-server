@@ -29,6 +29,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data.rows[0]
   })
   .catch((err) => {
+    err.message
     throw new Error('Falha na busca pela empresa cadastrada. Erro: ' + err.message);
   });
 

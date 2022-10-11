@@ -33,7 +33,7 @@ var CtrlUsuario = function(){
  * const rows = await CtrlUsuario.select('matheus.mello@painelfiscal.com.br','123456').then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 
@@ -84,7 +84,7 @@ CtrlUsuario.prototype.select = async (email, senha = '') => {
     return await Oracle.select(qry, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -119,7 +119,7 @@ CtrlUsuario.prototype.updateHash = async (id, hash) => {
     return await Oracle.update(sqlUpdate, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -136,7 +136,7 @@ CtrlUsuario.prototype.updateHash = async (id, hash) => {
  * const rows = await CtrlUsuario.selectByHash('AF8ADF87D5F45AF4787SDF').then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 CtrlUsuario.prototype.selectByHash = async (hash) => {
@@ -173,7 +173,7 @@ CtrlUsuario.prototype.selectByHash = async (hash) => {
     return await Oracle.select(sqlHash, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -215,7 +215,7 @@ CtrlUsuario.prototype.updateSenha = async (id, senhaWeb, senha) => {
     return await Oracle.update(sqlUpdateHash, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

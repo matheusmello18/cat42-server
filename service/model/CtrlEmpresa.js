@@ -32,7 +32,7 @@ var CtrlEmpresa = function(){
  * const rows = await CtrlEmpresa.select(1).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
  CtrlEmpresa.prototype.select = async (id_empresa) => {
@@ -54,7 +54,7 @@ var CtrlEmpresa = function(){
     return await Oracle.select(sql, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

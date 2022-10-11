@@ -37,7 +37,7 @@ var EtapaStatus = function(){
  * const rows = await EtapaStatus.select(1, 1, 2).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 
@@ -113,7 +113,7 @@ EtapaStatus.prototype.select = async (id_empresa, id_usuario, dt_periodo, id_sim
       })
 
     } catch (err) {
-      throw new Error(err);
+      throw err
     }
 }
 
@@ -138,7 +138,7 @@ EtapaStatus.prototype.select = async (id_empresa, id_usuario, dt_periodo, id_sim
  *    throw new Error('Erro ao inserir o registro.');
  * })
  */
-EtapaStatus.prototype.insert = async (dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status) => {
+EtapaStatus.prototype.insert = async (dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status, ds_pilha = '') => {
   const sqlSelect = `select id_simul_status, dt_periodo, id_simul_tp_status, id_simul_etapa, id_empresa, id_usuario, ds_status, dt_status 
                        from simul_etapa_status 
                       where id_simul_etapa = :id_simul_etapa
@@ -160,7 +160,7 @@ EtapaStatus.prototype.insert = async (dt_periodo,id_simul_tp_status,id_simul_eta
   }).then((data) => {
     return data.rows[0];
   }).catch((err) => {
-    throw new Error(err);
+    throw err
   });
 
   var msg = id_simul_tp_status === 1 ? "Importaçao realizada com sucesso." : (id_simul_tp_status === 2 ? "Importação realizada com advertência." : (id_simul_tp_status === 3 ? "Importação realizada com erro." : ""));
@@ -171,10 +171,10 @@ EtapaStatus.prototype.insert = async (dt_periodo,id_simul_tp_status,id_simul_eta
       ds_status: msg,
       id_simul_tp_status: id_simul_tp_status,
     }).catch((err) => {
-      throw new Error(err);
+      throw err
     });
 
-    await new EtapaStatusLog().insert(etapastatus.ID_SIMUL_STATUS, id_empresa, id_usuario, ds_status);
+    await new EtapaStatusLog().insert(etapastatus.ID_SIMUL_STATUS, id_empresa, id_usuario, ds_status, ds_pilha);
 
     return etapastatus.ID_SIMUL_STATUS
 
@@ -194,12 +194,12 @@ EtapaStatus.prototype.insert = async (dt_periodo,id_simul_tp_status,id_simul_eta
     try {
       await Oracle.insert(sqlInsert, parametros);
     
-      await new EtapaStatusLog().insert(nProx_Codigo, id_empresa, id_usuario, ds_status);
+      await new EtapaStatusLog().insert(nProx_Codigo, id_empresa, id_usuario, ds_status, ds_pilha);
 
       return nProx_Codigo;
 
     } catch (err) {
-      throw new Error(err);
+      throw err
     }
   }
 }
@@ -236,7 +236,7 @@ EtapaStatus.prototype.selectold = async (id_empresa, id_usuario, id_simul_etapa 
     return await Oracle.select(sql, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

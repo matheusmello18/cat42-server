@@ -63,7 +63,7 @@ AcC060Entrada.prototype.insert = async (dataAcC060Entrada) => {
 	try {
 		return await Oracle.insert(sql, dataAcC060Entrada)
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 
@@ -106,7 +106,7 @@ AcC060Entrada.prototype.insert = async (dataAcC060Entrada) => {
   try {
     return await Oracle.delete(sql, chaveC100Entrada);
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

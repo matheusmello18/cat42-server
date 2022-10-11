@@ -34,7 +34,7 @@ var Ac0450 = function(){
  * const rows = await ac0450.select('retorno ref a nf no0039142 de 19/05/2014 |', 1, '01/06/2014').then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 
@@ -53,7 +53,7 @@ Ac0450.prototype.select = async (ds_observacao, id_empresa, dt_inicial) => {
   try {
     return await Oracle.select(sql, {ds_observacao: ds_observacao, id_empresa: id_empresa, dt_inicial: dt_inicial})
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -94,7 +94,7 @@ Ac0450.prototype.insert = async (ds_observacao, id_empresa, dt_inicial) => {
     await Oracle.insert(sql, {cd_observacao: cd_observacao, ds_observacao: ds_observacao, id_empresa: id_empresa, dt_inicial: dt_inicial, dt_movimento: dt_inicial})
     return cd_observacao;
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

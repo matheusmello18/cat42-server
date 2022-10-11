@@ -32,7 +32,7 @@ const Oracle = require('../Oracle');
  * const rows = await Ac431.selectByCodigo('560').then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 
@@ -43,7 +43,7 @@ const Oracle = require('../Oracle');
   try {
     return await Oracle.select(sql, {cd_codigo: cd_codigo})
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

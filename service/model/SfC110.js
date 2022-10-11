@@ -62,7 +62,7 @@ SfC110Saida.prototype.insert = async (paramSfC110Saida) => {
       ...paramSfC110Saida.camposC110Saida
     })
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 };
 
@@ -107,7 +107,7 @@ SfC110Saida.prototype.insert = async (paramSfC110Saida) => {
  try {
    return await Oracle.delete(sql, chaveC100Saida);
  } catch (err) {
-   throw new Error(err);
+   throw err
  }
 };
 
@@ -201,7 +201,7 @@ var SfC110Entrada = function() {
       ...paramSfC110Entrada.camposC110Entrada
     })
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 };
 
@@ -244,7 +244,7 @@ SfC110Entrada.prototype.delete = async (chaveC100Entrada) => {
   try {
     return await Oracle.delete(sql, chaveC100Entrada);
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

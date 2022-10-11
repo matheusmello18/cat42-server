@@ -144,10 +144,10 @@ async function getT(){
   //   console.log(e.rows[0])
     
   //   return e.rows[0];
-  // }).catch((r) => {
-  //   return r;
-  //   //throw new Error(r.message + 'chupa')
-  //   //console.log(r)
+  // }).catch((err) => {
+  //   return err;
+  //   //throw err
+  //   //console.log(err)
   // });
 
   

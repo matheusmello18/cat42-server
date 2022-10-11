@@ -32,7 +32,7 @@
    * const rows = await Sf433.selectByCodigo('05').then((e) => {
    *    return e.rows;
    * }).catch((err) => {
-   *    throw new Error(err.message)
+   *    throw err
    * })
    */
   
@@ -43,7 +43,7 @@
   try {
     return await Oracle.select(sql, {cd_codigo: cd_codigo})
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

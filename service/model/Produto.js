@@ -59,7 +59,7 @@ Produto.prototype.insert = async (dataProdutoServico) => {
 	try {
 		await Oracle.insert(sql, dataProdutoServico)
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 
@@ -97,7 +97,7 @@ Produto.prototype.insertDePara = async (dataDeParaProduto) => {
 	try {
 		await Oracle.insert(sql, dataDeParaProduto)
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 
@@ -119,7 +119,7 @@ Produto.prototype.insertDePara = async (dataDeParaProduto) => {
  * const rows = await Produto.selectDePara('562718', '12.302.200/00001-10', '01/08/2019', '30/08/2019', 1).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
  Produto.prototype.selectDePara = async (cd_produto_entrada, cnpj_principal, dt_inicial, dt_final, id_empresa) => {
@@ -141,7 +141,7 @@ Produto.prototype.insertDePara = async (dataDeParaProduto) => {
 			id_empresa: id_empresa
 		})
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 
@@ -153,7 +153,7 @@ Produto.prototype.sp_gera_produto_mestre_item = async () => {
   try {
     return await Oracle.execProcedure('SP_GERA_PRODUTO_MESTRE_ITEM');
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -186,7 +186,7 @@ Produto.prototype.sp_gera_produto_mestre_item = async () => {
  * const rows = await ProdutoMestre.selectByCodigo('562718', 1).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw new err
  * })
  */
 ProdutoMestre.prototype.selectByCodigo = async (cd_produto_servico, id_empresa) => {
@@ -197,7 +197,7 @@ ProdutoMestre.prototype.selectByCodigo = async (cd_produto_servico, id_empresa) 
 	try {
 		return await Oracle.select(sql, {cd_produto_servico: cd_produto_servico, id_empresa: id_empresa})
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 
@@ -233,7 +233,7 @@ Produto.prototype.Mestre = new ProdutoMestre()
  * const rows = await ProdutoMestreItem.selectByCodigo('562718', 1, '01/08/2019').then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 ProdutoMestreItem.prototype.selectByCodigo = async (cd_produto_servico, id_empresa, dt_inicial) => {
@@ -250,7 +250,7 @@ ProdutoMestreItem.prototype.selectByCodigo = async (cd_produto_servico, id_empre
 	try {
 		return await Oracle.select(sql, {id_empresa: id_empresa, cd_produto_servico: cd_produto_servico, dt_inicial: dt_inicial})
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 

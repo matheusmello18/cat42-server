@@ -34,7 +34,7 @@
  * const rows = await Sf0190.selectByDsUnidade('UNIDAD', 1, '01/08/2013').then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 Sf0190.prototype.selectByDsUnidade = async (ds_unidade, id_empresa, dt_inicial) => {
@@ -52,7 +52,7 @@ Sf0190.prototype.selectByDsUnidade = async (ds_unidade, id_empresa, dt_inicial) 
     
     return await Oracle.select(sql, {ds_unidade: ds_unidade, id_empresa: id_empresa, dt_inicial: dt_inicial})
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -71,7 +71,7 @@ Sf0190.prototype.selectByDsUnidade = async (ds_unidade, id_empresa, dt_inicial) 
  * const rows = await Sf0190.selectDePara('PC', '04665945000183' ,1).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 Sf0190.prototype.selectDePara = async (ds_unidade_entrada, cnpj_principal, id_empresa) => {
@@ -84,7 +84,7 @@ Sf0190.prototype.selectDePara = async (ds_unidade_entrada, cnpj_principal, id_em
   try {
     return await Oracle.select(sql, {ds_unidade_entrada: ds_unidade_entrada, cnpj_principal: cnpj_principal, id_empresa: id_empresa})
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -124,7 +124,7 @@ Sf0190.prototype.insert = async (dataSf0190) => {
     return await Oracle.insert(sql, dataSf0190)
   } catch (err) {
     // fazer tratamento se houver retorno do banco 20211, se houver este código ignorar
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -161,7 +161,7 @@ Sf0190.prototype.insertDePara = async (id_empresa, cnpj_principal, ds_unidade_en
     })
   } catch (err) {
     // fazer tratamento se houver retorno do banco 20211, se houver este código ignorar
-    throw new Error(err);
+    throw err
   }
 }
 

@@ -31,7 +31,7 @@ var CFOP = function(){
  * const rows = await CFOP.selectByCdCfop('5991').then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
   
@@ -46,7 +46,7 @@ CFOP.prototype.selectByCdCfop = async (cd_cfop) => {
   try {
     return await Oracle.select(sql, {cd_cfop: cd_cfop})
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

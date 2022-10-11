@@ -60,7 +60,7 @@ var AcC700Saida = function(){
 	try {
 		return await Oracle.insert(sql, dataAcC700Saida)
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 
@@ -101,7 +101,7 @@ var AcC700Saida = function(){
   try {
     return await Oracle.delete(sql, chaveC100Saida);
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -161,7 +161,7 @@ AcC700Entrada.prototype.insert = async (dataAcC700Entrada) => {
 	try {
 		return await Oracle.insert(sql, dataAcC700Entrada)
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 	
@@ -204,7 +204,7 @@ AcC700Entrada.prototype.delete = async (chaveC100Entrada) => {
 	try {
 		return await Oracle.delete(sql, chaveC100Entrada);
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 

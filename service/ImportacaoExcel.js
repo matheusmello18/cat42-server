@@ -88,6 +88,6 @@ module.exports.Excel = async (filename, path, id_simul_etapa, id_empresa, id_usu
       await new model.EtapaStatus().insert(dt_periodo, 1, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), 'Dados importado com sucesso.');
     }
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }

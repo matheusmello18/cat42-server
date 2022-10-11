@@ -68,7 +68,7 @@ SfC800.prototype.insert = async (dataSfC800) => {
 	try {
 		await Oracle.insert(sql, dataSfC800)
 	} catch (err) {
-		throw new Error(err);
+		throw err
 	}
 }
 

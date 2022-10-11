@@ -65,10 +65,9 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
           }
         );
       } catch (err) {
-        console.log(err.message);
         /* id_simul_tp_status: 1 - SUCESSO / 2 - ERRO / 3 - PENDENCIA */
         await new model.EtapaStatus().insert(dt_periodo, 3, parseInt(id_simul_etapa), parseInt(id_empresa), parseInt(id_usuario), err.message.split(/\sORA-[0-9]*:/)[1].trim());
-        throw new Error(err.message);
+        throw err
       }
     }
   }
@@ -76,14 +75,12 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
   const rows = await new model.Sf_Importa_Arquivo().SelectLogImportacao(id_empresa, id_usuario).then((data) => {
     return data.rows;
   }).catch((err) => {
-    console.log(err.message);
-    throw new Error(err.message);
+    throw err
   })
   
   if (rows.length > 0){
     if (nm_procedure2 !== undefined){
       if (nm_procedure2 !== ""){
-        console.log('tem dados');
         var paramProcedures = {
           pId_Simul_Etapa: id_simul_etapa,
           pId_Empresa: id_empresa,
@@ -95,7 +92,7 @@ module.exports.Text = async (filename, path, id_simul_etapa, id_empresa, id_usua
         try {
           await Oracle.execLargProcedure(nm_procedure2, paramProcedures);
         } catch (err) {
-          throw new Error(err.message);
+          throw err
         }
       }
     }

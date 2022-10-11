@@ -53,7 +53,7 @@ EtapaProdutoStatus.prototype.insert = async (id_produto, id_simul_etapa, id_empr
     });
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 
 }
@@ -92,7 +92,7 @@ EtapaProdutoStatus.prototype.insert = async (id_produto, id_simul_etapa, id_empr
     await Oracle.delete(sqlDelete, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -110,7 +110,7 @@ EtapaProdutoStatus.prototype.insert = async (id_produto, id_simul_etapa, id_empr
  * const rows = await EtapaProdutoStatus.selectUmPorUmPendente(3).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 EtapaProdutoStatus.prototype.select = async (id_simul_etapa, id_empresa, id_usuario) => {
@@ -170,7 +170,7 @@ EtapaProdutoStatus.prototype.select = async (id_simul_etapa, id_empresa, id_usua
     return await Oracle.select(sql, params);
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -189,7 +189,7 @@ EtapaProdutoStatus.prototype.select = async (id_simul_etapa, id_empresa, id_usua
  * const rows = await EtapaProdutoStatus.concluido(3).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 EtapaProdutoStatus.prototype.concluido = async (id_simul_etapa, id_empresa, id_usuario) => {
@@ -216,7 +216,7 @@ EtapaProdutoStatus.prototype.concluido = async (id_simul_etapa, id_empresa, id_u
     });
   
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 

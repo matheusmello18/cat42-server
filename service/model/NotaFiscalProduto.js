@@ -100,7 +100,7 @@ var NotaFiscalSaidaProduto = function(){
  * const rows = await nfeSaida.insert(dataNotaFiscalSaidaProduto).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error(err.message)
+ *    throw err
  * })
  */
 NotaFiscalSaidaProduto.prototype.insert = async (dataNotaFiscalSaidaProduto) => {
@@ -112,7 +112,7 @@ NotaFiscalSaidaProduto.prototype.insert = async (dataNotaFiscalSaidaProduto) => 
   try {
     await Oracle.insert(sql, dataNotaFiscalSaidaProduto)
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 };
 
@@ -154,7 +154,7 @@ NotaFiscalSaidaProduto.prototype.delete = async (chaveC100Saida) => {
   try {
     return await Oracle.delete(sql, chaveC100Saida);
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 };
 
@@ -240,7 +240,7 @@ module.exports.Saida = NotaFiscalSaidaProduto;
   try {
     await Oracle.insert(sql, dataNotaFiscalEntradaProduto)
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 }
 
@@ -281,7 +281,7 @@ NotaFiscalEntradaProduto.prototype.delete = async (chaveC100Entrada) => {
   try {
     return await Oracle.delete(sql, chaveC100Entrada);
   } catch (err) {
-    throw new Error(err);
+    throw err
   }
 };
 

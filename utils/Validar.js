@@ -28,7 +28,7 @@ module.exports.ifelse = (param1, param2, valueDefault = "") => {
 module.exports.getValueArray = (array, pos, valueDefault = "") => {
   try {
     return (this.isArray(array) ? (array[pos] == undefined ? valueDefault : array[pos]) : valueDefault)
-  } catch (error) {
+  } catch (err) {
     return valueDefault;
   }
 }
