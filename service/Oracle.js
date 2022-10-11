@@ -250,21 +250,17 @@ module.exports.execProcedure = async (nm_procedure, nameByName = {}) => {
       query,
       nameByName, {autoCommit: true}
     ).then((v) => {
-      console.log(v);
     }).catch(err => {
       module.exports.monitorLogError(query, params, err.message);
 
-      console.log(err);
       throw err
     });
   } catch (err) {
-    console.log(err);
     throw err
   }
 }
 
 const exec_procedure_asynchronous = (nm_procedure, nameByName = {}) => {
-  console.log(nm_procedure, nameByName);
   try {
     var params = '';
     Object.keys(nameByName).forEach(element => {
@@ -294,7 +290,6 @@ const exec_procedure_asynchronous = (nm_procedure, nameByName = {}) => {
       connection.close();
     });    
   } catch (err) {
-    console.log(err);
     throw err
   }
 }
@@ -334,7 +329,6 @@ module.exports.execLargProcedure = async (nm_procedure, nameByName = {}) => {
     exec_procedure_asynchronous(nm_procedure,nameByName);
     
     while (terminou === '0') {
-      console.log('object');
       await sleep(60000).then( async(v) => {
         const row = (await module.exports.select(
           `select DM_TERMINOU 
@@ -348,7 +342,6 @@ module.exports.execLargProcedure = async (nm_procedure, nameByName = {}) => {
             pDt_Inicial:nameByName.pDt_Inicial,
           }
         )).rows[0]
-        console.log(row);
         terminou = row.DM_TERMINOU;
       })
     }

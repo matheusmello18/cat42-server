@@ -1240,7 +1240,7 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
     if(Sf433 !== undefined) paramC050.id_ref_433 = Sf433.ID_REF_433;
     //#endregion PIS
-console.log(det.imposto[0].COFINS);
+
     //#region COFINS
     if (det.imposto[0]?.COFINS[0]?.COFINSAliq !== undefined) {
       paramC050.id_ref_434 = utils.Validar.getValueArray(det.imposto[0]?.COFINS[0]?.COFINSAliq[0]?.CST, 0, "");

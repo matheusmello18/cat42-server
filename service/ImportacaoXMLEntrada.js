@@ -71,12 +71,9 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   });
   //#endregion Empresa  
 
-  console.log(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.$.Id);
-
   //#region Pais
   let Pais;
   if (xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.cPais !== undefined){
-    console.log(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.cPais);
     Pais = await new model.Ac331.Pais().select(xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.emit[0]?.enderEmit[0]?.cPais[0])
     .then((data) => {
       return data.rows[0]
@@ -490,10 +487,6 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         dt_movimento: dhEmi,
         id_empresa: id_empresa,
         id_usuario: id_usuario
-      }).then((v) => {
-        console.log(v);
-      }).catch((e) => {
-        console.log(e);
       });
 
       Unidade = await new model.Sf0190().selectByDsUnidade(ds_unidade, id_empresa, dhEmi)
