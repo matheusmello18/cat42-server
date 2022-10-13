@@ -103,7 +103,8 @@ CtrlUsuario.prototype.select = async (email, senha = '') => {
  * await CtrlUsuario.updateHash(1, 'AF8ADF87D5F45AF4787SDF').then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao realizar alteração da hash');
+ *    err.message = 'Erro ao realizar alteração da hash. '
+ *    throw err
  * })
  */
 CtrlUsuario.prototype.updateHash = async (id, hash) => {
@@ -192,7 +193,8 @@ CtrlUsuario.prototype.selectByHash = async (hash) => {
  * await CtrlUsuario.updateSenha(1, '123456', '123456').then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao realizar alteração da senha')
+ *    err.message = 'Erro ao realizar alteração da senha. '
+ *    throw err
  * })
  */
 

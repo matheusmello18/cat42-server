@@ -34,14 +34,15 @@
  * const data = await EtapaStatusLog.insert(1, 1, 1 , 'teste').then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
-EtapaStatusLog.prototype.insert = async (id_simul_status, id_empresa, id_usuario, ds_status, ds_pilha = '') => {
+EtapaStatusLog.prototype.insert = async (id_simul_status, id_empresa, id_usuario, ds_status, ds_pilha = '', code = null) => {
   const sqlMax = `select max(nr_item) nr_item from SIMUL_STATUS_LOG where id_simul_status = :id_simul_status`;
 
-  const sqlInsert = `insert into SIMUL_STATUS_LOG (id_simul_status, nr_item, dt_log, ds_tarefa, id_empresa, id_usuario, ds_pilha)
-  values (:id_simul_status, :nr_item, :dt_log, :ds_tarefa, :id_empresa, :id_usuario, :ds_pilha)`;
+  const sqlInsert = `insert into SIMUL_STATUS_LOG (id_simul_status, nr_item, dt_log, ds_tarefa, id_empresa, id_usuario, ds_pilha, id_simul_monitor_log_error)
+  values (:id_simul_status, :nr_item, :dt_log, :ds_tarefa, :id_empresa, :id_usuario, :ds_pilha, :id_simul_monitor_log_error)`;
   
   let statusLog = await Oracle.select(sqlMax, {
     id_simul_status: id_simul_status
@@ -62,6 +63,7 @@ EtapaStatusLog.prototype.insert = async (id_simul_status, id_empresa, id_usuario
       id_empresa: id_empresa,
       id_usuario: id_usuario,
       ds_pilha: ds_pilha,
+      id_simul_monitor_log_error: code,
     });
   
   } catch (err) {

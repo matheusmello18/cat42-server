@@ -105,7 +105,8 @@ const AcC050 = require('./AcC050');
  * const data = await nfeItemSaida.insert(dataNotaFiscalSaidaItem).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir registro no item da nota fiscal');
+ *    err.message = 'Erro ao inserir registro no item da nota fiscal. '
+ *    throw err
  * })
  */
 NotaFiscalSaidaProdutoItem.prototype.insert = async (dataNotaFiscalSaidaItem) => {
@@ -141,7 +142,7 @@ NotaFiscalSaidaProdutoItem.prototype.insert = async (dataNotaFiscalSaidaItem) =>
  * const data = await nfeItemEntrada.delete(chaveC100Saida).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar registro no item da nota fiscal saida');
+ *    throw err err.message = 'Erro ao deletar registro no item da nota fiscal saida');
  * })
  */
 
@@ -257,7 +258,7 @@ module.exports.Saida = NotaFiscalSaidaProdutoItem;
  * const data = await nfeItemEntrada.insert(dataNotaFiscalEntradaItem).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir registro no item da nota fiscal');
+ *    throw err err.message = 'Erro ao inserir registro no item da nota fiscal');
  * })
  */
 NotaFiscalEntradaProdutoItem.prototype.insert = async (dataNotaFiscalEntradaItem) => {
@@ -293,7 +294,7 @@ NotaFiscalEntradaProdutoItem.prototype.insert = async (dataNotaFiscalEntradaItem
  * const data = await nfeItemEntrada.delete(chaveC100Entrada).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar registro no item da nota fiscal entrada');
+ *    throw err err.message = 'Erro ao deletar registro no item da nota fiscal entrada');
  * })
  */
  NotaFiscalEntradaProdutoItem.prototype.delete = async (chaveC100Entrada) => {

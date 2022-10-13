@@ -69,12 +69,14 @@ router.post("/recovery", async (req, res) => {
   try {
     const usuario = await new Usuario.CtrlUsuario().select(req.body.email)
     .catch(async (err) => {
-      throw new Error('Falha ao buscar o cliente por E-mail. Erro: ' + err.message);
+      err.message = 'Falha ao buscar o cliente por E-mail. '
+      throw err
     });
 
     await new Usuario.CtrlUsuario().updateSenha(req.body.id, req.body.senhaWeb, req.body.senha)
     .catch(async (err) => {
-      throw new Error('Falha ao alterar a senha. Erro: ' + err.message);
+      err.message = 'Falha ao alterar a senha. '
+      throw err
     });
   
     if (usuario.rows[0] !== undefined)

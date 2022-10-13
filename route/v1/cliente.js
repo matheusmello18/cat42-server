@@ -30,12 +30,14 @@ router.post("/edit", async (req, res) => {
       if (req.body.senhaSistema.length > 0 && req.body.senhaWeb.length > 0){
         await new Usuario.CtrlUsuario().updateSenha(req.body.ID_USUARIO, req.body.senhaWeb, req.body.senhaSistema)
         .catch(async (err) => {
-          throw new Error('Falha ao alterar a senha. Erro: ' + err.message);
+          err.message = 'Falha ao alterar a senha. '
+          throw err
         });
       }
       const usuario = await new Usuario.CtrlUsuario().select(req.body.E_MAIL)
       .catch(async (err) => {
-        throw new Error('Falha ao buscar o cliente por E-mail. Erro: ' + err.message);
+        err.message = 'Falha ao buscar o cliente por E-mail. '
+        throw err
       });
       
       return res.status(200).json({success:"true", rows: usuario.rows[0], message: ''})

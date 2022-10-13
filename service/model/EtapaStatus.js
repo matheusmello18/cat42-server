@@ -135,10 +135,11 @@ EtapaStatus.prototype.select = async (id_empresa, id_usuario, dt_periodo, id_sim
  * const data = await EtapaStatus.insert('01/08/2022', 1, 1, 1, 1 , 'teste').then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
-EtapaStatus.prototype.insert = async (dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status, ds_pilha = '') => {
+EtapaStatus.prototype.insert = async (dt_periodo,id_simul_tp_status,id_simul_etapa,id_empresa,id_usuario,ds_status, ds_pilha = '', code = '') => {
   const sqlSelect = `select id_simul_status, dt_periodo, id_simul_tp_status, id_simul_etapa, id_empresa, id_usuario, ds_status, dt_status 
                        from simul_etapa_status 
                       where id_simul_etapa = :id_simul_etapa
@@ -174,7 +175,7 @@ EtapaStatus.prototype.insert = async (dt_periodo,id_simul_tp_status,id_simul_eta
       throw err
     });
 
-    await new EtapaStatusLog().insert(etapastatus.ID_SIMUL_STATUS, id_empresa, id_usuario, ds_status, ds_pilha);
+    await new EtapaStatusLog().insert(etapastatus.ID_SIMUL_STATUS, id_empresa, id_usuario, ds_status, ds_pilha, code);
 
     return etapastatus.ID_SIMUL_STATUS
 
@@ -194,7 +195,7 @@ EtapaStatus.prototype.insert = async (dt_periodo,id_simul_tp_status,id_simul_eta
     try {
       await Oracle.insert(sqlInsert, parametros);
     
-      await new EtapaStatusLog().insert(nProx_Codigo, id_empresa, id_usuario, ds_status, ds_pilha);
+      await new EtapaStatusLog().insert(nProx_Codigo, id_empresa, id_usuario, ds_status, ds_pilha, code);
 
       return nProx_Codigo;
 

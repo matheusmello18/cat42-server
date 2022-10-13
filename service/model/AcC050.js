@@ -58,7 +58,8 @@ var AcC050Saida = function(){
  * const rows = await acC050Saida.insert(dataAcC050Saida).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro ACC050 Saida')
+ *    err.message = 'Erro ao inserir o registro ACC050 Saida. '
+ *    throw err
  * })
  */
 
@@ -114,7 +115,8 @@ AcC050Saida.prototype.insert = async (dataAcC050Saida) => {
  * const rows = await acC050Saida.update(dataAcC050Saida).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error('Erro ao alterar o registro ACC050 Saida')
+ *    err.message = 'Erro ao alterar o registro ACC050 Saida. '
+ *    throw err
  * })
  */
  AcC050Saida.prototype.update = async (dataAcC050Saida) => {
@@ -146,7 +148,8 @@ AcC050Saida.prototype.insert = async (dataAcC050Saida) => {
  * const data = await acC050Saida.delete(chaveC100Saida).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar registro no AcC050 Saida');
+ *    err.message = 'Erro ao deletar registro no AcC050 Saida. '
+ *    throw err;
  * })
  */
 
@@ -221,7 +224,8 @@ module.exports.AcC050Saida = AcC050Saida;
  * const rows = await acC050Entrada.insert(dataAcC050Entrada).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro ACC050 Entrada')
+ *    err.message = 'Erro ao inserir o registro ACC050 Entrada. '
+ *    throw err
  * })
  */
 
@@ -260,7 +264,8 @@ AcC050Entrada.prototype.insert = async (dataAcC050Entrada) => {
  * const data = await acC050Entrada.delete(chaveC100Entrada).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar registro no AcC050 Entrada');
+ *    err.message = 'Erro ao deletar registro no AcC050 Entrada. '
+ *    throw err;
  * })
  */
  AcC050Entrada.prototype.delete = async (chaveC100Entrada) => {

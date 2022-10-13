@@ -29,8 +29,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data.rows[0]
   })
   .catch((err) => {
-    err.message
-    throw new Error('Falha na busca pela empresa cadastrada. Erro: ' + err.message);
+    err.message = 'Falha na busca pela empresa cadastrada. '
+    throw err;
   });
 
   if(Empresa.CNPJ_EMPRESA === xmlObj.nfeProc?.NFe[0]?.infNFe[0]?.dest[0].CNPJ[0].trim()) { //senão saida
@@ -52,7 +52,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data.rows[0]
   })
   .catch((err) => {
-    throw new Error('Falha na busca pelo o parametro empresa cadastrada. Erro: ' + err.message);
+    err.message = 'Falha na busca pelo o parametro empresa cadastrada. '
+    throw err;
   });
   //#endregion Empresa
   
@@ -70,7 +71,9 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pelo o país cadastrado. Erro: ' + err.message);
+      err.message = 'Falha na busca pelo o país cadastrado. '
+      
+      throw err;
     });
   }
   //#endregion Pais
@@ -81,7 +84,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data.rows[0]
   })
   .catch((err) => {
-    throw new Error('Falha na busca pelo o municipio cadastrado. Erro: ' + err.message);
+    err.message = 'Falha na busca pelo o municipio cadastrado. '
+    throw err;
   });
   //#endregion Municipio
 
@@ -96,7 +100,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pela a pessoa cadastrada. Erro: ' + err.message);
+      err.message = 'Falha na busca pela a pessoa cadastrada. '
+      throw err;
     });
 
     if (PessoaMestre !== undefined) {
@@ -111,7 +116,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pela a pessoa cadastrada pelo CNPJ ou CPF. Erro: ' + err.message);
+      err.message = 'Falha na busca pela a pessoa cadastrada pelo CNPJ ou CPF. '
+      throw err;
     });
 
     if (PessoaMestre !== undefined) {
@@ -147,14 +153,16 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data;
     })
     .catch((err) => {
-      throw new Error('Falha ao inserir a pessoa no cadastrado. Erro: ' + err.message);
+      err.message = 'Falha ao inserir a pessoa no cadastrado. '
+      throw err;
     });
   }
 
 
   await new model.Pessoa().sp_gera_pessoa_mestre_item()
   .catch(async (err) => {
-    throw new Error('Falha na geração Mestre Item da Pessoa. Erro: ' + err.message);
+    err.message = 'Falha na geração Mestre Item da Pessoa. '
+    throw err;
   });
   //#endregion Pessoa
   
@@ -164,7 +172,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data.rows[0]
   })
   .catch((err) => {
-    throw new Error('Falha na busca pela a pessoa cadastrada pelo código. Erro: ' + err.message);
+    err.message = 'Falha na busca pela a pessoa cadastrada pelo código. '
+    throw err;
   });
   //#endregion Pessoa Destinatario
 
@@ -174,7 +183,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data.rows[0]
   })
   .catch((err) => {
-    throw new Error('Falha na busca pelo o model documento cadastrado. Erro: ' + err.message);
+    err.message = 'Falha na busca pelo o model documento cadastrado. ';
+    throw err
   });
   //#endregion ModeloDocumento
 
@@ -184,7 +194,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data.rows[0]
   })
   .catch((err) => {
-    throw new Error('Falha na busca pelo o Ac433 cadastrado. Erro: ' + err.message);
+    err.message = 'Falha na busca pelo o Ac433 cadastrado. ';
+    throw err
   });
   //#endregion Ac413
   
@@ -194,7 +205,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data.rows[0]
   })
   .catch((err) => {
-    throw new Error('Falha na busca pelo o CFOP cadastrado. Erro: ' + err.message);
+    err.message = 'Falha na busca pelo o CFOP cadastrado. ';
+    throw err
   });
   //#endregion CFOP
 
@@ -228,7 +240,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro AcC050 Saída. Erro:' + err.message);
+    err.message = 'Falha ao deletar o registro AcC050 Saída. ';
+    throw err;
   })
 
   await new model.NotaFiscal.Saida().Item.delete(chaveC100)
@@ -236,7 +249,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro item da nota fiscal de saída. Erro:' + err.message);
+    err.message = 'Falha ao deletar o registro item da nota fiscal de saída. ';
+    throw err
   })
 
   await new model.NotaFiscal.Saida().SfC110.delete(chaveC100)
@@ -244,7 +258,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro C110 Saída. Erro:' + err.message);
+    err.message = 'Falha ao deletar o registro C110 Saída. ';
+    throw err
   })
 
   await new model.NotaFiscal.Saida().AcC700.delete(chaveC100)
@@ -252,7 +267,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro C700 Saída. Erro:' + err.message);
+    err.message = 'Falha ao deletar o registro C700 Saída. ';
+    throw err
   })
 
   await new model.NotaFiscal.Saida().SfC195.delete(chaveC100)
@@ -260,7 +276,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro C195 Saída. Erro:' + err.message);
+    err.message = 'Falha ao deletar o registro C195 Saída. ';
+    throw err
   })
 
   await new model.NotaFiscal.Saida().delete(chaveC100)
@@ -268,7 +285,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao deletar o registro da nota fiscal saída. Erro:' + err.message);
+    err.message = 'Falha ao deletar o registro da nota fiscal saída. '
+    throw err
   })
 
   //C100
@@ -309,7 +327,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data;
   })
   .catch((err) => {
-    throw new Error('Falha ao inserir a nota fiscal de saida no cadastrado. Erro: ' + err.message);
+    err.message = 'Falha ao inserir a nota fiscal de saida no cadastrado. '
+    throw err
   });
   //#endregion C100
 
@@ -322,7 +341,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         return data.rows[0]
       })
       .catch((err) => {
-        throw new Error('Falha na busca pelo o Ac0450 cadastrado. Erro: ' + err.message);
+        err.message = 'Falha na busca pelo o Ac0450 cadastrado. '
+        throw err
       });
 
       var id_ref_0450
@@ -332,7 +352,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
           return data;
         })
         .catch((err) => {
-          throw new Error('Falha ao inserir o Ac0450 no cadastrado. Erro: ' + err.message);
+          err.message = 'Falha ao inserir o Ac0450 no cadastrado. '
+          throw err
         });
 
       } else {
@@ -354,7 +375,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         return data;
       })
       .catch((err) => {
-        throw new Error('Falha ao inserir o C110 no cadastrado. Erro: ' + err.message);
+        err.message = 'Falha ao inserir o C110 no cadastrado. '
+        throw err
       });
     }
 
@@ -364,7 +386,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         return data.rows[0]
       })
       .catch((err) => {
-        throw new Error('Falha na busca pelo Ac0450 cadastrado. Erro: ' + err.message);
+        err.message = 'Falha na busca pelo Ac0450 cadastrado. '
+        throw err
       });
 
       let id_ref_0450
@@ -374,7 +397,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
           return data;
         })
         .catch((err) => {
-          throw new Error('Falha ao inserir o Ac0450 no cadastrado. Erro: ' + err.message);
+          err.message = 'Falha ao inserir o Ac0450 no cadastrado. '
+          throw err
         });
         
       } else {
@@ -394,7 +418,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         return data;
       })
       .catch((err) => {
-        throw new Error('Falha ao inserir o C110 no cadastrado. Erro: ' + err.message);
+        err.message = 'Falha ao inserir o C110 no cadastrado. '
+        throw err
       });
     }
   }
@@ -418,7 +443,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pela a unidade cadastrada. Erro: ' + err.message);
+      err.message = 'Falha na busca pela a unidade cadastrada. '
+      throw err
     });
 
     if (Unidade === undefined) {
@@ -437,7 +463,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         return data.rows[0]
       })
       .catch((err) => {
-        throw new Error('Falha na busca pela a unidade cadastrada. Erro: ' + err.message);
+        err.message = 'Falha na busca pela a unidade cadastrada. '
+        throw err
       });
     } else {
       ds_unidade = Unidade.DS_UNIDADE;
@@ -451,7 +478,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pelo o produto cadastrada. Erro: ' + err.message);
+      err.message = 'Falha na busca pelo o produto cadastrada. '
+      throw err
     });
     
     if(produto == undefined){
@@ -462,7 +490,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       ).then((data) => {
         return data.rows[0]
       }).catch((err) => {
-        throw new Error("Falha na busca pelo NCM. Erro: " + err.message);
+        err.message = "Falha na busca pelo NCM. "
+        throw err
       })
 
       var ExIpi
@@ -474,7 +503,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
           ).then((data) => {
             return data.rows[0]
           }).catch((err) => {
-            throw new Error("Falha na busca pelo ExIpi. Erro: " + err.message);
+            err.message = "Falha na busca pelo ExIpi. "
+            throw err
           })
         }
       }
@@ -485,7 +515,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       ).then((data) => {
         return data.rows[0];
       }).catch((err) => {
-        throw new Error('Falha na busca pelo Cest. Erro: ' + err.message);
+        err.message = 'Falha na busca pelo Cest. '
+        throw err
       })
 
       await new model.Produto().insert({
@@ -507,12 +538,14 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         return data;
       })
       .catch((err) => {
-        throw new Error('Falha ao inserir o produto no cadastrado. Erro: ' + err.message);
+        err.message = 'Falha ao inserir o produto no cadastrado. '
+        throw err
       });
 
       await new model.Produto().sp_gera_produto_mestre_item()
       .catch(async (err) => {
-        throw new Error('Falha na geração Mestre Item do Produto. Erro: ' + err.message);
+        err.message = 'Falha na geração Mestre Item do Produto. '
+        throw err
       });
     }
 
@@ -521,7 +554,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pelo o produto cadastrada. Erro: ' + err.message);
+      err.message = 'Falha na busca pelo o produto cadastrada. '
+      throw err
     });
     //#endregion 0200
 
@@ -531,7 +565,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pelo o CFOP cadastrado. Erro: ' + err.message);
+      err.message = 'Falha na busca pelo o CFOP cadastrado. '
+      throw err
     });
     //#endregion CFOP
 
@@ -1133,7 +1168,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     .then(async (data) => {
        return data.rows[0];
     }).catch(async (err) => {
-      throw new Error('Falha na busca pelo o Ac431 cadastrada. Erro: ' + err.message);
+      err.message = 'Falha na busca pelo o Ac431 cadastrada. '
+      throw err
     });
     
     if (ac431 !== undefined) paramC170.id_ref_431 = ac431.ID_REF_431; //sCST_ICMS
@@ -1154,7 +1190,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         return data.rows[0]
       })
       .catch((err) => {
-        throw new Error('Falha na busca pelo o SF453 cadastrada. Erro: ' + err.message);
+        err.message = 'Falha na busca pelo o SF453 cadastrada. '
+        throw err
       });
 
       if (Sf453 !== undefined) paramC170.id_ref_453 = Sf453.ID_REF_453;
@@ -1180,7 +1217,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         return data.rows[0]
       })
       .catch((err) => {
-        throw new Error('Falha na busca pelo o Ac432 cadastrada. Erro: ' + err.message);
+        err.message = 'Falha na busca pelo o Ac432 cadastrada. '
+        throw err
       });
 
       if(Ac432 !== undefined) paramC170.id_ref_432 = Ac432.ID_REF_432;
@@ -1235,7 +1273,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pelo o SF433 cadastrada. Erro: ' + err.message);
+      err.message = 'Falha na busca pelo o SF433 cadastrada. '
+      throw err
     });
 
     if(Sf433 !== undefined) paramC050.id_ref_433 = Sf433.ID_REF_433;
@@ -1279,7 +1318,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pelo o SF433 cadastrada. Erro: ' + err.message);
+      err.message = 'Falha na busca pelo o SF433 cadastrada. '
+      throw err
     });
 
     if(Sf434 !== undefined) paramC050.id_ref_434 = Sf434.ID_REF_434;
@@ -1340,7 +1380,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data;
     })
     .catch((err) => {
-      throw new Error('Falha ao inserir o item da nota fiscal de saida no cadastrado. Erro: ' + err.message);
+      err.message = 'Falha ao inserir o item da nota fiscal de saida no cadastrado. '
+      throw err
     });
     //#endregion C170
 
@@ -1356,7 +1397,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data;
     })
     .catch((err) => {
-      throw new Error('Falha ao inserir o AcC050 no cadastrado. Erro: ' + err.message);
+      err.message = 'Falha ao inserir o AcC050 no cadastrado. '
+      throw err
     });
     //#endregion ACC050
 
@@ -1372,7 +1414,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         return data.rows[0]
       })
       .catch((err) => {
-        throw new Error('Falha na busca pelo o Sf0460 cadastrado. Erro: ' + err.message);
+        err.message = 'Falha na busca pelo o Sf0460 cadastrado. '
+        throw err
       });
 
       if (Sf0460 === undefined){
@@ -1388,7 +1431,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
           return data;
         })
         .catch((err) => {
-          throw new Error('Falha ao inserir o Sf046 no cadastrado. Erro: ' + err.message);
+          err.message = 'Falha ao inserir o Sf046 no cadastrado. '
+          throw err
         });
       }
 
@@ -1403,7 +1447,8 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         return data;
       })
       .catch((err) => {
-        throw new Error('Falha ao inserir o SfC195 no cadastrado. Erro: ' + err.message);
+        err.message = 'Falha ao inserir o SfC195 no cadastrado. '
+        throw err
       });
     }
     //#endregion SFC195
@@ -1420,15 +1465,18 @@ module.exports.Nfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
 
   await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_ENTRADA", paramProcedures)
   .catch((err) => {
-    throw new Error('Falha ao Atualizar Mapa Entrada. Erro: ' + err.message);
+    err.message = 'Falha ao Atualizar Mapa Entrada. '
+    throw err
   });
   await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_SAIDA", paramProcedures)
   .catch((err) => {
-    throw new Error('Falha ao Atualizar Mapa Saída. Erro: ' + err.message);
+    err.message = 'Falha ao Atualizar Mapa Saída. '
+    throw err
   });
   await Oracle.execProcedure("SP_SF_ATUALIZA_NF_XML", paramProcedures)
   .catch((err) => {
-    throw new Error('Falha ao Atualizar NF XML. Erro: ' + err.message);
+    err.message = 'Falha ao Atualizar NF XML. '
+    throw err
   });
 
   
@@ -1450,7 +1498,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data.rows[0]
   })
   .catch((err) => {
-    throw new Error('Falha na busca pela empresa cadastrada. Erro: ' + err.message);
+    err.message = 'Falha na busca pela empresa cadastrada. '
+    throw err
   });
   
 
@@ -1465,7 +1514,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data.rows[0]
   })
   .catch((err) => {
-    throw new Error('Falha na busca pelo o model documento cadastrado. Erro: ' + err.message);
+    err.message = 'Falha na busca pelo o model documento cadastrado. '
+    throw err
   });
   //#endregion ModeloDocumento
 
@@ -1475,7 +1525,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data.rows[0]
   })
   .catch((err) => {
-    throw new Error('Falha na busca pelo o Ac433 cadastrado. Erro: ' + err.message);
+    err.message = 'Falha na busca pelo o Ac433 cadastrado. '
+    throw err
   });
   //#endregion Ac413
 
@@ -1572,7 +1623,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     return data
   })
   .catch((err) => {
-    throw new Error('Falha ao inserir SFC800 no cadastro. Erro: ' + err.message);
+    err.message = 'Falha ao inserir SFC800 no cadastro. '
+    throw err
   })
   //#endregion SfC800
 
@@ -1587,7 +1639,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pela a unidade cadastrada. Erro: ' + err.message);
+      err.message = 'Falha na busca pela a unidade cadastrada. '
+      throw err
     });
 
     if (Unidade === undefined) {
@@ -1611,7 +1664,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pelo o produto cadastrada. Erro: ' + err.message);
+      err.message = 'Falha na busca pelo o produto cadastrada. '
+      throw err
     });
     
     await new model.Produto().insert({
@@ -1633,12 +1687,14 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data;
     })
     .catch((err) => {
-      throw new Error('Falha ao inserir o produto no cadastrado. Erro: ' + err.message);
+      err.message = 'Falha ao inserir o produto no cadastrado. '
+      throw err
     });
 
     await new model.Produto().sp_gera_produto_mestre_item()
     .catch(async (err) => {
-      throw new Error('Falha na geração Mestre Item do Produto. Erro: ' + err.message);
+      err.message = 'Falha na geração Mestre Item do Produto. '
+      throw err
     });
 
     const prod = await new model.Produto().Mestre.Item.selectByCodigo(cd_produto_servico, id_empresa, SfC800Chave.dt_documento)
@@ -1646,7 +1702,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pelo o produto cadastrada. Erro: ' + err.message);
+      err.message = 'Falha na busca pelo o produto cadastrada. '
+      throw err
     });
     //#endregion 0200
 
@@ -1663,7 +1720,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
         return data.rows[0]
       })
       .catch((err) => {
-        throw new Error('Falha na busca pelo o Sf0460 cadastrado. Erro: ' + err.message);
+        err.message = 'Falha na busca pelo o Sf0460 cadastrado. '
+        throw err
       });
 
       if (Sf0460 === undefined){
@@ -1679,7 +1737,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
           return data;
         })
         .catch((err) => {
-          throw new Error('Falha ao inserir o Sf046 no cadastrado. Erro: ' + err.message);
+          err.message = 'Falha ao inserir o Sf046 no cadastrado. '
+          throw err
         });
       }
     }
@@ -1842,7 +1901,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
     .then(async (data) => {
     return data.rows[0];
     }).catch(async (err) => {
-    throw new Error('Falha na busca pelo o Ac431 cadastrada. Erro: ' + err.message);
+      err.message = 'Falha na busca pelo o Ac431 cadastrada. '
+      throw err
     });
 
     if (ac431 !== undefined) SfC850.id_ref_431 = ac431.ID_REF_431; //sCST_ICMS
@@ -1892,7 +1952,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pelo o SF433 cadastrada. Erro: ' + err.message);
+      err.message = 'Falha na busca pelo o SF433 cadastrada. '
+      throw err
     });
 
     if(Sf433 !== undefined) SfC850.id_ref_433 = Sf433.ID_REF_433;
@@ -1941,7 +2002,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data.rows[0]
     })
     .catch((err) => {
-      throw new Error('Falha na busca pelo o SF433 cadastrada. Erro: ' + err.message);
+      err.message = 'Falha na busca pelo o SF433 cadastrada. '
+      throw err
     });
 
     if(Sf434 !== undefined) SfC850.id_ref_434 = Sf434.ID_REF_4
@@ -1954,7 +2016,8 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
       return data
     })
     .catch((err) => {
-      throw new Error('Falha ao inserir SFC800 no cadastro. Erro: ' + err.message);
+      err.message = 'Falha ao inserir SFC800 no cadastro. '
+      throw err
     })
     //#endregion SFC850
   }
@@ -1970,14 +2033,17 @@ module.exports.Cfe = async (xmlObj, id_simul_etapa, id_empresa, id_usuario, dt_p
   
   await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_ENTRADA", paramProcedures)
   .catch((err) => {
-    throw new Error('Falha ao Atualizar Mapa Entrada. Erro: ' + err.message);
+    err.message = 'Falha ao Atualizar Mapa Entrada. '
+    throw err
   });
   await Oracle.execProcedure("SP_ATUAL_MAPA_CIPI_SAIDA", paramProcedures)
   .catch((err) => {
-    throw new Error('Falha ao Atualizar Mapa Saída. Erro: ' + err.message);
+    err.message = 'Falha ao Atualizar Mapa Saída. '
+    throw err
   });
   await Oracle.execProcedure("SP_SF_ATUALIZA_NF_XML", paramProcedures)
   .catch((err) => {
-    throw new Error('Falha ao Atualizar NF XML. Erro: ' + err.message);
+    err.message = 'Falha ao Atualizar NF XML. '
+    throw err
   });
 }

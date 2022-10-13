@@ -72,7 +72,7 @@ Ac0450.prototype.select = async (ds_observacao, id_empresa, dt_inicial) => {
  * const id_ref_0450 = await ac0450.insert('retorno ref a nf no0039142 de 19/05/2014 |', 1, '01/06/2014').then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro AC0450');
+ *    throw err;
  * })
  */
 Ac0450.prototype.insert = async (ds_observacao, id_empresa, dt_inicial) => {

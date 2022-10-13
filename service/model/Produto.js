@@ -47,7 +47,8 @@ var Produto = function(){
 	* const data = await Produto.insert(dataProdutoServico).then((e) => {
 	*    return e;
 	* }).catch((err) => {
-	*    throw new Error('Erro ao inserir o registro.');
+	*    err.message = 'Erro ao inserir o registro. '
+	*    throw err
 	* })
 	*/
 Produto.prototype.insert = async (dataProdutoServico) => {
@@ -85,7 +86,8 @@ Produto.prototype.insert = async (dataProdutoServico) => {
 	* const data = await Produto.insertDePara(dataDeParaProduto).then((e) => {
 	*    return e;
 	* }).catch((err) => {
-	*    throw new Error('Erro ao inserir o registro.');
+	*    err.message = 'Erro ao inserir o registro. '
+	*    throw err
 	* })
 	*/
 Produto.prototype.insertDePara = async (dataDeParaProduto) => {

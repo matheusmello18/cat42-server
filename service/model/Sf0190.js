@@ -110,7 +110,8 @@ Sf0190.prototype.selectDePara = async (ds_unidade_entrada, cnpj_principal, id_em
   * const data = await Sf0190.insert(dataSf0190).then((e) => {
   *    return e;
   * }).catch((err) => {
-  *    throw new Error('Erro ao inserir o registro.')
+  *    err.message = 'Erro ao inserir o registro. '
+  *    throw err
   * })
 	*/
 
@@ -144,7 +145,8 @@ Sf0190.prototype.insert = async (dataSf0190) => {
   * const data = await Sf0190.insertDePara('PC', '04665945000183', 1).then((e) => {
   *    return e;
   * }).catch((err) => {
-  *    throw new Error('Erro ao inserir o registro Unidade Medida De Para.')
+  *    err.message = 'Erro ao inserir o registro Unidade Medida De Para. '
+  *    throw err
   * })
 	*/
 Sf0190.prototype.insertDePara = async (id_empresa, cnpj_principal, ds_unidade_entrada) => {

@@ -39,7 +39,8 @@ var Sf_Importa_Arquivo = function(){
  * const data = await Sf_Importa_Arquivo.insert('1','descricao', 1, 1, '01/08/2019', '31/08/2019', 1, 1, 1, 'descricao').then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
 Sf_Importa_Arquivo.prototype.Insert = async ( nr_referencia, ds_conteudo, id_empresa, id_usuario, dt_inicial, dt_final, nr_linha, id_projeto, id_modulo, ds_arquivo ) => {
@@ -79,7 +80,8 @@ Sf_Importa_Arquivo.prototype.Insert = async ( nr_referencia, ds_conteudo, id_emp
  * const data = await Sf_Importa_Arquivo.insert('1','descricao', 1, 1, '01/08/2019', '31/08/2019', 1, 1, 1, 'descricao').then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
  Sf_Importa_Arquivo.prototype.InsertMany = async ( binds ) => {
@@ -111,7 +113,8 @@ Sf_Importa_Arquivo.prototype.Insert = async ( nr_referencia, ds_conteudo, id_emp
  * const data = await Sf_Importa_Arquivo.Delete(1, 1, '01/08/2019', '31/08/2019', 1, 1).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar o registro.');
+ *    err.message = 'Erro ao deletar o registro. '
+ *    throw err
  * })
  */
 Sf_Importa_Arquivo.prototype.Delete = async (id_projeto, id_modulo, dt_inicial, dt_final, id_empresa, id_usuario) => {
@@ -155,7 +158,8 @@ Sf_Importa_Arquivo.prototype.Delete = async (id_projeto, id_modulo, dt_inicial, 
  * const data = await Sf_Importa_Arquivo.DeleteLog(1, 1).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar o registro.');
+ *    err.message = 'Erro ao deletar o registro. '
+ *    throw err
  * })
  */
  Sf_Importa_Arquivo.prototype.DeleteLog = async (id_empresa, id_usuario) => {

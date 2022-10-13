@@ -70,7 +70,8 @@ Sf0460.prototype.selectByCodigo = async (ds_obs, id_empresa) => {
  * const data = await Sf0460.insert(dataSf0460).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
 Sf0460.prototype.insert = async (dataSf0460) => {

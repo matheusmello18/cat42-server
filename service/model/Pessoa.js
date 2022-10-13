@@ -53,7 +53,8 @@ const Oracle = require('../Oracle');
  * const data = await Pessoa.insert(dataAcC700Saida).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
 Pessoa.prototype.insert = async (dataPessoa) => {
@@ -111,7 +112,8 @@ var PessoaMestre = function(){
  * const data = await PessoaMestre.insert(dataPessoaMestre).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
 PessoaMestre.prototype.insert = async (dataPessoaMestre) => {

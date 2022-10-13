@@ -47,7 +47,8 @@ var AcC700Saida = function(){
 	* const data = await acC700Saida.insert(dataAcC700Saida).then((e) => {
 	*    return e;
 	* }).catch((err) => {
-	*    throw new Error('Erro ao inserir o registro AcC700 Saída');
+	*    err.message = 'Erro ao inserir o registro AcC700 Saída. '
+	*    throw err
 	* })
 	*/
  
@@ -84,7 +85,8 @@ var AcC700Saida = function(){
  * const data = await acC700Saida.delete(chaveC100Saida).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar registro no AcC700 Saida');
+ *    err.message = 'Erro ao deletar registro no AcC700 Saida. '
+ *    throw err
  * })
  */
 
@@ -148,7 +150,8 @@ var AcC700Entrada = function(){
  * const data = await acC700Entrada.insert(dataAcC700Entrada).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Falha ao inserir o registro C700 Entrada');
+ *    err.message = 'Falha ao inserir o registro C700 Entrada. '
+ *    throw err;
  * })
  */
 
@@ -186,7 +189,7 @@ AcC700Entrada.prototype.insert = async (dataAcC700Entrada) => {
  * const data = await acC700Entrada.delete(chaveC100Entrada).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar registro no AcC700 Entrada');
+ *    throw err err.message = 'Erro ao deletar registro no AcC700 Entrada');
  * })
  */
 

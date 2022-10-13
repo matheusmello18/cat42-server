@@ -43,7 +43,8 @@ ProdutoSimulador.prototype.BuscarPeloProdutosSimul = async (xmlObj, id_empresa, 
  * const data = await ProdutoSimulador.ComPendencia(1, 1).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
  ProdutoSimulador.prototype.ComPendencia = async (id_empresa, id_usuario) => {
@@ -89,7 +90,8 @@ ProdutoSimulador.prototype.BuscarPeloProdutosSimul = async (xmlObj, id_empresa, 
  * const data = await ProdutoSimulador.insert('1','descricao', 1, 1, '01/08/2019', '31/08/2019', 1, 1, 1, 'descricao').then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
 ProdutoSimulador.prototype.Insert = async (id_produto, cd_produto, ds_produto, ds_unidade_venda, cd_produto_forn, ds_unidade_forn, vl_fator_conversao, aliq_icms, vl_saldo_estoque_inicial, id_empresa, id_usuario) => {
@@ -130,7 +132,8 @@ ProdutoSimulador.prototype.Insert = async (id_produto, cd_produto, ds_produto, d
  * const data = await ProdutoSimulador.Delete('1','descricao', 1, 1, '01/08/2019', '31/08/2019', 1, 1, 1, 'descricao').then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
 ProdutoSimulador.prototype.Delete = async (id_empresa, id_usuario) => {
@@ -163,7 +166,8 @@ ProdutoSimulador.prototype.Delete = async (id_empresa, id_usuario) => {
  * const data = await ProdutoSimulador.selectByCodProdForn('00981', 1, 1).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
 ProdutoSimulador.prototype.selectByCodProdForn = async (cdProdForn, id_empresa, id_usuario) => {
@@ -202,7 +206,8 @@ ProdutoSimulador.prototype.selectByCodProdForn = async (cdProdForn, id_empresa, 
  * const data = await ProdutoSimulador.updateStatus(1, 3, 1, 1).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao alterar o registro.');
+ *    err.message = 'Erro ao alterar o registro. '
+ *    throw err
  * })
  */
 ProdutoSimulador.prototype.updateStatus = async (id_simul_tp_status, id_produto, id_empresa, id_usuario) => {

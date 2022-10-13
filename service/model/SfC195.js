@@ -46,7 +46,8 @@
  * const data = await SfC195Saida.insert(dataSfC195Saida).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
 
@@ -84,7 +85,8 @@ SfC195Saida.prototype.insert = async (dataSfC195Saida) => {
  * const data = await SfC195Saida.delete(chaveC100Saida).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar registro no SFC195');
+ *    err.message = 'Erro ao deletar registro no SFC195. '
+ *    throw err
  * })
  */
 
@@ -150,7 +152,8 @@ var SfC195Entrada = function(){
  * const data = await SfC195Entrada.insert(dataSfC195Entrada).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
 
@@ -160,7 +163,6 @@ SfC195Entrada.prototype.insert = async (dataSfC195Entrada) => {
 						values 
 						( :id_0460, :ds_complementar, :id_nota_fiscal_entrada, :serie_subserie_documento, :nr_documento, to_date(:dt_emissao_documento, 'dd/mm/yyyy'), :id_pessoa_remetente, :nr_sequencia, :nr_item, :id_empresa, :id_usuario, :id_modelo_documento)
 						`;
-	console.log(sql, dataSfC195Entrada);
 	try {
 		await Oracle.insert(sql, dataSfC195Entrada)
 	} catch (err) {
@@ -190,7 +192,8 @@ SfC195Entrada.prototype.insert = async (dataSfC195Entrada) => {
  * const data = await SfC195Entrada.delete(chaveC100Entrada).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar registro no SFC195');
+ *    err.message = 'Erro ao deletar registro no SFC195. '
+ *    throw err
  * })
  */
 
@@ -204,7 +207,6 @@ SfC195Entrada.prototype.delete = async (chaveC100Entrada) => {
     and id_modelo_documento  = :id_modelo_documento
     and id_empresa           = :id_empresa
   `;
-console.log(sql, chaveC100Entrada);
   try {
     return await Oracle.delete(sql, chaveC100Entrada);
   } catch (err) {

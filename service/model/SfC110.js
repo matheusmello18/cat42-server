@@ -46,7 +46,8 @@ var SfC110Saida = function(){
  * const data = await SfC110Saida.insert(paramSfC110Saida).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
 
@@ -87,7 +88,8 @@ SfC110Saida.prototype.insert = async (paramSfC110Saida) => {
  * const data = await SfC110Saida.delete(chaveC100Saida).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar o registro SFC195.');
+ *    err.message = 'Erro ao deletar o registro SFC195. '
+ *    throw err
  * })
  */
 
@@ -186,7 +188,8 @@ var SfC110Entrada = function() {
  * const data = await SfC110Entrada.insert(paramSfC110Entrada).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
  SfC110Entrada.prototype.insert = async (paramSfC110Entrada) => {
@@ -226,7 +229,8 @@ var SfC110Entrada = function() {
  * const data = await SfC110Entrada.delete(chaveC100Entrada).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar registro no SFC110 Entrada');
+ *    err.message = 'Erro ao deletar registro no SFC110 Entrada. '
+ *    throw err
  * })
  */
 

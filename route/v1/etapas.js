@@ -6,6 +6,7 @@ const router = express.Router();
 
 const model = require('../../service/model');
 const Importacoes = require('../../service/Importacoes');
+const Looger = require('../../utils/Logger');
 
 var storage = multer.diskStorage({
   // @ts-ignore
@@ -101,8 +102,9 @@ router.post("/upload", async (req, res) => {
         }        
         success = 'true';
       } catch (err) {
-        console.log(err);
-        await new model.EtapaStatus().insert(req.body.dt_periodo, 2, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, err.message, err.stack);  
+        Looger.gravar(err);
+        const code = err.code === undefined ? null : err.code;
+        await new model.EtapaStatus().insert(req.body.dt_periodo, 2, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, err.message, err.stack, code);  
         success = 'false';
       }
 

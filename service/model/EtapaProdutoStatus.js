@@ -34,7 +34,8 @@
  * const data = await EtapaProdutoStatus.insert(1, 1, 1, 1 , 'teste').then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir o registro.');
+ *    err.message = 'Erro ao inserir o registro. '
+ *    throw err
  * })
  */
 EtapaProdutoStatus.prototype.insert = async (id_produto, id_simul_etapa, id_empresa, id_usuario) => {
@@ -72,7 +73,8 @@ EtapaProdutoStatus.prototype.insert = async (id_produto, id_simul_etapa, id_empr
  * const data = await EtapaProdutoStatus.deleteAll(1, 1).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar o registro.');
+ *    err.message = 'Erro ao deletar o registro. '
+ *    throw err
  * })
  */
  EtapaProdutoStatus.prototype.deleteAll = async (id_empresa, id_usuario) => {

@@ -138,7 +138,8 @@ NotaFiscalSaidaProduto.prototype.insert = async (dataNotaFiscalSaidaProduto) => 
  * const rows = await nfeSaida.delete(chaveC100Saida).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar a nota fiscal de saída')
+ *    err.message = 'Erro ao deletar a nota fiscal de saída. '
+ *    throw err
  * })
  */
 NotaFiscalSaidaProduto.prototype.delete = async (chaveC100Saida) => {
@@ -228,7 +229,8 @@ module.exports.Saida = NotaFiscalSaidaProduto;
  * const rows = await nfeEntrada.insert(dataNotaFiscalEntradaProduto).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error('Erro ao inserir a nota fiscal de entrada')
+ *    err.message = 'Erro ao inserir a nota fiscal de entrada. '
+ *    throw err
  * })
  */
  NotaFiscalEntradaProduto.prototype.insert = async (dataNotaFiscalEntradaProduto) => {
@@ -264,7 +266,8 @@ module.exports.Saida = NotaFiscalSaidaProduto;
  * const rows = await nfeEntrada.delete(chaveC100Entrada).then((e) => {
  *    return e.rows;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar a nota fiscal de saída')
+ *    err.message = 'Erro ao deletar a nota fiscal de saída. '
+ *    throw err
  * })
  */
 NotaFiscalEntradaProduto.prototype.delete = async (chaveC100Entrada) => {

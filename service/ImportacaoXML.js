@@ -41,8 +41,10 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
         try {
            xml = fs.readFileSync(newPath+'\\'+file, {encoding:'utf8', flag:'r'})
         } catch (err) {
-          if (err.code === 'EISDIR')
-            throw new Error('O zip não pode conter pastas dentro dele, apenas os XML');
+          if (err.code === 'EISDIR'){
+            err.message = 'O zip não pode conter pastas dentro dele, apenas os XML. ' + err.message
+            throw err;
+          }
         }
 
         const parseStringAsync = new Promise((resolve, reject) => {
@@ -51,7 +53,7 @@ module.exports.XmlSaida = async (filename, path, id_simul_etapa, id_empresa, id_
     
         await parseStringAsync
         .catch(async (err) => {
-          //err.message = err.message + ' - Arquivo: ' + file
+          err.message = err.message + ' - Arquivo: ' + file
           throw err
         })
         .then(async (jsonXML) => {

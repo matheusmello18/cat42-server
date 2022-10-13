@@ -66,7 +66,8 @@
    * const data = await SfC850.insert(dataSfC850).then((e) => {
    *    return e;
    * }).catch((err) => {
-   *    throw new Error('Erro ao inserir o registro.');
+   *    err.message = 'Erro ao inserir o registro. '
+   *    throw err
    * })
    */
   

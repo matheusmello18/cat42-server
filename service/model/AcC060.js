@@ -50,7 +50,8 @@ var AcC060Entrada = function(){
 	* const rows = await acC060Entrada.insert(dataAcC060Entrada).then((e) => {
 	*    return e.rows;
 	* }).catch((err) => {
-	*    throw new Error('Erro ao inserir o registro ACC060 Entrada')
+	*    err.message = 'Erro ao inserir o registro ACC060 Entrada. '
+	*    throw err
 	* })
 	*/
  
@@ -88,7 +89,8 @@ AcC060Entrada.prototype.insert = async (dataAcC060Entrada) => {
  * const data = await acC060Entrada.delete(chaveC100Entrada).then((e) => {
  *    return e;
  * }).catch((err) => {
- *    throw new Error('Erro ao deletar registro no AcC060');
+ *    err.message = 'Erro ao deletar registro no AcC060 '
+ *    throw err
  * })
  */
 
