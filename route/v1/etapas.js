@@ -102,8 +102,13 @@ router.post("/upload", async (req, res) => {
         }        
         success = 'true';
       } catch (err) {
-        Looger.gravar(err);
-        const code = err.code === undefined ? null : err.code;
+        
+        let code 
+        if (err.code === undefined) 
+          code = (await Looger.banco(req.body,err))
+        else
+          code = err.code;
+
         await new model.EtapaStatus().insert(req.body.dt_periodo, 2, req.body.id_simul_etapa, req.body.id_empresa, req.body.id_usuario, err.message, err.stack, code);  
         success = 'false';
       }

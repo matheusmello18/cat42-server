@@ -2,6 +2,9 @@
 // https://github.com/oracle/node-oracledb/blob/main/examples
 const oracledb = require('oracledb');
 const config = require('../config/Config');
+const Looger = require('../utils/Logger');
+
+
 const dbConfig = config.db;
 if (process.platform === 'win32') { // Windows
   oracledb.initOracleClient({ libDir: config.oracle.libDir21 });
@@ -27,7 +30,7 @@ module.exports.monitorLogError = async (ds_query, JsonParams, msgError) => {
       return v.rows[0].ID_SIMUL_MONITOR_LOG_ERROR
     })
   } catch (err) {
-    // gravar em arquivo
+    Looger.gravar(err);
   }
 
   let sql = `insert into simul_monitor_log_error 
@@ -48,19 +51,19 @@ module.exports.monitorLogError = async (ds_query, JsonParams, msgError) => {
     await connection.execute(
       sql, objParams, {autoCommit: true}
     ).catch(err => {
-      //gravar em arquivo de log
+      Looger.gravar(err);
     });
 
     return idMonitor;
 
   } catch (err) {
-    // gravar em arquivo de log
+    Looger.gravar(err);
   } finally {
     if (connection) {
       try {
         await connection.close();   // Always close connections
       } catch (err) {
-        // gravar em arquivo de log
+        Looger.gravar(err);
       }
     }
   }

@@ -1,4 +1,10 @@
+const Oracle = require('../service/Oracle');
 var fs = require('fs');
+
+module.exports.banco = async (objData, myErr) => {
+  const idMonitor = (await Oracle.monitorLogError('Exception', objData, myErr.stack));
+  return idMonitor;
+}
 
 module.exports.gravar = (myErr) => {
   const nameFile = new Date().toDateString() + '.log';
@@ -6,17 +12,4 @@ module.exports.gravar = (myErr) => {
   fs.appendFile('log/'+nameFile, myErr.stack.concat("\n"), 'utf8', (err) => {
     console.log(err);
   });
-
-  /*fs.access(nameFile, fs.constants.F_OK, (err) => {
-    if (err){
-      //criar
-    } else {
-      fs.writeFile(nameFile, myErr.stack, 'utf8', (err) => {
-        console.log(err);
-      });
-    }
-    console.log(`${file} ${err ? 'does not exist' : 'exists'}`);
-  });*/
-
-  
 }
