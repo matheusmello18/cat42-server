@@ -3,5 +3,6 @@
 /.pnp
 .pnp.js
 /uploads
+/log
 layoutX.php
 layoutX.sql
